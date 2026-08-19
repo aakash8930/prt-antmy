@@ -1,34 +1,46 @@
+/* ---------------------------------------------------------------------- *
+ * Design tokens — "blueprint paper" system.
+ * Two neutrals do almost all the work; one reserved accent (--bp-redline)
+ * is used exclusively for annotation/redline moments, never decoratively.
+ * ---------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bp-paper: #eef1ef;
+  --bp-surface: #e4e9e6;
+  --bp-ink: #172227;
+  --bp-ink-dim: #4b5c61;
+  --bp-line: #3e5c67;
+  --bp-line-soft: rgba(62, 92, 103, 0.32);
+  --bp-grid: rgba(62, 92, 103, 0.12);
+  --bp-redline: #a8402a;
+  --bp-redline-soft: rgba(168, 64, 42, 0.14);
+
+  --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", "Cascadia Code",
+    Menlo, Consolas, monospace;
+  --font-body: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+  --background: var(--bp-paper);
+  --foreground: var(--bp-ink);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bp-paper: #0e171c;
+    --bp-surface: #152128;
+    --bp-ink: #dce6e8;
+    --bp-ink-dim: #8fa3a8;
+    --bp-line: #6fa0ac;
+    --bp-line-soft: rgba(111, 160, 172, 0.32);
+    --bp-grid: rgba(111, 160, 172, 0.1);
+    --bp-redline: #e2694a;
+    --bp-redline-soft: rgba(226, 105, 74, 0.16);
+
+    --background: var(--bp-paper);
+    --foreground: var(--bp-ink);
   }
-}
 
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  html {
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -37,13 +49,180 @@ body {
   margin: 0;
 }
 
+html {
+  height: 100%;
+}
+
+/*
+ * Deliberately no `overflow-x: hidden` here: per the CSS Overflow spec, an
+ * element with overflow-x set to anything but `visible` has its overflow-y
+ * computed as `auto` even if left unset, and that turns html/body into a
+ * scroll container that breaks `position: sticky` for every descendant —
+ * exactly what the Blueprint centerpiece's pinned viewport relies on.
+ */
+
+body {
+  min-height: 100%;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* ---------------------------------------------------------------------- *
+ * Site nav + sections — normal document flow, after the blueprint
+ * centerpiece's pinned/scrubbed hero has released. Kept in the same
+ * mono/technical language as the blueprint (no new visual system) but as
+ * plain HTML: always present, always real links, unaffected by the SVG
+ * animation's state.
+ * ---------------------------------------------------------------------- */
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bp-paper);
+  border-bottom: 1px solid var(--bp-line-soft);
+  font-family: var(--font-mono);
+}
+
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 4vw, 40px);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px clamp(16px, 3vw, 40px);
+}
+
+.site-nav-mark {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--bp-ink-dim);
+  flex-shrink: 0;
+}
+
+.site-nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(12px, 3vw, 28px);
+  list-style: none;
+}
+
+.site-nav-list a {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bp-ink);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+
+.site-nav-list a:hover {
+  border-bottom-color: var(--bp-redline);
+}
+
+.site-sections {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+
+.site-section {
+  padding: clamp(48px, 10vh, 96px) 0;
+  border-bottom: 1px solid var(--bp-line-soft);
+}
+.site-section:last-child {
+  border-bottom: none;
+}
+
+.site-section-heading {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bp-ink-dim);
+  margin-bottom: 20px;
+}
+
+.site-section-body {
+  max-width: 60ch;
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.6;
+}
+.site-section-body a {
+  border-bottom: 1px solid var(--bp-redline);
+}
+
+.site-tech-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+  max-width: 60ch;
+}
+.site-tech-row {
+  display: flex;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-top: 1px solid var(--bp-line-soft);
+  padding-top: 10px;
+}
+.site-tech-row dt {
+  flex: 0 0 140px;
+  color: var(--bp-ink-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.site-tech-row dd {
+  color: var(--bp-ink);
+}
+
+.site-project-list {
+  list-style: none;
+  display: grid;
+  gap: 28px;
+  margin-top: 8px;
+}
+.site-project-row {
+  border-top: 1px solid var(--bp-line-soft);
+  padding-top: 16px;
+}
+.site-project-name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  margin-right: 12px;
+}
+.site-project-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--bp-redline);
+}
+.site-project-desc {
+  margin-top: 6px;
+  max-width: 60ch;
+  color: var(--bp-ink-dim);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
