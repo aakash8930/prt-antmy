@@ -9,6 +9,10 @@ import {
   ENVELOPE_X,
   MASS_OUTLINE,
   MOBILE_VIEW_BOX,
+  MOBILE_PROOF_CARD_W,
+  MOBILE_PROOF_CENTER_X,
+  MOBILE_PROOF_GAP,
+  MOBILE_PROOF_TOP,
   FLOOR_PLAN_ZONES,
   FLOOR_PLAN_ZONES_MOBILE,
   PROJECT_COLUMN_GAP,
@@ -26,7 +30,9 @@ import { ConnectorArrow } from "./primitives/ConnectorArrow";
 import { DimensionLine } from "./primitives/DimensionLine";
 import { TechAnnotation } from "./primitives/TechAnnotation";
 import { EvidenceCallout } from "./primitives/EvidenceCallout";
+import { MobileEvidenceCallout } from "./primitives/MobileEvidenceCallout";
 import { ProjectColumnCard, projectCardHeight } from "./primitives/ProjectColumnCard";
+import { MobileProjectCard, mobileProjectCardHeight } from "./primitives/MobileProjectCard";
 import { FloorPlanZone } from "./primitives/FloorPlanZone";
 import { DataPlateContent } from "./plates/DataPlateContent";
 import { BackendPlateContent } from "./plates/BackendPlateContent";
@@ -41,8 +47,11 @@ type Props = {
   registerNode: RegisterNode;
   isMobileLayout: boolean;
   navActive: boolean;
-  /** Mobile only — see BlueprintCenterpiece's MOBILE_WIDE_VIEWBOX_PERCENT. */
-  mobileWideViewBox: boolean;
+  /** BlueprintCenterpiece drives the mobile 0-100% viewBox imperatively
+   * (see its mobileViewBoxString) so scrubbing doesn't cost a React
+   * re-render; this ref only needs to exist for that write target — the
+   * JSX `viewBox` below is just this element's initial value. */
+  svgRef?: (el: SVGSVGElement | null) => void;
 };
 
 const ZONE_GROUP_ID: Record<string, NodeId> = {
@@ -130,6 +139,20 @@ const PROJECT_COLUMN_LAYOUT = (() => {
   });
 })();
 
+/** Mobile PROOF's vertical sequence — same cumulative-height idea as
+ * PROJECT_COLUMN_LAYOUT above (no card's description can ever overflow
+ * into the one below it), stacked below the architecture instead of beside
+ * it. See geometry.MOBILE_PROOF_TOP/CARD_W. */
+const MOBILE_PROOF_COLUMN_LAYOUT = (() => {
+  let cursorY = MOBILE_PROOF_TOP;
+  return EVIDENCE_PROJECTS.map((project) => {
+    const y = cursorY;
+    cursorY += mobileProjectCardHeight(project) + MOBILE_PROOF_GAP;
+    return y;
+  });
+})();
+const MOBILE_PROOF_CARD_X = MOBILE_PROOF_CENTER_X - MOBILE_PROOF_CARD_W / 2;
+
 const CX = ENVELOPE_X + ENVELOPE_W / 2;
 const CY = ENVELOPE_TOP_Y + ENVELOPE_H / 2;
 const DIVIDER_X1 = ENVELOPE_X;
@@ -156,9 +179,11 @@ const MASS_INSET = insetRect(
 function PlateOverlay({
   plateId,
   registerNode,
+  isMobileLayout,
 }: {
   plateId: PlateId;
   registerNode: RegisterNode;
+  isMobileLayout: boolean;
 }) {
   const top = BAND_TOP[plateId];
   const tech = TECH_STACK[plateId];
@@ -191,7 +216,18 @@ function PlateOverlay({
         groupRef={(el) => registerNode(TECH_ANNOTATION_ID[plateId], el)}
         valueRef={(el) => registerNode(TECH_VALUE_ID[plateId], el)}
       />
-      {project && (
+      {project && isMobileLayout && (
+        <MobileEvidenceCallout
+          anchorX={ENVELOPE_X + ENVELOPE_W / 2}
+          anchorY={top + BAND_H}
+          detailLabel={`DETAIL ${String.fromCharCode(65 + evidenceIndex)}`}
+          project={project}
+          leaderRef={(el) => registerNode(EVIDENCE_LEADER_ID[evidenceIndex], el)}
+          markerRef={(el) => registerNode(EVIDENCE_MARKER_ID[evidenceIndex], el)}
+          cardRef={(el) => registerNode(EVIDENCE_COMPACT_ID[evidenceIndex], el)}
+        />
+      )}
+      {project && !isMobileLayout && (
         <EvidenceCallout
           anchorX={ENVELOPE_X}
           anchorY={top + BAND_H / 2}
@@ -217,15 +253,19 @@ export function BlueprintScene({
   registerNode,
   isMobileLayout,
   navActive,
-  mobileWideViewBox,
+  svgRef,
 }: Props) {
   const zones = isMobileLayout ? FLOOR_PLAN_ZONES_MOBILE : FLOOR_PLAN_ZONES;
-  const viewBox =
-    isMobileLayout && !mobileWideViewBox
-      ? `${MOBILE_VIEW_BOX.x} ${MOBILE_VIEW_BOX.y} ${MOBILE_VIEW_BOX.width} ${MOBILE_VIEW_BOX.height}`
-      : `0 0 ${VIEW_W} ${VIEW_H}`;
+  // Initial value only — desktop's is never touched again after this render
+  // (guaranteeing byte-identical desktop output); mobile's is immediately
+  // overwritten imperatively by BlueprintCenterpiece once the timeline
+  // effect runs, then kept current on every scroll frame. See svgRef's doc.
+  const viewBox = isMobileLayout
+    ? `${MOBILE_VIEW_BOX.x} ${MOBILE_VIEW_BOX.y} ${MOBILE_VIEW_BOX.width} ${MOBILE_VIEW_BOX.height}`
+    : `0 0 ${VIEW_W} ${VIEW_H}`;
   return (
     <svg
+      ref={svgRef}
       viewBox={viewBox}
       className="bp-svg"
       role="img"
@@ -362,7 +402,7 @@ export function BlueprintScene({
           contentRef={(el) => registerNode("dataContent", el)}
           leaderRef={(el) => registerNode("dataLeader", el)}
         />
-        <PlateOverlay plateId="data" registerNode={registerNode} />
+        <PlateOverlay plateId="data" registerNode={registerNode} isMobileLayout={isMobileLayout} />
       </g>
 
       <g className="bp-data-dim-group">
@@ -467,7 +507,7 @@ export function BlueprintScene({
             contentRef={(el) => registerNode("plateInfraContent", el)}
             leaderRef={(el) => registerNode("plateInfraLeader", el)}
           />
-          <PlateOverlay plateId="infra" registerNode={registerNode} />
+          <PlateOverlay plateId="infra" registerNode={registerNode} isMobileLayout={isMobileLayout} />
         </g>
         <g ref={(el) => registerNode("plateFrontendWrapper", el)} className="bp-plate-wrapper">
           <FrontendPlateContent
@@ -477,7 +517,7 @@ export function BlueprintScene({
             contentRef={(el) => registerNode("plateFrontendContent", el)}
             leaderRef={(el) => registerNode("plateFrontendLeader", el)}
           />
-          <PlateOverlay plateId="frontend" registerNode={registerNode} />
+          <PlateOverlay plateId="frontend" registerNode={registerNode} isMobileLayout={isMobileLayout} />
         </g>
         <g ref={(el) => registerNode("plateApisWrapper", el)} className="bp-plate-wrapper">
           <ApisPlateContent
@@ -487,7 +527,7 @@ export function BlueprintScene({
             contentRef={(el) => registerNode("plateApisContent", el)}
             leaderRef={(el) => registerNode("plateApisLeader", el)}
           />
-          <PlateOverlay plateId="apis" registerNode={registerNode} />
+          <PlateOverlay plateId="apis" registerNode={registerNode} isMobileLayout={isMobileLayout} />
         </g>
         <g ref={(el) => registerNode("plateBackendWrapper", el)} className="bp-plate-wrapper">
           <BackendPlateContent
@@ -497,24 +537,42 @@ export function BlueprintScene({
             contentRef={(el) => registerNode("plateBackendContent", el)}
             leaderRef={(el) => registerNode("plateBackendLeader", el)}
           />
-          <PlateOverlay plateId="backend" registerNode={registerNode} />
+          <PlateOverlay plateId="backend" registerNode={registerNode} isMobileLayout={isMobileLayout} />
         </g>
       </g>
       </g>
 
-      {/* ---- stage 7 : PROOF (60-70%), the readable half. Fixed in the
-           report column — deliberately NOT inside blueprintRoot, so it
-           stays full-size and legible while the drawing shrinks to make
-           room for it. ---- */}
-      {EVIDENCE_PROJECTS.map((project, i) => (
-        <ProjectColumnCard
-          key={project.id}
-          x={PROJECT_COLUMN_X}
-          y={PROJECT_COLUMN_LAYOUT[i]}
-          project={project}
-          groupRef={(el) => registerNode(EVIDENCE_FULL_ID[i], el)}
-        />
-      ))}
+      {/* ---- stage 7 : PROOF (60-70%). Desktop: fixed in the report column
+           — deliberately NOT inside blueprintRoot, so it stays full-size
+           and legible while the drawing shrinks to make room for it.
+           Mobile: a vertical sequence below the architecture instead (see
+           geometry.MOBILE_PROOF_*) — there is no room for a side column on
+           a narrow screen, and blueprintRoot doesn't shift/shrink for
+           mobile in the first place (addProofRootShift's translateX/scale
+           read the same on both layouts; mobile's camera move happens in
+           the viewBox instead, see BlueprintCenterpiece). Both branches
+           register the SAME EVIDENCE_FULL_ID nodes, so the opacity/
+           translateY chain addEvidenceProofStage already drives needs no
+           changes for either layout. ---- */}
+      {isMobileLayout
+        ? EVIDENCE_PROJECTS.map((project, i) => (
+            <MobileProjectCard
+              key={project.id}
+              x={MOBILE_PROOF_CARD_X}
+              y={MOBILE_PROOF_COLUMN_LAYOUT[i]}
+              project={project}
+              groupRef={(el) => registerNode(EVIDENCE_FULL_ID[i], el)}
+            />
+          ))
+        : EVIDENCE_PROJECTS.map((project, i) => (
+            <ProjectColumnCard
+              key={project.id}
+              x={PROJECT_COLUMN_X}
+              y={PROJECT_COLUMN_LAYOUT[i]}
+              project={project}
+              groupRef={(el) => registerNode(EVIDENCE_FULL_ID[i], el)}
+            />
+          ))}
 
       {/* ---- stage 10 : FLOOR PLAN (90-100%). The site's navigation, drawn
            as six rooms on a technical plan. A top-level sibling of

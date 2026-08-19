@@ -165,6 +165,141 @@ export const PROJECT_CARD_W = 220;
 export const TRACE_OPACITY = 0.28;
 
 /**
+ * Mobile-only geometry for stages 5-7 (40-70%), INSPECTION -> EVIDENCE ->
+ * PROOF. The desktop composition for this window (fixed right-side project
+ * column, left-anchored evidence callouts) is a "cramped scaled desktop
+ * layout" on a narrow screen — this section gives mobile its OWN spatial
+ * targets for the SAME semantic stages, per the resolver model: global
+ * progress -> desktop/mobile geometry resolver -> same stage -> different
+ * spatial target. None of this changes desktop geometry, timing, or the
+ * animated properties buildTimelines.ts drives (still just opacity/draw/
+ * translateY) — only WHERE on mobile those properties are applied to.
+ */
+
+/** Must match BlueprintCenterpiece's spreadScaleForWidth() mobile value. */
+export const MOBILE_SPREAD_SCALE = 0.4;
+
+function mobilePlateTopAbs(id: PlateId): number {
+  if (id === "data") return BAND_TOP.data + DATA_DROP * MOBILE_SPREAD_SCALE;
+  const offset =
+    -MASS_LIFT * MOBILE_SPREAD_SCALE + INNER_PLATE_LOCAL_Y[id] * MOBILE_SPREAD_SCALE;
+  return BAND_TOP[id] + offset;
+}
+
+/** Each plate's mobile-resting vertical center once EXPOSE has finished
+ * (40% onward, unchanged through RECONCILE at 70%) — the same positions
+ * addExposeStage's wrapper animation already produces for spreadScale 0.4,
+ * just read back out in absolute coordinates so a tracking viewBox can pan
+ * to them without touching that animation. */
+export const MOBILE_PLATE_CENTER_Y: Record<PlateId, number> = PLATE_ORDER.reduce(
+  (acc, id) => {
+    acc[id] = mobilePlateTopAbs(id) + BAND_H / 2;
+    return acc;
+  },
+  {} as Record<PlateId, number>,
+);
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+/** Holds at `values[i]` once past `starts[i] + swing`; swings linearly from
+ * `values[i-1]` during the first `swing` points of each window. Produces a
+ * "settle on one thing, then move" camera instead of continuous drifting. */
+function lerpSteps(percent: number, starts: number[], values: number[], swing: number): number {
+  let idx = 0;
+  for (let i = 0; i < starts.length; i++) {
+    if (percent >= starts[i]) idx = i;
+  }
+  if (idx === 0 || percent >= starts[idx] + swing) return values[idx];
+  const t = (percent - starts[idx]) / swing;
+  return lerp(values[idx - 1], values[idx], t);
+}
+
+export type MobileFocusBox = { x: number; y: number; width: number; height: number };
+
+const MOBILE_CX = ENVELOPE_X + ENVELOPE_W / 2;
+// bp-stage-frame is a tall 3:4 box below 640px (see blueprint.css) — a wide
+// crop (like the plate's own ~6:1 native proportions) letterboxes badly
+// inside it (most of the tall frame goes unused). These are picked close to
+// that 3:4 ratio instead, so the active plate actually fills the portrait
+// frame rather than floating in a thin horizontal strip of it.
+const INSPECT_CROP = { width: 520, height: 580 };
+const EVIDENCE_CROP = { width: 560, height: 660 };
+/** PROOF's crop is fixed (not tracking): the envelope settles into the
+ * upper portion, the vertical project sequence (MOBILE_PROOF_*) occupies
+ * the room below it in the SAME crop, per the "blueprint remains visually
+ * present as context" requirement. */
+const PROOF_CROP: MobileFocusBox = { x: 190, y: 100, width: 780, height: 950 };
+
+// Inspection: same 5-plate order INSPECT_ORDER establishes in
+// buildTimelines.ts, split into equal windows across the stage's own
+// [40,50] label boundary (constants/stages.ts STAGE_BOUNDS.inspect) rather
+// than converting that file's internal ms offsets to percent — the ms
+// scale (PHASE_MS = 111.5ms/point) is only exactly linear against
+// scroll-percent up to TIMELINE_END; once RECONCILE/WHOLE_AGAIN/FLOOR_PLAN
+// extend tl.duration past that (their own pacing is explicitly documented
+// as "not hand-calibrated" there), percent = ms/tl.duration*100 drifts from
+// that assumption — verified empirically (a hand-converted ms breakpoint
+// landed the camera ~4 points early against the real reveal). Equal
+// division against the label boundary is what the on-screen stage caption
+// itself is keyed to, so it's the more honest sync target.
+const INSPECT_PLATES: PlateId[] = ["data", "backend", "apis", "frontend", "infra"];
+const INSPECT_STARTS = [40, 42, 44, 46, 48];
+const INSPECT_SWING = 0.8;
+
+// Evidence: same project order addEvidenceProofStage uses — backend
+// (CraveCart) -> frontend (GENKO) -> data (QuantX) — equal windows across
+// [50,60] for the same reason as INSPECT_STARTS above.
+const EVIDENCE_PLATES: PlateId[] = ["backend", "frontend", "data"];
+const EVIDENCE_STARTS = [50, 53.33, 56.67];
+const EVIDENCE_SWING = 1.2;
+/** Bias the evidence camera below the plate's own center so the leader +
+ * card emerging beneath it stay in frame, not just the plate itself. */
+const EVIDENCE_Y_BIAS = 70;
+
+/**
+ * Mobile-only continuous camera for the 40-70% window. Stages 0-40 and
+ * 70-100 keep their existing static crops (MOBILE_VIEW_BOX, then the full
+ * canvas) — this is only ever consulted for percent in [40, 70).
+ */
+export function mobileFocusViewBox(percent: number): MobileFocusBox {
+  if (percent < 50) {
+    const values = INSPECT_PLATES.map((p) => MOBILE_PLATE_CENTER_Y[p]);
+    const cy = lerpSteps(percent, INSPECT_STARTS, values, INSPECT_SWING);
+    return {
+      x: MOBILE_CX - INSPECT_CROP.width / 2,
+      y: cy - INSPECT_CROP.height / 2,
+      width: INSPECT_CROP.width,
+      height: INSPECT_CROP.height,
+    };
+  }
+  if (percent < 60) {
+    const values = EVIDENCE_PLATES.map((p) => MOBILE_PLATE_CENTER_Y[p] + EVIDENCE_Y_BIAS);
+    const cy = lerpSteps(percent, EVIDENCE_STARTS, values, EVIDENCE_SWING);
+    return {
+      x: MOBILE_CX - EVIDENCE_CROP.width / 2,
+      y: cy - EVIDENCE_CROP.height / 2,
+      width: EVIDENCE_CROP.width,
+      height: EVIDENCE_CROP.height,
+    };
+  }
+  return PROOF_CROP;
+}
+
+/**
+ * Mobile PROOF (60-70%) project sequence — a vertical stack below the
+ * envelope within the SAME crop as the architecture (PROOF_CROP above), not
+ * a fixed right column. Width fits the crop with comfortable margins;
+ * MOBILE_PROOF_TOP sits just below the mobile-resting envelope's bottom
+ * edge (data plate bottom ~= 468 + 64 = 532).
+ */
+export const MOBILE_PROOF_CARD_W = 480;
+export const MOBILE_PROOF_TOP = 570;
+export const MOBILE_PROOF_GAP = 26;
+export const MOBILE_PROOF_CENTER_X = MOBILE_CX;
+
+/**
  * Stage 10 (FLOOR PLAN, 88-100%) — the site's navigation, drawn as six
  * rooms on a technical plan rather than a nav bar. Same footprint as the
  * envelope (ENVELOPE_X..+ENVELOPE_W) so the plan reads as having grown out

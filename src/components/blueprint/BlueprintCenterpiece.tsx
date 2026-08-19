@@ -13,6 +13,7 @@ import { useScrollProgress } from "./hooks/useScrollProgress";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useIsMobileViewport } from "./hooks/useIsMobileViewport";
 import { currentStage, STAGE_LABEL, type StageName } from "./constants/stages";
+import { MOBILE_VIEW_BOX, VIEW_H, VIEW_W, mobileFocusViewBox } from "./constants/geometry";
 
 /**
  * Scroll runway for the complete 0-100% experience. Stages 1-4 set the pace
@@ -26,11 +27,32 @@ const PROGRESS_MAX_PERCENT = 100;
 /** Stage 10 — from here the floor-plan zones read as live navigation, not
  * just architecture (see BlueprintScene's nav-active affordance). */
 const NAV_ACTIVE_PERCENT = 96;
-/** Mobile only — below this percent the tighter DRAW..INSPECT crop applies
- * (see geometry.MOBILE_VIEW_BOX); at and above it, EVIDENCE's fixed project
- * column and the floor plan's fuller vertical extent need the whole
- * viewBox, so the crop releases back to it. */
-const MOBILE_WIDE_VIEWBOX_PERCENT = 50;
+
+const MOBILE_FULL_VIEW_BOX = `0 0 ${VIEW_W} ${VIEW_H}`;
+const MOBILE_TIGHT_VIEW_BOX = `${MOBILE_VIEW_BOX.x} ${MOBILE_VIEW_BOX.y} ${MOBILE_VIEW_BOX.width} ${MOBILE_VIEW_BOX.height}`;
+
+/**
+ * Mobile's viewBox for the whole 0-100% journey, as a pure function of
+ * scroll percent — computed here (not React state) and written straight
+ * onto the <svg> element via svgRef so scrubbing never costs a re-render,
+ * the same reasoning progressLabelRef's imperative textContent write
+ * already uses. Only ever called when isMobileLayout is true; desktop's
+ * viewBox is the static JSX value in BlueprintScene and this function is
+ * never consulted for it.
+ *   0-40   : the existing tight DRAW..EXPOSE crop (unchanged).
+ *   40-70  : INSPECTION/EVIDENCE/PROOF's own tracking camera — see
+ *            geometry.mobileFocusViewBox for what it follows and why.
+ *   70-100 : the full canvas, same as before (RECONCILE's reassembly and
+ *            the floor plan's fuller vertical extent need it).
+ */
+function mobileViewBoxString(percent: number): string {
+  if (percent < 40) return MOBILE_TIGHT_VIEW_BOX;
+  if (percent < 70) {
+    const box = mobileFocusViewBox(percent);
+    return `${box.x} ${box.y} ${box.width} ${box.height}`;
+  }
+  return MOBILE_FULL_VIEW_BOX;
+}
 
 /**
  * How far the plates travel when they separate, as a fraction of the
@@ -51,6 +73,7 @@ export function BlueprintCenterpiece() {
   const registryRef = useRef<NodeRegistry>({});
   const timelineRef = useRef<Timeline | null>(null);
   const progressLabelRef = useRef<HTMLSpanElement>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const lastStageRef = useRef<StageName | null>(null);
   const lastNavActiveRef = useRef(false);
 
@@ -61,8 +84,6 @@ export function BlueprintCenterpiece() {
   // above), not accumulated state, so it's exact regardless of how the
   // visitor's scroll position arrived here.
   const [navActive, setNavActive] = useState(false);
-  const [mobileWideViewBox, setMobileWideViewBox] = useState(false);
-  const lastMobileWideRef = useRef(false);
   const isMobileLayout = useIsMobileViewport();
 
   const registerNode = useCallback((id: NodeId, el: SVGElement | null) => {
@@ -77,6 +98,14 @@ export function BlueprintCenterpiece() {
 
     if (prefersReducedMotion) {
       applyProgress(timeline, 1); // static, fully-resolved floor-plan fallback
+      if (isMobileLayout && svgRef.current) {
+        svgRef.current.setAttribute("viewBox", MOBILE_FULL_VIEW_BOX);
+      }
+    } else if (isMobileLayout && svgRef.current) {
+      // percent = 0 default — handleProgress takes over from the first
+      // scroll frame onward, but nothing fires one before the visitor
+      // actually scrolls.
+      svgRef.current.setAttribute("viewBox", mobileViewBoxString(0));
     }
 
     return () => {
@@ -85,37 +114,41 @@ export function BlueprintCenterpiece() {
     };
   }, [prefersReducedMotion, isMobileLayout]);
 
-  const handleProgress = useCallback((progress: number) => {
-    const timeline = timelineRef.current;
-    if (!timeline) return;
+  const handleProgress = useCallback(
+    (progress: number) => {
+      const timeline = timelineRef.current;
+      if (!timeline) return;
 
-    applyProgress(timeline, progress);
-    const percent = progress * PROGRESS_MAX_PERCENT;
+      applyProgress(timeline, progress);
+      const percent = progress * PROGRESS_MAX_PERCENT;
 
-    if (progressLabelRef.current) {
-      progressLabelRef.current.textContent = `${Math.round(percent)
-        .toString()
-        .padStart(2, "0")}%`;
-    }
+      if (progressLabelRef.current) {
+        progressLabelRef.current.textContent = `${Math.round(percent)
+          .toString()
+          .padStart(2, "0")}%`;
+      }
 
-    const stage = currentStage(percent);
-    if (stage !== lastStageRef.current) {
-      lastStageRef.current = stage;
-      setStageLabel(STAGE_LABEL[stage]);
-    }
+      const stage = currentStage(percent);
+      if (stage !== lastStageRef.current) {
+        lastStageRef.current = stage;
+        setStageLabel(STAGE_LABEL[stage]);
+      }
 
-    const navActiveNow = percent >= NAV_ACTIVE_PERCENT;
-    if (navActiveNow !== lastNavActiveRef.current) {
-      lastNavActiveRef.current = navActiveNow;
-      setNavActive(navActiveNow);
-    }
+      const navActiveNow = percent >= NAV_ACTIVE_PERCENT;
+      if (navActiveNow !== lastNavActiveRef.current) {
+        lastNavActiveRef.current = navActiveNow;
+        setNavActive(navActiveNow);
+      }
 
-    const wideNow = percent >= MOBILE_WIDE_VIEWBOX_PERCENT;
-    if (wideNow !== lastMobileWideRef.current) {
-      lastMobileWideRef.current = wideNow;
-      setMobileWideViewBox(wideNow);
-    }
-  }, []);
+      // Desktop's viewBox is never touched here — see mobileViewBoxString's
+      // doc — so this guard is what keeps desktop's <svg> attribute
+      // permanently byte-identical to its static JSX value.
+      if (isMobileLayout && svgRef.current) {
+        svgRef.current.setAttribute("viewBox", mobileViewBoxString(percent));
+      }
+    },
+    [isMobileLayout],
+  );
 
   useScrollProgress({
     containerRef,
@@ -145,7 +178,9 @@ export function BlueprintCenterpiece() {
             registerNode={registerNode}
             isMobileLayout={isMobileLayout}
             navActive={navActive || prefersReducedMotion}
-            mobileWideViewBox={mobileWideViewBox || prefersReducedMotion}
+            svgRef={(el) => {
+              svgRef.current = el;
+            }}
           />
         </div>
 

@@ -355,6 +355,23 @@
   stroke: none;
 }
 
+/* mobile-only EVIDENCE callout (MobileEvidenceCallout) — bigger type than
+   the desktop compact card above, sized for the mobile focus viewBox's
+   tighter zoom rather than a shrunk copy of the desktop values. */
+.bp-evidence-compact-name-mobile {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  fill: var(--bp-ink);
+  stroke: none;
+}
+.bp-evidence-compact-category-mobile {
+  font-size: 10.5px;
+  fill: var(--bp-ink-dim);
+  letter-spacing: 0.02em;
+  stroke: none;
+}
+
 /* stage 7 — PROOF (60-70%): the fixed, readable project column */
 
 .bp-project-card {
@@ -406,6 +423,45 @@
 }
 .bp-project-tech {
   font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  fill: var(--bp-ink-dim);
+  text-transform: uppercase;
+  stroke: none;
+}
+
+/* mobile-only PROOF card (MobileProjectCard) — deliberately bigger type
+   than the desktop equivalents above, not a shrunk copy: sized for the
+   mobile focus viewBox's zoom level so nothing reads as tiny. */
+.bp-project-name-mobile {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  fill: var(--bp-ink);
+  stroke: none;
+}
+.bp-project-category-mobile {
+  font-size: 12px;
+  fill: var(--bp-ink-dim);
+  letter-spacing: 0.02em;
+  stroke: none;
+}
+.bp-project-desc-mobile {
+  font-size: 12px;
+  fill: var(--bp-ink);
+  opacity: 0.85;
+  stroke: none;
+}
+.bp-project-arch-mobile {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  fill: var(--bp-redline);
+  text-transform: uppercase;
+  stroke: none;
+}
+.bp-project-tech-mobile {
+  font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.03em;
   fill: var(--bp-ink-dim);
@@ -594,6 +650,17 @@
   .bp-registration,
   .bp-metadata,
   .bp-dim-decor {
+    display: none;
+  }
+
+  /* Mobile INSPECTION (40-50%): the active plate's own label/diagram stays
+     (they're what "the diagram becomes clearer" refers to) but the
+     right-side tech-stack annotation is exactly the kind of secondary
+     metadata the brief says can disappear on a narrow screen — desktop's
+     right-margin position for it doesn't exist in the mobile focus crop
+     anyway. Purely cosmetic (display:none) — the opacity animation driving
+     it in buildTimelines.ts still runs harmlessly underneath. */
+  .bp-tech-annotation {
     display: none;
   }
 }
