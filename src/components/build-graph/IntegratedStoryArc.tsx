@@ -30,6 +30,9 @@ const INTEGRATED_IDS: IntegratedChapterId[] = [
   "client-work",
   "rebuilding-model",
   "building-genko",
+  "ai-engineering",
+  "quantx-experiment",
+  "how-i-build-now",
 ];
 
 function isIntegratedId(value: string): value is IntegratedChapterId {

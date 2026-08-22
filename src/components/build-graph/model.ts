@@ -19,6 +19,20 @@ export type BuildGraphState =
   | "genko-loop"
   | "genko-ai-product"
   | "genko-capability"
+  | "ai-workbench"
+  | "ai-proposals"
+  | "ai-evaluation"
+  | "ai-workflow"
+  | "ai-capability"
+  | "quantx-problem"
+  | "market-pipeline"
+  | "model-branching"
+  | "decision-gates"
+  | "quantx-capability"
+  | "accumulated-system"
+  | "capability-provenance"
+  | "open-frontier"
+  | "contact-handoff"
   | "spotify-limited"
   | "inherited-rebuild"
   | "capability-compression";
@@ -114,7 +128,39 @@ export type GraphNodeId =
   | "ai-product"
   | "continue"
   | "product-research"
-  | "ai-product-development";
+  | "ai-product-development"
+  | "documentation"
+  | "repository"
+  | "running-system"
+  | "compare-approaches"
+  | "inspect"
+  | "debug"
+  | "ai-engineering-capability"
+  | "market-information"
+  | "analysis"
+  | "features"
+  | "model"
+  | "xgboost"
+  | "lstm"
+  | "experimental-model"
+  | "risk"
+  | "execution"
+  | "outcome"
+  | "no-action"
+  | "insufficient-confidence"
+  | "risk-rejected"
+  | "unresolved"
+  | "early-work"
+  | "duforge-work"
+  | "workflow-provenance"
+  | "learning-frontier"
+  | "development-frontier"
+  | "next-experiment"
+  | "unknown-yet"
+  | "build-further"
+  | "open-connection"
+  | "email-contact"
+  | "github-contact";
 
 export type GraphNode = {
   id: GraphNodeId;
@@ -1412,6 +1458,749 @@ const inheritedRebuild: StateResolver = (viewport) => {
   };
 };
 
+const aiWorkbench: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "ai-workbench",
+    index: "07A",
+    name: "AI moves from product to workbench",
+    shortName: "AI boundary",
+    thesis: "A product feature becomes one input to engineering work",
+    description:
+      "GENKŌ's AI interaction detaches from the learning topology and enters the workbench beside product research. It does not become the engineer.",
+    annotation: "AI: PRODUCT FEATURE → ENGINEERING INPUT",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 980 : undefined,
+    nodes: mobile
+      ? [
+          node("genko-project", "GENKŌ", "evidence", 195, 110, { emphasis: "branch" }),
+          node("ai-product", "AI interaction", "external", 195, 290, { emphasis: "external", width: 180, detail: "product feature" }),
+          node("product-research", "Product research", "outcome", 195, 485, { emphasis: "branch", width: 195 }),
+          node("workbench", "Engineering workbench", "service", 195, 700, { emphasis: "primary", width: 230 }),
+          node("decision", "Engineering judgment", "decision", 195, 875, { emphasis: "primary", width: 220 }),
+        ]
+      : [
+          node("genko-project", "GENKŌ", "evidence", 135, 350, { emphasis: "branch" }),
+          node("ai-product", "AI interaction", "external", 365, 350, { emphasis: "external", width: 180, detail: "product feature" }),
+          node("product-research", "Product research", "outcome", 590, 190, { emphasis: "branch", width: 195 }),
+          node("workbench", "Engineering workbench", "service", 770, 350, { emphasis: "primary", width: 230 }),
+          node("decision", "Engineering judgment", "decision", 1050, 350, { emphasis: "primary", width: 220 }),
+        ],
+    edges: [
+      { id: "ai-boundary-genko", from: "genko-project", to: "ai-product", kind: "transition" },
+      { id: "ai-boundary-product", from: "ai-product", to: "workbench", kind: "transition" },
+      { id: "ai-boundary-research", from: "product-research", to: "workbench", kind: "branch" },
+      { id: "ai-boundary-judgment", from: "workbench", to: "decision", kind: "primary" },
+    ],
+    events: [{ id: "ai-detaches", from: "ai-product", to: "workbench" }],
+    callouts: [
+      { id: "ai-not-engineer", text: "INPUT ≠ ENGINEER", x: mobile ? 195 : 1090, y: mobile ? 935 : 640, tone: "redline" },
+    ],
+  };
+};
+
+const aiProposals: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "ai-proposals",
+    index: "07B",
+    name: "Multiple proposal inputs",
+    shortName: "Proposals",
+    thesis: "AI is one source among documentation, repository, and the running system",
+    description:
+      "Research opens several proposal sources. None bypasses the workbench or enters the system directly.",
+    annotation: "POSSIBILITIES ENTER THE WORKBENCH",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1120 : undefined,
+    groups: mobile
+      ? [{ id: "proposal-inputs", label: "PROPOSAL INPUTS", x: 22, y: 255, width: 346, height: 475, tone: "frontend" }]
+      : [{ id: "proposal-inputs", label: "PROPOSAL INPUTS", x: 315, y: 80, width: 550, height: 535, tone: "frontend" }],
+    nodes: mobile
+      ? [
+          node("problem", "Problem", "idea", 195, 90),
+          node("research", "Research", "evidence", 195, 210, { emphasis: "primary" }),
+          node("ai-product", "AI systems", "external", 100, 355, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 290, 355, { width: 150 }),
+          node("repository", "Repository", "evidence", 100, 525),
+          node("running-system", "Running system", "evidence", 290, 525, { width: 160 }),
+          node("compare-approaches", "Compare approaches", "diagnosis", 195, 665, { emphasis: "primary", width: 210 }),
+          node("workbench", "Engineering workbench", "service", 195, 850, { emphasis: "primary", width: 230 }),
+          node("decision", "Engineering decision", "decision", 195, 1010, { emphasis: "branch", width: 220 }),
+        ]
+      : [
+          node("problem", "Problem", "idea", 95, 350),
+          node("research", "Research", "evidence", 250, 350, { emphasis: "primary" }),
+          node("ai-product", "AI systems", "external", 420, 180, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 650, 180, { width: 150 }),
+          node("repository", "Repository", "evidence", 420, 500),
+          node("running-system", "Running system", "evidence", 650, 500, { width: 160 }),
+          node("compare-approaches", "Compare approaches", "diagnosis", 790, 350, { emphasis: "primary", width: 210 }),
+          node("workbench", "Workbench", "service", 990, 230, { emphasis: "primary" }),
+          node("decision", "Engineering decision", "decision", 1045, 470, { emphasis: "branch", width: 220 }),
+        ],
+    edges: [
+      { id: "proposal-problem-research", from: "problem", to: "research", kind: "primary" },
+      { id: "proposal-research-ai", from: "research", to: "ai-product", kind: "branch" },
+      { id: "proposal-research-docs", from: "research", to: "documentation", kind: "branch" },
+      { id: "proposal-research-repo", from: "research", to: "repository", kind: "branch" },
+      { id: "proposal-research-running", from: "research", to: "running-system", kind: "branch" },
+      { id: "proposal-ai-compare", from: "ai-product", to: "compare-approaches", kind: "branch" },
+      { id: "proposal-docs-compare", from: "documentation", to: "compare-approaches", kind: "branch" },
+      { id: "proposal-repo-compare", from: "repository", to: "compare-approaches", kind: "branch" },
+      { id: "proposal-running-compare", from: "running-system", to: "compare-approaches", kind: "branch" },
+      { id: "proposal-compare-workbench", from: "compare-approaches", to: "workbench", kind: "primary" },
+      { id: "proposal-workbench-decision", from: "workbench", to: "decision", kind: "primary" },
+    ],
+    events: [{ id: "proposal-convergence", from: "research", to: "compare-approaches" }],
+  };
+};
+
+const aiEvaluation: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "ai-evaluation",
+    index: "07C",
+    name: "Engineering evaluation gate",
+    shortName: "Evaluation",
+    thesis: "Possibilities stop at engineering judgment before they reach implementation",
+    description:
+      "AI, documentation, repository evidence, and the running system converge on one decision boundary that can accept, revise, reject, or research again.",
+    annotation: "POSSIBILITIES → ENGINEERING JUDGMENT",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1160 : undefined,
+    nodes: mobile
+      ? [
+          node("ai-product", "AI systems", "external", 90, 110, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 300, 110, { width: 150 }),
+          node("repository", "Repository", "evidence", 90, 270),
+          node("running-system", "Running system", "evidence", 300, 270, { width: 160 }),
+          node("workbench", "Engineering workbench", "service", 195, 455, { emphasis: "primary", width: 230 }),
+          node("decision", "Engineering decision", "decision", 195, 640, { emphasis: "primary", width: 220 }),
+          node("accept", "Accept", "outcome", 65, 820, { emphasis: "resolved" }),
+          node("revise", "Revise", "outcome", 195, 820, { emphasis: "branch" }),
+          node("reject", "Reject", "outcome", 325, 820, { emphasis: "branch" }),
+          node("research-again", "Research again", "evidence", 195, 1015, { emphasis: "branch", width: 165 }),
+        ]
+      : [
+          node("ai-product", "AI systems", "external", 130, 150, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 130, 300, { width: 150 }),
+          node("repository", "Repository", "evidence", 130, 450),
+          node("running-system", "Running system", "evidence", 130, 600, { width: 160 }),
+          node("workbench", "Engineering workbench", "service", 465, 350, { emphasis: "primary", width: 230 }),
+          node("decision", "Engineering decision", "decision", 750, 350, { emphasis: "primary", width: 220 }),
+          node("accept", "Accept", "outcome", 1035, 125, { emphasis: "resolved" }),
+          node("revise", "Revise", "outcome", 1035, 275, { emphasis: "branch" }),
+          node("reject", "Reject", "outcome", 1035, 425, { emphasis: "branch" }),
+          node("research-again", "Research again", "evidence", 1035, 575, { emphasis: "branch", width: 165 }),
+        ],
+    edges: [
+      { id: "evaluation-ai-workbench", from: "ai-product", to: "workbench", kind: "branch" },
+      { id: "evaluation-docs-workbench", from: "documentation", to: "workbench", kind: "branch" },
+      { id: "evaluation-repo-workbench", from: "repository", to: "workbench", kind: "branch" },
+      { id: "evaluation-running-workbench", from: "running-system", to: "workbench", kind: "branch" },
+      { id: "evaluation-workbench-decision", from: "workbench", to: "decision", kind: "primary" },
+      { id: "evaluation-accept", from: "decision", to: "accept", kind: "branch" },
+      { id: "evaluation-revise", from: "decision", to: "revise", kind: "branch" },
+      { id: "evaluation-reject", from: "decision", to: "reject", kind: "branch" },
+      { id: "evaluation-research", from: "decision", to: "research-again", kind: "feedback" },
+    ],
+    events: [{ id: "evaluation-gate", from: "workbench", to: "decision" }],
+    callouts: [
+      { id: "evaluation-boundary", text: "NOTHING BYPASSES JUDGMENT", x: mobile ? 195 : 1090, y: mobile ? 1100 : 650, tone: "redline" },
+    ],
+  };
+};
+
+const aiWorkflow: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "ai-workflow",
+    index: "07D",
+    name: "AI-assisted engineering workflow",
+    shortName: "Workflow",
+    thesis: "Judgment determines which accelerated possibility becomes part of the system",
+    description:
+      "Proposal inputs pass through engineering decision, inspection, and debugging before implementation, testing, and a working system. Rejected paths return to research.",
+    annotation: "POSSIBILITIES → JUDGMENT → SYSTEM",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1360 : undefined,
+    nodes: mobile
+      ? [
+          node("ai-product", "AI systems", "external", 90, 90, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 300, 90, { width: 150 }),
+          node("repository", "Repository", "evidence", 90, 225),
+          node("running-system", "Running system", "evidence", 300, 225, { width: 160 }),
+          node("decision", "Engineering decision", "decision", 195, 410, { emphasis: "primary", width: 220 }),
+          node("accept", "Accept", "outcome", 65, 575, { emphasis: "resolved" }),
+          node("revise", "Revise", "outcome", 195, 575, { emphasis: "branch" }),
+          node("reject", "Reject", "outcome", 325, 575, { emphasis: "branch" }),
+          node("research-again", "Research again", "evidence", 195, 725, { emphasis: "branch", width: 165 }),
+          node("implement", "Implement", "service", 195, 890, { emphasis: "primary" }),
+          node("inspect", "Inspect", "diagnosis", 105, 1045),
+          node("debug", "Debug", "diagnosis", 285, 1045),
+          node("test", "Test", "evidence", 195, 1180),
+          node("working", "Working system", "outcome", 195, 1300, { emphasis: "resolved", width: 165 }),
+        ]
+      : [
+          node("ai-product", "AI systems", "external", 105, 120, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 105, 275, { width: 150 }),
+          node("repository", "Repository", "evidence", 105, 430),
+          node("running-system", "Running system", "evidence", 105, 585, { width: 160 }),
+          node("decision", "Engineering decision", "decision", 405, 350, { emphasis: "primary", width: 220 }),
+          node("accept", "Accept", "outcome", 650, 170, { emphasis: "resolved" }),
+          node("revise", "Revise", "outcome", 650, 350, { emphasis: "branch" }),
+          node("reject", "Reject", "outcome", 650, 530, { emphasis: "branch" }),
+          node("research-again", "Research again", "evidence", 860, 575, { emphasis: "branch", width: 165 }),
+          node("implement", "Implement", "service", 860, 170, { emphasis: "primary" }),
+          node("inspect", "Inspect", "diagnosis", 1040, 100),
+          node("debug", "Debug", "diagnosis", 1040, 245),
+          node("test", "Test", "evidence", 1040, 390),
+          node("working", "Working system", "outcome", 1040, 535, { emphasis: "resolved", width: 165 }),
+        ],
+    edges: [
+      { id: "workflow-ai-decision", from: "ai-product", to: "decision", kind: "branch" },
+      { id: "workflow-docs-decision", from: "documentation", to: "decision", kind: "branch" },
+      { id: "workflow-repo-decision", from: "repository", to: "decision", kind: "branch" },
+      { id: "workflow-running-decision", from: "running-system", to: "decision", kind: "branch" },
+      { id: "workflow-accept", from: "decision", to: "accept", kind: "branch" },
+      { id: "workflow-revise", from: "decision", to: "revise", kind: "branch" },
+      { id: "workflow-reject", from: "decision", to: "reject", kind: "branch" },
+      { id: "workflow-revise-research", from: "revise", to: "research-again", kind: "feedback" },
+      { id: "workflow-reject-research", from: "reject", to: "research-again", kind: "feedback" },
+      { id: "workflow-accept-implement", from: "accept", to: "implement", kind: "primary" },
+      { id: "workflow-implement-inspect", from: "implement", to: "inspect", kind: "primary" },
+      { id: "workflow-inspect-debug", from: "inspect", to: "debug", kind: "primary" },
+      { id: "workflow-debug-test", from: "debug", to: "test", kind: "primary" },
+      { id: "workflow-test-working", from: "test", to: "working", kind: "primary" },
+      { id: "workflow-research-decision", from: "research-again", to: "decision", kind: "feedback" },
+    ],
+    events: [
+      { id: "workflow-proposal-event", from: "ai-product", to: "decision" },
+      { id: "workflow-build-event", from: "accept", to: "working", delay: 0.8 },
+    ],
+  };
+};
+
+const aiCapability: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "ai-capability",
+    index: "07E",
+    name: "AI-assisted engineering extracted",
+    shortName: "AI capability",
+    thesis: "The workflow compresses into a capability governed by engineering judgment",
+    description:
+      "The decision boundary remains visible while the detailed workflow becomes AI-assisted engineering within the accumulated capability graph.",
+    annotation: "WORKFLOW → AI-ASSISTED ENGINEERING",
+    preferredComposition: "typography-integrated",
+    canvasHeight: mobile ? 1080 : undefined,
+    nodes: mobile
+      ? [
+          node("product-research", "Product research", "outcome", 195, 100, { emphasis: "branch", width: 190 }),
+          node("ai-product", "AI systems", "external", 90, 280, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 300, 280, { width: 150 }),
+          node("decision", "Engineering decision", "decision", 195, 470, { emphasis: "primary", width: 220 }),
+          node("working", "Working system", "outcome", 195, 660, { emphasis: "resolved", width: 165 }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 195, 865, { emphasis: "resolved", width: 255, detail: "judgment remains responsible" }),
+        ]
+      : [
+          node("product-research", "Product research", "outcome", 125, 180, { emphasis: "branch", width: 190 }),
+          node("ai-product", "AI systems", "external", 125, 480, { emphasis: "external" }),
+          node("documentation", "Documentation", "evidence", 380, 180, { width: 150 }),
+          node("decision", "Engineering decision", "decision", 600, 350, { emphasis: "primary", width: 220 }),
+          node("working", "Working system", "outcome", 840, 350, { emphasis: "resolved", width: 165 }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 1060, 350, { emphasis: "resolved", width: 255, detail: "judgment remains responsible" }),
+        ],
+    edges: [
+      { id: "ai-cap-research-decision", from: "product-research", to: "decision", kind: "branch" },
+      { id: "ai-cap-ai-decision", from: "ai-product", to: "decision", kind: "branch" },
+      { id: "ai-cap-doc-decision", from: "documentation", to: "decision", kind: "branch" },
+      { id: "ai-cap-decision-working", from: "decision", to: "working", kind: "primary" },
+      { id: "ai-cap-compress", from: "working", to: "ai-engineering-capability", kind: "compression" },
+    ],
+    events: [{ id: "ai-cap-event", from: "working", to: "ai-engineering-capability" }],
+  };
+};
+
+const quantxProblem: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "quantx-problem",
+    index: "08A",
+    name: "Recurring trading problem",
+    shortName: "QuantX problem",
+    thesis: "A less deterministic problem demands experimentation rather than a fixed answer",
+    description:
+      "Manual chart monitoring, placing orders, and remembering when to sell create the motivation. Missing the right selling moment can lose money; no successful automation is implied.",
+    annotation: "MANUAL MONITORING → RECURRING DECISION PROBLEM",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 950 : undefined,
+    nodes: mobile
+      ? [
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 195, 100, { emphasis: "branch", width: 250 }),
+          node("problem", "Manual trading problem", "idea", 195, 310, { emphasis: "primary", width: 235 }),
+          node("market-information", "Market information", "external", 195, 530, { emphasis: "external", width: 205 }),
+          node("analysis", "Analysis needed", "diagnosis", 195, 750, { emphasis: "branch", width: 180 }),
+        ]
+      : [
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 145, 350, { emphasis: "branch", width: 250 }),
+          node("problem", "Manual trading problem", "idea", 455, 350, { emphasis: "primary", width: 235 }),
+          node("market-information", "Market information", "external", 760, 350, { emphasis: "external", width: 205 }),
+          node("analysis", "Analysis needed", "diagnosis", 1045, 350, { emphasis: "branch", width: 180 }),
+        ],
+    edges: [
+      { id: "quantx-capability-problem", from: "ai-engineering-capability", to: "problem", kind: "transition" },
+      { id: "quantx-problem-market", from: "problem", to: "market-information", kind: "primary" },
+      { id: "quantx-market-analysis", from: "market-information", to: "analysis", kind: "primary" },
+    ],
+    events: [{ id: "quantx-problem-event", from: "problem", to: "analysis" }],
+    callouts: [
+      { id: "quantx-no-claim", text: "NO PROFITABILITY CLAIM", x: mobile ? 195 : 1090, y: mobile ? 890 : 640, tone: "redline" },
+    ],
+  };
+};
+
+const marketPipeline: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "market-pipeline",
+    index: "08B",
+    name: "Market analysis pipeline",
+    shortName: "Pipeline",
+    thesis: "Market information must be transformed before a model can evaluate it",
+    description:
+      "The experimental pipeline grows from market information through analysis and features toward a model boundary. It does not yet imply an action.",
+    annotation: "MARKET → ANALYSIS → FEATURES → MODEL",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1040 : undefined,
+    nodes: mobile
+      ? [
+          node("market-information", "Market information", "external", 195, 120, { emphasis: "external", width: 205 }),
+          node("analysis", "Analysis", "diagnosis", 195, 335, { emphasis: "primary" }),
+          node("features", "Features", "data", 195, 550),
+          node("model", "Model boundary", "decision", 195, 765, { emphasis: "branch", width: 185 }),
+          node("unresolved", "Unresolved", "outcome", 195, 930, { emphasis: "branch" }),
+        ]
+      : [
+          node("market-information", "Market information", "external", 130, 350, { emphasis: "external", width: 205 }),
+          node("analysis", "Analysis", "diagnosis", 390, 350, { emphasis: "primary" }),
+          node("features", "Features", "data", 640, 350),
+          node("model", "Model boundary", "decision", 890, 350, { emphasis: "branch", width: 185 }),
+          node("unresolved", "Unresolved", "outcome", 1090, 520, { emphasis: "branch" }),
+        ],
+    edges: [
+      { id: "pipeline-market-analysis", from: "market-information", to: "analysis", kind: "primary" },
+      { id: "pipeline-analysis-features", from: "analysis", to: "features", kind: "primary" },
+      { id: "pipeline-features-model", from: "features", to: "model", kind: "primary" },
+      { id: "pipeline-model-unresolved", from: "model", to: "unresolved", kind: "branch" },
+    ],
+    events: [{ id: "market-pipeline-event", from: "market-information", to: "model" }],
+  };
+};
+
+const modelBranching: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "model-branching",
+    index: "08C",
+    name: "Experimental model branches",
+    shortName: "Models",
+    thesis: "Several model approaches remain experiments; none is declared the winner",
+    description:
+      "XGBoost, LSTM, and other experimental approaches branch from the same feature input. Insufficient confidence and unresolved paths remain first-class outcomes.",
+    annotation: "XGBOOST / LSTM / OTHER EXPERIMENTATION",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1210 : undefined,
+    nodes: mobile
+      ? [
+          node("features", "Features", "data", 195, 105),
+          node("model", "Model experiments", "decision", 195, 280, { emphasis: "primary", width: 190 }),
+          node("xgboost", "XGBoost", "component", 70, 475),
+          node("lstm", "LSTM", "component", 195, 475),
+          node("experimental-model", "Experimental", "component", 320, 475, { width: 145 }),
+          node("decision", "Decision candidate", "decision", 195, 690, { emphasis: "branch", width: 190 }),
+          node("insufficient-confidence", "Insufficient confidence", "outcome", 195, 880, { emphasis: "branch", width: 225 }),
+          node("unresolved", "Unresolved", "outcome", 195, 1060, { emphasis: "branch" }),
+        ]
+      : [
+          node("features", "Features", "data", 105, 350),
+          node("model", "Model experiments", "decision", 325, 350, { emphasis: "primary", width: 190 }),
+          node("xgboost", "XGBoost", "component", 585, 145),
+          node("lstm", "LSTM", "component", 585, 350),
+          node("experimental-model", "Experimental", "component", 585, 555, { width: 145 }),
+          node("decision", "Decision candidate", "decision", 855, 350, { emphasis: "branch", width: 190 }),
+          node("insufficient-confidence", "Insufficient confidence", "outcome", 1080, 225, { emphasis: "branch", width: 225 }),
+          node("unresolved", "Unresolved", "outcome", 1080, 500, { emphasis: "branch" }),
+        ],
+    edges: [
+      { id: "models-features-boundary", from: "features", to: "model", kind: "primary" },
+      { id: "models-xgboost", from: "model", to: "xgboost", kind: "branch" },
+      { id: "models-lstm", from: "model", to: "lstm", kind: "branch" },
+      { id: "models-experimental", from: "model", to: "experimental-model", kind: "branch" },
+      { id: "models-xgboost-decision", from: "xgboost", to: "decision", kind: "branch" },
+      { id: "models-lstm-decision", from: "lstm", to: "decision", kind: "branch" },
+      { id: "models-experimental-decision", from: "experimental-model", to: "decision", kind: "branch" },
+      { id: "models-low-confidence", from: "decision", to: "insufficient-confidence", kind: "branch" },
+      { id: "models-unresolved", from: "decision", to: "unresolved", kind: "branch" },
+    ],
+    events: [{ id: "model-experiment-event", from: "features", to: "decision" }],
+  };
+};
+
+const decisionGates: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "decision-gates",
+    index: "08D",
+    name: "Decision and risk gates",
+    shortName: "Gates",
+    thesis: "A model output is not automatically an action",
+    description:
+      "Experimental model outputs pass through decision and risk gates. Valid terminal paths include execution, no action, insufficient confidence, risk rejection, and unresolved research.",
+    annotation: "MODEL OUTPUT ≠ ACTION",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1470 : undefined,
+    nodes: mobile
+      ? [
+          node("market-information", "Market", "external", 195, 75, { emphasis: "external" }),
+          node("analysis", "Analysis", "diagnosis", 195, 210),
+          node("model", "Model experiments", "decision", 195, 350, { emphasis: "primary", width: 190 }),
+          node("xgboost", "XGBoost", "component", 90, 500),
+          node("lstm", "LSTM", "component", 300, 500),
+          node("experimental-model", "Experimental", "component", 195, 625, { width: 145 }),
+          node("decision", "Decision gate", "decision", 195, 755, { emphasis: "primary", width: 175 }),
+          node("insufficient-confidence", "Insufficient confidence", "outcome", 195, 890, { emphasis: "branch", width: 225 }),
+          node("risk", "Risk gate", "decision", 195, 1040, { emphasis: "primary" }),
+          node("execution", "Execution", "service", 80, 1200, { emphasis: "branch" }),
+          node("no-action", "No action", "outcome", 195, 1200, { emphasis: "branch" }),
+          node("risk-rejected", "Risk rejected", "outcome", 310, 1200, { emphasis: "branch", width: 145 }),
+          node("outcome", "Outcome unknown", "outcome", 80, 1360, { emphasis: "branch", width: 160 }),
+          node("unresolved", "Unresolved", "outcome", 300, 1360, { emphasis: "branch" }),
+        ]
+      : [
+          node("market-information", "Market", "external", 70, 350, { emphasis: "external" }),
+          node("analysis", "Analysis", "diagnosis", 220, 350),
+          node("model", "Model experiments", "decision", 400, 350, { emphasis: "primary", width: 190 }),
+          node("xgboost", "XGBoost", "component", 580, 170),
+          node("experimental-model", "Experimental", "component", 580, 350, { width: 145 }),
+          node("lstm", "LSTM", "component", 580, 530),
+          node("decision", "Decision gate", "decision", 735, 350, { emphasis: "primary", width: 175 }),
+          node("insufficient-confidence", "Insufficient confidence", "outcome", 735, 590, { emphasis: "branch", width: 225 }),
+          node("risk", "Risk gate", "decision", 900, 350, { emphasis: "primary" }),
+          node("execution", "Execution", "service", 1080, 155, { emphasis: "branch" }),
+          node("no-action", "No action", "outcome", 1080, 285, { emphasis: "branch" }),
+          node("risk-rejected", "Risk rejected", "outcome", 1080, 415, { emphasis: "branch", width: 145 }),
+          node("outcome", "Outcome unknown", "outcome", 1080, 545, { emphasis: "branch", width: 160 }),
+          node("unresolved", "Unresolved", "outcome", 900, 590, { emphasis: "branch" }),
+        ],
+    edges: [
+      { id: "gates-market-analysis", from: "market-information", to: "analysis", kind: "primary" },
+      { id: "gates-analysis-model", from: "analysis", to: "model", kind: "primary" },
+      { id: "gates-model-xgboost", from: "model", to: "xgboost", kind: "branch" },
+      { id: "gates-model-experimental", from: "model", to: "experimental-model", kind: "branch" },
+      { id: "gates-model-lstm", from: "model", to: "lstm", kind: "branch" },
+      { id: "gates-xgboost-decision", from: "xgboost", to: "decision", kind: "branch" },
+      { id: "gates-experimental-decision", from: "experimental-model", to: "decision", kind: "branch" },
+      { id: "gates-lstm-decision", from: "lstm", to: "decision", kind: "branch" },
+      { id: "gates-low-confidence", from: "decision", to: "insufficient-confidence", kind: "branch" },
+      { id: "gates-decision-risk", from: "decision", to: "risk", kind: "primary" },
+      { id: "gates-risk-execution", from: "risk", to: "execution", kind: "branch" },
+      { id: "gates-risk-no-action", from: "risk", to: "no-action", kind: "branch" },
+      { id: "gates-risk-rejected", from: "risk", to: "risk-rejected", kind: "branch" },
+      { id: "gates-execution-outcome", from: "execution", to: "outcome", kind: "branch" },
+      { id: "gates-outcome-unresolved", from: "outcome", to: "unresolved", kind: "feedback" },
+    ],
+    events: [{ id: "decision-gate-event", from: "model", to: "risk" }],
+    callouts: [
+      { id: "quantx-status", text: "UNFINISHED ACTIVE EXPERIMENT", x: mobile ? 195 : 1090, y: mobile ? 1430 : 650, tone: "redline" },
+    ],
+  };
+};
+
+const quantxCapability: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "quantx-capability",
+    index: "08E",
+    name: "Unfinished QuantX capability",
+    shortName: "ML experimentation",
+    thesis: "Unresolved experiment branches can still develop reusable decision-system capability",
+    description:
+      "A condensed market-to-risk pipeline remains visibly unfinished while QuantX contributes ML experimentation and decision systems to the accumulated graph.",
+    annotation: "QUANTX → ML EXPERIMENTATION / UNRESOLVED",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1240 : undefined,
+    groups: mobile
+      ? [
+          { id: "quantx-condensed", label: "QUANTX / UNFINISHED ACTIVE EXPERIMENT", x: 22, y: 65, width: 346, height: 720, tone: "legacy" },
+          { id: "quantx-extracted", label: "PERSISTENT CAPABILITY", x: 22, y: 840, width: 346, height: 315, tone: "capability" },
+        ]
+      : [
+          { id: "quantx-condensed", label: "QUANTX / UNFINISHED ACTIVE EXPERIMENT", x: 45, y: 80, width: 755, height: 540, tone: "legacy" },
+          { id: "quantx-extracted", label: "PERSISTENT CAPABILITY", x: 845, y: 80, width: 310, height: 540, tone: "capability" },
+        ],
+    nodes: mobile
+      ? [
+          node("market-information", "Market", "external", 195, 125, { emphasis: "external" }),
+          node("analysis", "Analysis", "diagnosis", 195, 260),
+          node("model", "Model branches", "decision", 195, 395, { emphasis: "branch", width: 175 }),
+          node("decision", "Decision", "decision", 195, 530, { emphasis: "branch" }),
+          node("risk", "Risk", "decision", 195, 665, { emphasis: "branch" }),
+          node("unresolved", "Unresolved", "outcome", 195, 750, { emphasis: "branch" }),
+          node("quantx-project", "QuantX", "evidence", 195, 905, { emphasis: "branch" }),
+          node("experiment-capability", "ML experimentation", "outcome", 195, 1070, { emphasis: "resolved", width: 220, detail: "decision systems" }),
+        ]
+      : [
+          node("market-information", "Market", "external", 120, 350, { emphasis: "external" }),
+          node("analysis", "Analysis", "diagnosis", 270, 350),
+          node("model", "Model branches", "decision", 440, 350, { emphasis: "branch", width: 175 }),
+          node("decision", "Decision", "decision", 605, 230, { emphasis: "branch" }),
+          node("risk", "Risk", "decision", 605, 470, { emphasis: "branch" }),
+          node("unresolved", "Unresolved", "outcome", 755, 470, { emphasis: "branch" }),
+          node("quantx-project", "QuantX", "evidence", 990, 235, { emphasis: "branch" }),
+          node("experiment-capability", "ML experimentation", "outcome", 990, 470, { emphasis: "resolved", width: 220, detail: "decision systems" }),
+        ],
+    edges: [
+      { id: "quantx-cap-market-analysis", from: "market-information", to: "analysis", kind: "branch" },
+      { id: "quantx-cap-analysis-model", from: "analysis", to: "model", kind: "branch" },
+      { id: "quantx-cap-model-decision", from: "model", to: "decision", kind: "branch" },
+      { id: "quantx-cap-decision-risk", from: "decision", to: "risk", kind: "branch" },
+      { id: "quantx-cap-risk-unresolved", from: "risk", to: "unresolved", kind: "feedback" },
+      { id: "quantx-cap-project", from: "unresolved", to: "quantx-project", kind: "transition" },
+      { id: "quantx-cap-compress", from: "quantx-project", to: "experiment-capability", kind: "compression" },
+    ],
+    events: [{ id: "quantx-extract-event", from: "quantx-project", to: "experiment-capability" }],
+    callouts: [
+      { id: "quantx-claim", text: "NO PROFITABILITY / ACCURACY / RETURN CLAIM", x: mobile ? 195 : 1090, y: mobile ? 1185 : 655, tone: "redline" },
+    ],
+  };
+};
+
+const accumulatedSystem: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  const items = [
+    ["interface-capability", "Interface"],
+    ["connected-capability", "Connected system"],
+    ["client-capability", "Client delivery"],
+    ["shared-capability", "Shared architecture"],
+    ["product-research", "Product research"],
+    ["ai-engineering-capability", "AI-assisted engineering"],
+    ["experiment-capability", "ML experimentation"],
+  ] as const;
+  return {
+    state: "accumulated-system",
+    index: "09A",
+    name: "Accumulated capability system",
+    shortName: "Accumulated system",
+    thesis: "Project topology recedes; connected capability remains",
+    description:
+      "Seven accumulated capabilities form one living backbone rather than a skills list. Each was developed through earlier work and remains available to the current build process.",
+    annotation: "ACCUMULATED CAPABILITY / NOT A FINISH LINE",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1080 : undefined,
+    nodes: items.map(([id, label], index) =>
+      node(
+        id,
+        label,
+        "outcome",
+        mobile ? 195 : 115 + index * 160,
+        mobile ? 105 + index * 140 : 350,
+        { emphasis: index === items.length - 1 ? "resolved" : "branch", width: label.length > 18 ? 235 : 185 },
+      ),
+    ),
+    edges: items.slice(0, -1).map(([id], index) => ({
+      id: `accumulated-${index}`,
+      from: id,
+      to: items[index + 1][0],
+      kind: "branch" as const,
+    })),
+    events: [{ id: "accumulated-path", from: "interface-capability", to: "experiment-capability" }],
+  };
+};
+
+const capabilityProvenance: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "capability-provenance",
+    index: "09B",
+    name: "Capability with provenance",
+    shortName: "Provenance",
+    thesis: "Every persistent capability points back to work that developed it",
+    description:
+      "Restrained provenance markers connect early web work and multiple products, BellyBasket, Duforge, CraveCart, GENKŌ, the development workflow, and QuantX to the accumulated backbone.",
+    annotation: "CAPABILITY ← PROVENANCE",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1460 : undefined,
+    groups: mobile
+      ? [{ id: "provenance-stack", label: "ACCUMULATED CAPABILITY + SOURCE", x: 20, y: 60, width: 350, height: 1310, tone: "capability" }]
+      : [{ id: "provenance-stack", label: "ACCUMULATED CAPABILITY + RESTRAINED PROVENANCE", x: 40, y: 75, width: 1120, height: 550, tone: "capability" }],
+    nodes: mobile
+      ? [
+          node("early-work", "Early web work / products", "evidence", 105, 125, { emphasis: "branch", width: 205 }),
+          node("interface-capability", "Interface", "outcome", 290, 125, { emphasis: "resolved" }),
+          node("bellybasket-project", "BellyBasket", "evidence", 105, 310, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 290, 310, { emphasis: "resolved", width: 185 }),
+          node("duforge-work", "Duforge", "evidence", 105, 495, { emphasis: "branch" }),
+          node("client-capability", "Client delivery", "outcome", 290, 495, { emphasis: "resolved", width: 170 }),
+          node("cravecart-project", "CraveCart", "evidence", 105, 680, { emphasis: "branch" }),
+          node("shared-capability", "Shared architecture", "outcome", 290, 680, { emphasis: "resolved", width: 205 }),
+          node("genko-project", "GENKŌ", "evidence", 105, 865, { emphasis: "branch" }),
+          node("product-research", "Product research", "outcome", 290, 865, { emphasis: "resolved", width: 185 }),
+          node("workflow-provenance", "Development workflow", "evidence", 80, 1050, { emphasis: "branch", width: 190, detail: "GENKŌ" }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 300, 1050, { emphasis: "resolved", width: 225 }),
+          node("quantx-project", "QuantX", "evidence", 105, 1235, { emphasis: "branch" }),
+          node("experiment-capability", "ML experimentation", "outcome", 290, 1235, { emphasis: "resolved", width: 205 }),
+        ]
+      : [
+          node("early-work", "Early web work / products", "evidence", 130, 140, { emphasis: "branch", width: 205 }),
+          node("interface-capability", "Interface", "outcome", 390, 140, { emphasis: "resolved" }),
+          node("bellybasket-project", "BellyBasket", "evidence", 130, 300, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 390, 300, { emphasis: "resolved", width: 185 }),
+          node("duforge-work", "Duforge", "evidence", 130, 460, { emphasis: "branch" }),
+          node("client-capability", "Client delivery", "outcome", 390, 460, { emphasis: "resolved", width: 170 }),
+          node("cravecart-project", "CraveCart", "evidence", 650, 140, { emphasis: "branch" }),
+          node("shared-capability", "Shared architecture", "outcome", 950, 140, { emphasis: "resolved", width: 205 }),
+          node("genko-project", "GENKŌ", "evidence", 650, 300, { emphasis: "branch" }),
+          node("product-research", "Product research", "outcome", 950, 300, { emphasis: "resolved", width: 185 }),
+          node("workflow-provenance", "Development workflow / GENKŌ", "evidence", 650, 460, { emphasis: "branch", width: 230 }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 950, 460, { emphasis: "resolved", width: 225 }),
+          node("quantx-project", "QuantX", "evidence", 650, 580, { emphasis: "branch" }),
+          node("experiment-capability", "ML experimentation", "outcome", 950, 580, { emphasis: "resolved", width: 205 }),
+        ],
+    edges: [
+      { id: "prov-interface", from: "early-work", to: "interface-capability", kind: "compression" },
+      { id: "prov-connected", from: "bellybasket-project", to: "connected-capability", kind: "compression" },
+      { id: "prov-client", from: "duforge-work", to: "client-capability", kind: "compression" },
+      { id: "prov-shared", from: "cravecart-project", to: "shared-capability", kind: "compression" },
+      { id: "prov-product", from: "genko-project", to: "product-research", kind: "compression" },
+      { id: "prov-ai", from: "workflow-provenance", to: "ai-engineering-capability", kind: "compression" },
+      { id: "prov-ml", from: "quantx-project", to: "experiment-capability", kind: "compression" },
+      { id: "prov-cap-interface-connected", from: "interface-capability", to: "connected-capability", kind: "branch" },
+      { id: "prov-cap-connected-client", from: "connected-capability", to: "client-capability", kind: "branch" },
+      { id: "prov-cap-client-shared", from: "client-capability", to: "shared-capability", kind: "branch" },
+      { id: "prov-cap-shared-product", from: "shared-capability", to: "product-research", kind: "branch" },
+      { id: "prov-cap-product-ai", from: "product-research", to: "ai-engineering-capability", kind: "branch" },
+      { id: "prov-cap-ai-ml", from: "ai-engineering-capability", to: "experiment-capability", kind: "branch" },
+    ],
+    events: [{ id: "provenance-resolve", from: "early-work", to: "experiment-capability" }],
+  };
+};
+
+const openFrontier: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "open-frontier",
+    index: "09C",
+    name: "Open capability frontier",
+    shortName: "Open frontier",
+    thesis: "Accumulated capability supports continued work; it does not imply completion",
+    description:
+      "The capability backbone stays connected while quiet open nodes preserve learning, development, the next experiment, and what is not known yet.",
+    annotation: "CAPABLE OF BUILDING FURTHER / NOT FINISHED",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1320 : undefined,
+    nodes: mobile
+      ? [
+          node("interface-capability", "Interface", "outcome", 195, 85, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 195, 205, { emphasis: "branch", width: 185 }),
+          node("client-capability", "Client delivery", "outcome", 195, 325, { emphasis: "branch", width: 170 }),
+          node("shared-capability", "Shared architecture", "outcome", 195, 445, { emphasis: "branch", width: 205 }),
+          node("product-research", "Product research", "outcome", 195, 565, { emphasis: "branch", width: 185 }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 195, 685, { emphasis: "branch", width: 225 }),
+          node("experiment-capability", "ML experimentation", "outcome", 195, 805, { emphasis: "resolved", width: 205 }),
+          node("learning-frontier", "Learning", "idea", 80, 1010, { emphasis: "branch" }),
+          node("development-frontier", "In development", "idea", 310, 1010, { emphasis: "branch", width: 160 }),
+          node("next-experiment", "Next experiment", "idea", 80, 1165, { emphasis: "branch", width: 160 }),
+          node("unknown-yet", "Unknown yet", "idea", 310, 1165, { emphasis: "branch" }),
+          node("build-further", "Build further", "outcome", 195, 1260, { emphasis: "resolved", width: 165 }),
+        ]
+      : [
+          node("interface-capability", "Interface", "outcome", 90, 270, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 250, 270, { emphasis: "branch", width: 185 }),
+          node("client-capability", "Client delivery", "outcome", 430, 270, { emphasis: "branch", width: 170 }),
+          node("shared-capability", "Shared architecture", "outcome", 625, 270, { emphasis: "branch", width: 205 }),
+          node("product-research", "Product research", "outcome", 825, 270, { emphasis: "branch", width: 185 }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 1040, 270, { emphasis: "branch", width: 225 }),
+          node("experiment-capability", "ML experimentation", "outcome", 1040, 470, { emphasis: "resolved", width: 205 }),
+          node("learning-frontier", "Learning", "idea", 170, 500, { emphasis: "branch" }),
+          node("development-frontier", "In development", "idea", 370, 500, { emphasis: "branch", width: 160 }),
+          node("next-experiment", "Next experiment", "idea", 570, 500, { emphasis: "branch", width: 160 }),
+          node("unknown-yet", "Unknown yet", "idea", 760, 500, { emphasis: "branch" }),
+          node("build-further", "Build further", "outcome", 600, 625, { emphasis: "resolved", width: 165 }),
+        ],
+    edges: [
+      { id: "frontier-interface-connected", from: "interface-capability", to: "connected-capability", kind: "branch" },
+      { id: "frontier-connected-client", from: "connected-capability", to: "client-capability", kind: "branch" },
+      { id: "frontier-client-shared", from: "client-capability", to: "shared-capability", kind: "branch" },
+      { id: "frontier-shared-product", from: "shared-capability", to: "product-research", kind: "branch" },
+      { id: "frontier-product-ai", from: "product-research", to: "ai-engineering-capability", kind: "branch" },
+      { id: "frontier-ai-ml", from: "ai-engineering-capability", to: "experiment-capability", kind: "branch" },
+      { id: "frontier-learning-build", from: "learning-frontier", to: "build-further", kind: "branch" },
+      { id: "frontier-development-build", from: "development-frontier", to: "build-further", kind: "branch" },
+      { id: "frontier-experiment-build", from: "next-experiment", to: "build-further", kind: "branch" },
+      { id: "frontier-unknown-build", from: "unknown-yet", to: "build-further", kind: "branch" },
+      { id: "frontier-capability-build", from: "experiment-capability", to: "build-further", kind: "transition" },
+    ],
+    events: [{ id: "frontier-open-event", from: "experiment-capability", to: "build-further" }],
+  };
+};
+
+const contactHandoff: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "contact-handoff",
+    index: "09D",
+    name: "Quiet contact handoff",
+    shortName: "Handoff",
+    thesis: "Accumulated capability stays attributable, then hands off to a real person",
+    description:
+      "The quiet final state retains all seven capabilities with restrained provenance while one open connection leads to Aakash's email and GitHub. Actionable links follow in the contact footer.",
+    annotation: "OPEN CONNECTION / AAKASH SINGH",
+    preferredComposition: "typography-integrated",
+    canvasHeight: mobile ? 1140 : undefined,
+    nodes: mobile
+      ? [
+          node("interface-capability", "Interface", "outcome", 195, 80, { emphasis: "branch", detail: "early web work / products" }),
+          node("connected-capability", "Connected system", "outcome", 195, 185, { emphasis: "branch", width: 190, detail: "BellyBasket" }),
+          node("client-capability", "Client delivery", "outcome", 195, 290, { emphasis: "branch", width: 180, detail: "Duforge" }),
+          node("shared-capability", "Shared architecture", "outcome", 195, 395, { emphasis: "branch", width: 205, detail: "CraveCart" }),
+          node("product-research", "Product research", "outcome", 195, 500, { emphasis: "branch", width: 190, detail: "GENKŌ" }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 195, 605, { emphasis: "branch", width: 235, detail: "development workflow / GENKŌ" }),
+          node("experiment-capability", "ML experimentation", "outcome", 195, 710, { emphasis: "branch", width: 205, detail: "QuantX" }),
+          node("open-connection", "Open connection", "idea", 195, 830, { emphasis: "primary", width: 180 }),
+          node("email-contact", "aakash.singh0953@gmail.com", "outcome", 195, 955, { emphasis: "resolved", width: 290 }),
+          node("github-contact", "github.com/aakash8930", "evidence", 195, 1060, { emphasis: "branch", width: 245 }),
+        ]
+      : [
+          node("interface-capability", "Interface", "outcome", 130, 155, { emphasis: "branch", detail: "early web work / products" }),
+          node("connected-capability", "Connected system", "outcome", 410, 155, { emphasis: "branch", width: 190, detail: "BellyBasket" }),
+          node("client-capability", "Client delivery", "outcome", 690, 155, { emphasis: "branch", width: 180, detail: "Duforge" }),
+          node("shared-capability", "Shared architecture", "outcome", 990, 155, { emphasis: "branch", width: 205, detail: "CraveCart" }),
+          node("product-research", "Product research", "outcome", 225, 350, { emphasis: "branch", width: 190, detail: "GENKŌ" }),
+          node("ai-engineering-capability", "AI-assisted engineering", "outcome", 590, 350, { emphasis: "branch", width: 235, detail: "development workflow / GENKŌ" }),
+          node("experiment-capability", "ML experimentation", "outcome", 960, 350, { emphasis: "branch", width: 205, detail: "QuantX" }),
+          node("open-connection", "Open connection", "idea", 600, 500, { emphasis: "primary", width: 180 }),
+          node("email-contact", "aakash.singh0953@gmail.com", "outcome", 420, 620, { emphasis: "resolved", width: 290 }),
+          node("github-contact", "github.com/aakash8930", "evidence", 800, 620, { emphasis: "branch", width: 245 }),
+        ],
+    edges: [
+      { id: "contact-interface-connected", from: "interface-capability", to: "connected-capability", kind: "branch" },
+      { id: "contact-connected-client", from: "connected-capability", to: "client-capability", kind: "branch" },
+      { id: "contact-client-shared", from: "client-capability", to: "shared-capability", kind: "branch" },
+      { id: "contact-shared-product", from: "shared-capability", to: "product-research", kind: "branch" },
+      { id: "contact-product-ai", from: "product-research", to: "ai-engineering-capability", kind: "branch" },
+      { id: "contact-ai-ml", from: "ai-engineering-capability", to: "experiment-capability", kind: "branch" },
+      { id: "contact-open", from: "experiment-capability", to: "open-connection", kind: "transition" },
+      { id: "contact-email", from: "open-connection", to: "email-contact", kind: "primary" },
+      { id: "contact-github", from: "open-connection", to: "github-contact", kind: "branch" },
+    ],
+    events: [],
+    callouts: [
+      { id: "contact-person", text: "THE SYSTEM BECOMES QUIET HERE", x: mobile ? 195 : 1090, y: mobile ? 1100 : 655, tone: "muted" },
+    ],
+  };
+};
+
 const capabilityCompression: StateResolver = (viewport) => {
   const projects = [
     ["bellybasket-project", "BellyBasket", "connected-capability", "Connected product system", "backend · payments · location · tracking"],
@@ -1537,6 +2326,20 @@ const resolvers: Record<BuildGraphState, StateResolver> = {
   "genko-loop": genkoLoop,
   "genko-ai-product": genkoAiProduct,
   "genko-capability": genkoCapability,
+  "ai-workbench": aiWorkbench,
+  "ai-proposals": aiProposals,
+  "ai-evaluation": aiEvaluation,
+  "ai-workflow": aiWorkflow,
+  "ai-capability": aiCapability,
+  "quantx-problem": quantxProblem,
+  "market-pipeline": marketPipeline,
+  "model-branching": modelBranching,
+  "decision-gates": decisionGates,
+  "quantx-capability": quantxCapability,
+  "accumulated-system": accumulatedSystem,
+  "capability-provenance": capabilityProvenance,
+  "open-frontier": openFrontier,
+  "contact-handoff": contactHandoff,
   "spotify-limited": spotifyLimited,
   "inherited-rebuild": inheritedRebuild,
   "capability-compression": capabilityCompression,
@@ -1563,6 +2366,20 @@ export const BUILD_GRAPH_STATES: BuildGraphState[] = [
   "genko-loop",
   "genko-ai-product",
   "genko-capability",
+  "ai-workbench",
+  "ai-proposals",
+  "ai-evaluation",
+  "ai-workflow",
+  "ai-capability",
+  "quantx-problem",
+  "market-pipeline",
+  "model-branching",
+  "decision-gates",
+  "quantx-capability",
+  "accumulated-system",
+  "capability-provenance",
+  "open-frontier",
+  "contact-handoff",
   "multi-surface",
   "engineering-loop",
   "capability-compression",

@@ -10,7 +10,10 @@ export type IntegratedChapterId =
   | "first-real-system"
   | "client-work"
   | "rebuilding-model"
-  | "building-genko";
+  | "building-genko"
+  | "ai-engineering"
+  | "quantx-experiment"
+  | "how-i-build-now";
 
 export type ChapterVisualInput = {
   chapterId: IntegratedChapterId;
@@ -41,7 +44,21 @@ export type ResolvedChapterVisual = {
     | "personal-problem"
     | "learning-loop"
     | "ai-product-feature"
-    | "product-capability";
+    | "product-capability"
+    | "ai-boundary"
+    | "proposal-inputs"
+    | "evaluation-gate"
+    | "implementation-loop"
+    | "ai-engineering-capability"
+    | "trading-problem"
+    | "market-analysis"
+    | "experimental-models"
+    | "risk-gates"
+    | "ml-capability"
+    | "accumulated-capability"
+    | "provenance"
+    | "unfinished-frontier"
+    | "contact";
 };
 
 function clamp01(value: number): number {
@@ -136,20 +153,85 @@ export function resolveChapterVisual({
     return { state: "shared-architecture", phase: "shared-capability" };
   }
 
-  if (reducedMotion) {
+  if (chapterId === "building-genko") {
+    if (reducedMotion) {
+      return { state: "genko-capability", phase: "product-capability" };
+    }
+    const loopStart = viewport === "mobile" ? 0.22 : 0.3;
+    const aiStart = viewport === "mobile" ? 0.55 : 0.7;
+    const extractionStart = viewport === "mobile" ? 0.82 : 0.9;
+    if (progress < loopStart) {
+      return { state: "genko-problem", phase: "personal-problem" };
+    }
+    if (progress < aiStart) {
+      return { state: "genko-loop", phase: "learning-loop" };
+    }
+    if (progress < extractionStart) {
+      return { state: "genko-ai-product", phase: "ai-product-feature" };
+    }
     return { state: "genko-capability", phase: "product-capability" };
   }
-  const loopStart = viewport === "mobile" ? 0.22 : 0.3;
-  const aiStart = viewport === "mobile" ? 0.55 : 0.7;
-  const extractionStart = viewport === "mobile" ? 0.82 : 0.9;
-  if (progress < loopStart) {
-    return { state: "genko-problem", phase: "personal-problem" };
+
+  if (chapterId === "ai-engineering") {
+    if (reducedMotion) {
+      return { state: "ai-workflow", phase: "implementation-loop" };
+    }
+    const proposalsStart = viewport === "mobile" ? 0.2 : 0.3;
+    const evaluationStart = viewport === "mobile" ? 0.48 : 0.58;
+    const implementationStart = viewport === "mobile" ? 0.7 : 0.78;
+    const capabilityStart = viewport === "mobile" ? 0.9 : 0.94;
+    if (progress < proposalsStart) {
+      return { state: "ai-workbench", phase: "ai-boundary" };
+    }
+    if (progress < evaluationStart) {
+      return { state: "ai-proposals", phase: "proposal-inputs" };
+    }
+    if (progress < implementationStart) {
+      return { state: "ai-evaluation", phase: "evaluation-gate" };
+    }
+    if (progress < capabilityStart) {
+      return { state: "ai-workflow", phase: "implementation-loop" };
+    }
+    return { state: "ai-capability", phase: "ai-engineering-capability" };
   }
-  if (progress < aiStart) {
-    return { state: "genko-loop", phase: "learning-loop" };
+
+  if (chapterId === "quantx-experiment") {
+    if (reducedMotion) {
+      return { state: "decision-gates", phase: "risk-gates" };
+    }
+    const pipelineStart = viewport === "mobile" ? 0.2 : 0.25;
+    const modelsStart = viewport === "mobile" ? 0.4 : 0.45;
+    const gatesStart = viewport === "mobile" ? 0.6 : 0.65;
+    const capabilityStart = viewport === "mobile" ? 0.88 : 0.94;
+    if (progress < pipelineStart) {
+      return { state: "quantx-problem", phase: "trading-problem" };
+    }
+    if (progress < modelsStart) {
+      return { state: "market-pipeline", phase: "market-analysis" };
+    }
+    if (progress < gatesStart) {
+      return { state: "model-branching", phase: "experimental-models" };
+    }
+    if (progress < capabilityStart) {
+      return { state: "decision-gates", phase: "risk-gates" };
+    }
+    return { state: "quantx-capability", phase: "ml-capability" };
   }
-  if (progress < extractionStart) {
-    return { state: "genko-ai-product", phase: "ai-product-feature" };
+
+  if (reducedMotion) {
+    return { state: "contact-handoff", phase: "contact" };
   }
-  return { state: "genko-capability", phase: "product-capability" };
+  const provenanceStart = viewport === "mobile" ? 0.3 : 0.4;
+  const frontierStart = viewport === "mobile" ? 0.62 : 0.7;
+  const contactStart = viewport === "mobile" ? 0.88 : 0.94;
+  if (progress < provenanceStart) {
+    return { state: "accumulated-system", phase: "accumulated-capability" };
+  }
+  if (progress < frontierStart) {
+    return { state: "capability-provenance", phase: "provenance" };
+  }
+  if (progress < contactStart) {
+    return { state: "open-frontier", phase: "unfinished-frontier" };
+  }
+  return { state: "contact-handoff", phase: "contact" };
 }
