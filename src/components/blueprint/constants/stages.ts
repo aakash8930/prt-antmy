@@ -59,8 +59,24 @@ export function stageLocalProgress(globalPercent: number, stage: StageName): num
   return clampPercent((globalPercent - start) * (100 / (end - start))) / 100;
 }
 
-/** Which stage is "current" for the on-screen caption, by the midpoint rule. */
-export function currentStage(globalPercent: number): StageName {
+/**
+ * Which stage is "current" for the on-screen caption.
+ *
+ * The WHOLE AGAIN -> FLOOR PLAN boundary is the one place the caption must
+ * align exactly with the *physical* animation rather than the midpoint rule:
+ * `floorPlanStartPercent` is the instant the plate geometry actually begins
+ * compressing (FLOOR_PLAN_START_MS / timeline.duration, computed once in
+ * BlueprintCenterpiece from the real timeline). Both closing stages use
+ * crisp thresholds so the caption flips at the exact visual boundary —
+ * deterministic and reversible, with no flicker. Every earlier stage keeps
+ * the original midpoint rule (unchanged for 0-80%).
+ */
+export function currentStage(
+  globalPercent: number,
+  floorPlanStartPercent: number = STAGE_BOUNDS.floorPlan[0],
+): StageName {
+  if (globalPercent >= floorPlanStartPercent) return "floorPlan";
+  if (globalPercent >= STAGE_BOUNDS.wholeAgain[0]) return "wholeAgain";
   const order: StageName[] = [
     "draw",
     "assemble",
@@ -70,8 +86,6 @@ export function currentStage(globalPercent: number): StageName {
     "evidence",
     "proof",
     "reconcile",
-    "wholeAgain",
-    "floorPlan",
   ];
   let active: StageName = "draw";
   for (const s of order) {

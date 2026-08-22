@@ -6,6 +6,7 @@ import { BlueprintScene } from "./BlueprintScene";
 import {
   applyProgress,
   buildTimeline,
+  FLOOR_PLAN_START_MS,
   revertTimeline,
 } from "./animation/buildTimelines";
 import type { NodeId, NodeRegistry } from "./animation/types";
@@ -76,6 +77,11 @@ export function BlueprintCenterpiece() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const lastStageRef = useRef<StageName | null>(null);
   const lastNavActiveRef = useRef(false);
+  // Percent at which the FLOOR PLAN caption begins, derived once the real
+  // timeline is built (FLOOR_PLAN_START_MS / timeline.duration). The initial
+  // value is the pre-drift fallback; it is overwritten on mount before any
+  // scroll frame can read it.
+  const floorPlanStartPercentRef = useRef<number>(88);
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const [stageLabel, setStageLabel] = useState(STAGE_LABEL.draw);
@@ -95,6 +101,9 @@ export function BlueprintCenterpiece() {
     const spreadScale = spreadScaleForWidth(window.innerWidth);
     const timeline = buildTimeline(registryRef.current, spreadScale, isMobileLayout);
     timelineRef.current = timeline;
+    // Source of truth for the WHOLE AGAIN -> FLOOR PLAN caption boundary:
+    // the real timeline's compress start, expressed as a scroll percent.
+    floorPlanStartPercentRef.current = (FLOOR_PLAN_START_MS / timeline.duration) * 100;
 
     if (prefersReducedMotion) {
       applyProgress(timeline, 1); // static, fully-resolved floor-plan fallback
@@ -128,7 +137,7 @@ export function BlueprintCenterpiece() {
           .padStart(2, "0")}%`;
       }
 
-      const stage = currentStage(percent);
+      const stage = currentStage(percent, floorPlanStartPercentRef.current);
       if (stage !== lastStageRef.current) {
         lastStageRef.current = stage;
         setStageLabel(STAGE_LABEL[stage]);

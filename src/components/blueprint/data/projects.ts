@@ -27,6 +27,21 @@ export type Project = {
   description: string;
   architectureArea: Exclude<PlateId, never>;
   technologies: string[];
+  /**
+   * Optional real evidence fields — populated from supplied information, not
+   * invented. Every one is optional: when absent, the corresponding row is
+   * simply omitted from the Projects section (never shown as a placeholder).
+   * The Blueprint's EVIDENCE/PROOF phases ignore these fields entirely, so
+   * adding them changes nothing about how the centerpiece renders.
+   */
+  /** What the author did on this project. */
+  role?: string;
+  /** Public live URL, when one exists. */
+  liveUrl?: string;
+  /** Public source repository URL, when one exists. */
+  githubUrl?: string;
+  /** Longer prose on how the system is structured. */
+  systemNarrative?: string;
 };
 
 export const PROJECTS: Project[] = [
@@ -39,6 +54,10 @@ export const PROJECTS: Project[] = [
       "Multi-vendor delivery platform — storefront, admin, partner and rider consoles, plus a customer mobile app.",
     architectureArea: "backend",
     technologies: ["Node.js", "Express", "MongoDB", "React"],
+    role: "Full-stack developer · product rebuild",
+    liveUrl: "https://cravecart.duforge.tech/",
+    systemNarrative:
+      "Rebuilt an earlier PHP/Flutter delivery platform (Dapigo) as a multi-surface system on React, Node.js and React Native. The customer, admin, partner and rider experiences are separate interfaces connected through a shared backend.",
   },
   {
     id: "genko",
@@ -49,6 +68,11 @@ export const PROJECTS: Project[] = [
       "AI-native Japanese language learning platform — a native mobile app backed by a NestJS API.",
     architectureArea: "frontend",
     technologies: ["NestJS", "React Native", "Expo"],
+    role: "Solo developer · AI-assisted development",
+    liveUrl: "https://aakash-ideapad-3-15iml05-u-1.tail7a4203.ts.net/",
+    githubUrl: "https://github.com/aakash8930/langapp.git",
+    systemNarrative:
+      "An AI-assisted Japanese learning system where conversational AI is one part of a broader learning flow — structured courses, writing practice, listening practice, quizzes and progress tracking, delivered through a React/React Native client and a NestJS backend.",
   },
   {
     id: "quantx",
@@ -59,6 +83,9 @@ export const PROJECTS: Project[] = [
       "Autonomous cryptocurrency trading bot — XGBoost ML models, technical-analysis strategies, live risk engine.",
     architectureArea: "data",
     technologies: ["Python", "XGBoost", "Backtesting"],
+    role: "Developer · AI-assisted development",
+    systemNarrative:
+      "An experimental autonomous trading and research system focused on deciding when to trade — and when not to. The pipeline evaluates market conditions and strategy signals before applying risk and execution logic, with backtesting and outcome tracking used to evaluate decisions.",
   },
 ];
 

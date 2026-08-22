@@ -379,8 +379,13 @@ export function BlueprintScene({
         </text>
       </g>
 
-      <g ref={(el) => registerNode("metadataGroup", el)} className="bp-metadata">
+      <g ref={(el) => registerNode("metadataTitle", el)} className="bp-metadata bp-metadata-title">
         <text x={330} y={664}>FIG. 01 — SYSTEM VOLUME</text>
+      </g>
+      <g ref={(el) => registerNode("metadataFloorPlanTitle", el)} className="bp-metadata bp-metadata-title">
+        <text x={330} y={664}>FIG. 02 — FLOOR PLAN</text>
+      </g>
+      <g ref={(el) => registerNode("metadataGroup", el)} className="bp-metadata bp-metadata-scale">
         <text x={330} y={680}>SCALE 1:1 · PROJECTION ORTHOGRAPHIC</text>
       </g>
 

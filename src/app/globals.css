@@ -20,6 +20,31 @@
 
   --background: var(--bp-paper);
   --foreground: var(--bp-ink);
+
+  /* ---- Content-layer tokens (site shell / typography / spacing) ---- *
+   * The surrounding page is deliberately quieter than the Blueprint. It
+   * borrows the same paper/ink/redline variables (same designer, same
+   * sheet) but introduces its own type and spacing scale, independent of
+   * the centerpiece's own px-based geometry.                           */
+  --site-max: 1100px;
+  --site-gutter: clamp(16px, 3vw, 40px);
+
+  --site-space-1: 4px;
+  --site-space-2: 8px;
+  --site-space-3: 12px;
+  --site-space-4: 16px;
+  --site-space-5: 24px;
+  --site-space-6: 32px;
+  --site-space-7: 48px;
+  --site-space-8: 64px;
+  --site-space-9: 96px;
+
+  --site-text-xs: 11px;
+  --site-text-sm: 12.5px;
+  --site-text-base: 15px;
+  --site-text-md: 17px;
+  --site-text-lg: 20px;
+  --site-text-display: clamp(30px, 4.5vw, 44px);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -76,145 +101,11 @@ a {
 }
 
 /* ---------------------------------------------------------------------- *
- * Site nav + sections — normal document flow, after the blueprint
- * centerpiece's pinned/scrubbed hero has released. Kept in the same
- * mono/technical language as the blueprint (no new visual system) but as
- * plain HTML: always present, always real links, unaffected by the SVG
- * animation's state.
+ * The surrounding site (nav, sections, footer, typography, spacing) lives
+ * in components/site/site.css, kept separate from this token/reset layer
+ * and from the Blueprint's own stylesheet, so the centerpiece stays fully
+ * isolated from the content system.
  * ---------------------------------------------------------------------- */
-
-.site-nav {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--bp-paper);
-  border-bottom: 1px solid var(--bp-line-soft);
-  font-family: var(--font-mono);
-}
-
-.site-nav-inner {
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 4vw, 40px);
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 14px clamp(16px, 3vw, 40px);
-}
-
-.site-nav-mark {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--bp-ink-dim);
-  flex-shrink: 0;
-}
-
-.site-nav-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(12px, 3vw, 28px);
-  list-style: none;
-}
-
-.site-nav-list a {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bp-ink);
-  border-bottom: 1px solid transparent;
-  padding-bottom: 2px;
-}
-
-.site-nav-list a:hover {
-  border-bottom-color: var(--bp-redline);
-}
-
-.site-sections {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 clamp(16px, 3vw, 40px);
-}
-
-.site-section {
-  padding: clamp(48px, 10vh, 96px) 0;
-  border-bottom: 1px solid var(--bp-line-soft);
-}
-.site-section:last-child {
-  border-bottom: none;
-}
-
-.site-section-heading {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--bp-ink-dim);
-  margin-bottom: 20px;
-}
-
-.site-section-body {
-  max-width: 60ch;
-  font-size: clamp(15px, 1.6vw, 18px);
-  line-height: 1.6;
-}
-.site-section-body a {
-  border-bottom: 1px solid var(--bp-redline);
-}
-
-.site-tech-list {
-  display: grid;
-  gap: 14px;
-  margin-top: 24px;
-  max-width: 60ch;
-}
-.site-tech-row {
-  display: flex;
-  gap: 16px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  border-top: 1px solid var(--bp-line-soft);
-  padding-top: 10px;
-}
-.site-tech-row dt {
-  flex: 0 0 140px;
-  color: var(--bp-ink-dim);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.site-tech-row dd {
-  color: var(--bp-ink);
-}
-
-.site-project-list {
-  list-style: none;
-  display: grid;
-  gap: 28px;
-  margin-top: 8px;
-}
-.site-project-row {
-  border-top: 1px solid var(--bp-line-soft);
-  padding-top: 16px;
-}
-.site-project-name {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 15px;
-  margin-right: 12px;
-}
-.site-project-meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--bp-redline);
-}
-.site-project-desc {
-  margin-top: 6px;
-  max-width: 60ch;
-  color: var(--bp-ink-dim);
-  font-size: 14px;
-  line-height: 1.5;
-}
 
 @media (prefers-reduced-motion: reduce) {
   *,
