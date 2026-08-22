@@ -178,7 +178,28 @@ const RECONCILE_REASSEMBLE_MS = 750; // precision -> acceleration -> controlled 
  * order the visitor already inspected them in).
  */
 const COMPRESS_OFFSET = FLOOR_PLAN_OFFSET; // 90% — flattening begins
+/**
+ * The timeline position (ms) at which the floor-plan transformation truly
+ * begins — the plate geometry starts compressing here. BlueprintCenterpiece
+ * divides this by the built timeline's actual duration to derive the exact
+ * scroll-percent at which the caption should flip from WHOLE AGAIN to
+ * FLOOR PLAN. Exported (rather than a precomputed percent) because
+ * `tl.duration` is only known after `buildTimeline()` runs — the real
+ * timeline is the source of truth, not an assumed ms-per-percent value.
+ */
+export const FLOOR_PLAN_START_MS = COMPRESS_OFFSET;
 const COMPRESS_MS = 220;
+/**
+ * Stage 10 — how the stale Stage-1 drafting information withdraws as the
+ * floor plan forms, in the same beat the plates begin compressing
+ * (COMPRESS_OFFSET): the outer dimensions (W 400 / H 320) retract, the
+ * old interface nodes retract, and the sheet's figure title cross-fades
+ * from "FIG. 01 — SYSTEM VOLUME" to "FIG. 02 — FLOOR PLAN". The scale /
+ * projection line ("SCALE 1:1 · PROJECTION ORTHOGRAPHIC") is still valid
+ * for a plan and stays. All part of the master timeline's own chains, so
+ * seeking stays deterministic and reversible.
+ */
+const FLOOR_PLAN_RETRACT_MS = 240;
 // Priority 5 (motion-quality pass): wider than the original 90ms so the
 // five rooms visibly register one after another rather than nearly at
 // once — still restrained, not six independent card animations.
@@ -209,6 +230,8 @@ function addDrawStage(tl: Timeline, registry: NodeRegistry, offset: number): voi
   const dimHDecor = required(registry, "outerDimHDecor");
   const envelopeDraw = drawableOf(registry, "envelopeOutline");
   const metaGroup = required(registry, "metadataGroup");
+  const metaTitle = required(registry, "metadataTitle");
+  const metaFloorPlanTitle = required(registry, "metadataFloorPlanTitle");
 
   // the drawing announces itself: one reference point, precisely placed.
   // Starts exactly at position 0 (offset === DRAW_OFFSET === 0 always), so
@@ -236,15 +259,28 @@ function addDrawStage(tl: Timeline, registry: NodeRegistry, offset: number): voi
     0,
   );
 
-  // dimension guides are struck before the geometry they will measure exists
+  // dimension guides are struck before the geometry they will measure exists.
+  // Stage 10 retracts them once the 400x320 envelope they measure is gone.
   tl.add(
     dimWLine,
-    leadIn({ draw: "0 0" }, offset + 480, { draw: "0 1", duration: 180, ease: EASE_DRAW }),
+    leadIn(
+      { draw: "0 0" },
+      offset + 480,
+      { draw: "0 1", duration: 180, ease: EASE_DRAW },
+      { draw: "0 1", duration: COMPRESS_OFFSET - (offset + 480 + 180) },
+      { draw: "0 0", duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_DRAW },
+    ),
     0,
   );
   tl.add(
     dimHLine,
-    leadIn({ draw: "0 0" }, offset + 540, { draw: "0 1", duration: 180, ease: EASE_DRAW }),
+    leadIn(
+      { draw: "0 0" },
+      offset + 540,
+      { draw: "0 1", duration: 180, ease: EASE_DRAW },
+      { draw: "0 1", duration: COMPRESS_OFFSET - (offset + 540 + 180) },
+      { draw: "0 0", duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_DRAW },
+    ),
     0,
   );
 
@@ -255,21 +291,57 @@ function addDrawStage(tl: Timeline, registry: NodeRegistry, offset: number): voi
     0,
   );
 
-  // the guides become confirmed measurements now that there is something to measure
+  // the guides become confirmed measurements now that there is something to
+  // measure. Stage 10 retracts the confirmed W/H reading along with the line.
   tl.add(
     dimWDecor,
-    leadIn({ opacity: 0 }, offset + 1000, { opacity: 1, duration: 130, ease: EASE_SNAP }),
+    leadIn(
+      { opacity: 0 },
+      offset + 1000,
+      { opacity: 1, duration: 130, ease: EASE_SNAP },
+      { opacity: 1, duration: COMPRESS_OFFSET - (offset + 1000 + 130) },
+      { opacity: 0, duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_REVEAL },
+    ),
     0,
   );
   tl.add(
     dimHDecor,
-    leadIn({ opacity: 0 }, offset + 1050, { opacity: 1, duration: 130, ease: EASE_SNAP }),
+    leadIn(
+      { opacity: 0 },
+      offset + 1050,
+      { opacity: 1, duration: 130, ease: EASE_SNAP },
+      { opacity: 1, duration: COMPRESS_OFFSET - (offset + 1050 + 130) },
+      { opacity: 0, duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_REVEAL },
+    ),
     0,
   );
 
+  // sheet metadata: the scale/projection line persists (still valid for a
+  // plan); the figure title cross-fades from SYSTEM VOLUME to FLOOR PLAN
+  // when the plates begin reorganizing (stage 10).
   tl.add(
     metaGroup,
     leadIn({ opacity: 0 }, offset + 1150, { opacity: 1, duration: 150, ease: EASE_REVEAL }),
+    0,
+  );
+  tl.add(
+    metaTitle,
+    leadIn(
+      { opacity: 0 },
+      offset + 1150,
+      { opacity: 1, duration: 150, ease: EASE_REVEAL },
+      { opacity: 1, duration: COMPRESS_OFFSET - (offset + 1150 + 150) },
+      { opacity: 0, duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_REVEAL },
+    ),
+    0,
+  );
+  tl.add(
+    metaFloorPlanTitle,
+    leadIn(
+      { opacity: 0 },
+      COMPRESS_OFFSET,
+      { opacity: 1, duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_REVEAL },
+    ),
     0,
   );
 }
@@ -298,10 +370,17 @@ function addAssembleStage(tl: Timeline, registry: NodeRegistry, offset: number):
   // along the whole center line, so a group-level scale would pivot around
   // their shared centroid and drag them apart instead of each popping in
   // place. EASE_SNAP still gives the fade a brisker, more decisive curve
-  // than a plain reveal.
+  // than a plain reveal. Stage 10 retracts them once the central volume
+  // they mark has become the floor plan.
   tl.add(
     interfaces,
-    leadIn({ opacity: 0 }, offset + 420, { opacity: 1, duration: 300, ease: EASE_SNAP }),
+    leadIn(
+      { opacity: 0 },
+      offset + 420,
+      { opacity: 1, duration: 300, ease: EASE_SNAP },
+      { opacity: 1, duration: COMPRESS_OFFSET - (offset + 420 + 300) },
+      { opacity: 0, duration: FLOOR_PLAN_RETRACT_MS, ease: EASE_REVEAL },
+    ),
     0,
   );
   tl.add(

@@ -17,6 +17,8 @@ export type NodeId =
   | "outerDimHLine"
   | "outerDimHDecor"
   | "metadataGroup"
+  | "metadataTitle"
+  | "metadataFloorPlanTitle"
   | "divider1"
   | "divider2"
   | "divider3"

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@/components/blueprint/blueprint.css";
+import "@/components/site/site.css";
 
 export const metadata: Metadata = {
   title: "System Volume — Blueprint Prototype",

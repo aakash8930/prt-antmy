@@ -98,7 +98,11 @@
   text-transform: uppercase;
   opacity: 0.85;
 }
-.bp-metadata text:first-child {
+/* The figure title ("FIG. 01 — SYSTEM VOLUME" → "FIG. 02 — FLOOR PLAN") is
+   the emphasized tier; the scale/projection line beneath stays the quieter
+   one. Named classes replace the old :first-child rule now that the title
+   and scale line are independently-animated sibling groups. */
+.bp-metadata-title text {
   fill: var(--bp-ink);
   opacity: 1;
 }
