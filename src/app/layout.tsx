@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
-import "@/components/blueprint/blueprint.css";
-import "@/components/site/site.css";
+import "@/components/story/story.css";
 
 export const metadata: Metadata = {
   title: "Aakash Singh — Full-Stack Software Developer",
   description:
-    "Aakash Singh — full-stack software developer building web, mobile and backend systems, APIs, automation and AI-assisted products.",
+    "The story of how Aakash Singh moved from first browser experiments to client software, connected systems, AI-assisted engineering, and ML experimentation.",
   openGraph: {
     title: "Aakash Singh — Full-Stack Software Developer",
     description:
-      "Full-stack software developer building web, mobile and backend systems, APIs, automation and AI-assisted products.",
+      "I started by making things work. I became a developer by learning what it takes to make the whole system work.",
     type: "website",
     siteName: "Aakash Singh",
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>

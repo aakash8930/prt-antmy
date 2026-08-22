@@ -1,98 +1,50 @@
-/* ---------------------------------------------------------------------- *
- * Design tokens — "blueprint paper" system.
- * Two neutrals do almost all the work; one reserved accent (--bp-redline)
- * is used exclusively for annotation/redline moments, never decoratively.
- * ---------------------------------------------------------------------- */
 :root {
-  --bp-paper: #eef1ef;
-  --bp-surface: #e4e9e6;
-  --bp-ink: #172227;
-  --bp-ink-dim: #4b5c61;
-  --bp-line: #3e5c67;
-  --bp-line-soft: rgba(62, 92, 103, 0.32);
-  --bp-grid: rgba(62, 92, 103, 0.12);
-  --bp-redline: #a8402a;
-  --bp-redline-soft: rgba(168, 64, 42, 0.14);
-
-  --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", "Cascadia Code",
-    Menlo, Consolas, monospace;
-  --font-body: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-
-  --background: var(--bp-paper);
-  --foreground: var(--bp-ink);
-
-  /* ---- Content-layer tokens (site shell / typography / spacing) ---- *
-   * The surrounding page is deliberately quieter than the Blueprint. It
-   * borrows the same paper/ink/redline variables (same designer, same
-   * sheet) but introduces its own type and spacing scale, independent of
-   * the centerpiece's own px-based geometry.                           */
-  --site-max: 1100px;
-  --site-gutter: clamp(16px, 3vw, 40px);
-
-  --site-space-1: 4px;
-  --site-space-2: 8px;
-  --site-space-3: 12px;
-  --site-space-4: 16px;
-  --site-space-5: 24px;
-  --site-space-6: 32px;
-  --site-space-7: 48px;
-  --site-space-8: 64px;
-  --site-space-9: 96px;
-
-  --site-text-xs: 11px;
-  --site-text-sm: 12.5px;
-  --site-text-base: 15px;
-  --site-text-md: 17px;
-  --site-text-lg: 20px;
-  --site-text-display: clamp(30px, 4.5vw, 44px);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bp-paper: #0e171c;
-    --bp-surface: #152128;
-    --bp-ink: #dce6e8;
-    --bp-ink-dim: #8fa3a8;
-    --bp-line: #6fa0ac;
-    --bp-line-soft: rgba(111, 160, 172, 0.32);
-    --bp-grid: rgba(111, 160, 172, 0.1);
-    --bp-redline: #e2694a;
-    --bp-redline-soft: rgba(226, 105, 74, 0.16);
-
-    --background: var(--bp-paper);
-    --foreground: var(--bp-ink);
-  }
-
-  html {
-    color-scheme: dark;
-  }
+  --canvas: #091116;
+  --canvas-deep: #060b0f;
+  --surface: #101b21;
+  --surface-raised: #142229;
+  --ink: #e6edef;
+  --ink-soft: #a4b4b9;
+  --ink-faint: #71838a;
+  --line: rgba(127, 166, 176, 0.28);
+  --line-strong: rgba(127, 166, 176, 0.52);
+  --grid: rgba(110, 151, 161, 0.055);
+  --signal: #83b4bf;
+  --redline: #ef7353;
+  --redline-soft: rgba(239, 115, 83, 0.13);
+  --complete: #b8d7bc;
+  --font-body: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --page-max: 1280px;
+  --gutter: clamp(20px, 4vw, 64px);
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 html {
-  height: 100%;
+  min-height: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
+  color-scheme: dark;
+  background: var(--canvas);
 }
-
-/*
- * Deliberately no `overflow-x: hidden` here: per the CSS Overflow spec, an
- * element with overflow-x set to anything but `visible` has its overflow-y
- * computed as `auto` even if left unset, and that turns html/body into a
- * scroll container that breaks `position: sticky` for every descendant —
- * exactly what the Blueprint centerpiece's pinned viewport relies on.
- */
 
 body {
   min-height: 100%;
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--ink);
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    var(--canvas);
+  background-size: 32px 32px;
   font-family: var(--font-body);
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -100,20 +52,64 @@ a {
   text-decoration: none;
 }
 
-/* ---------------------------------------------------------------------- *
- * The surrounding site (nav, sections, footer, typography, spacing) lives
- * in components/site/site.css, kept separate from this token/reset layer
- * and from the Blueprint's own stylesheet, so the centerpiece stays fully
- * isolated from the content system.
- * ---------------------------------------------------------------------- */
+button,
+summary,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  color: var(--ink);
+  background: rgba(239, 115, 83, 0.35);
+}
+
+:focus-visible {
+  outline: 2px solid var(--redline);
+  outline-offset: 4px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 10px 14px;
+  color: var(--canvas);
+  background: var(--ink);
+  font: 700 11px/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.anchor-target {
+  position: absolute;
+  top: -100px;
+}
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
   }
 }
