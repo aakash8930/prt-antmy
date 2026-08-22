@@ -10,7 +10,7 @@ export default function Home() {
         Skip to content
       </a>
       <main id="main">
-        <h1 className="visually-hidden">System Volume</h1>
+        <h1 className="visually-hidden">Aakash Singh — Full-Stack Software Developer</h1>
         <BlueprintCenterpiece />
         <SiteNav />
         <SiteSections />

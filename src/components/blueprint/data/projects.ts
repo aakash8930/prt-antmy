@@ -69,7 +69,6 @@ export const PROJECTS: Project[] = [
     architectureArea: "frontend",
     technologies: ["NestJS", "React Native", "Expo"],
     role: "Solo developer · AI-assisted development",
-    liveUrl: "https://aakash-ideapad-3-15iml05-u-1.tail7a4203.ts.net/",
     githubUrl: "https://github.com/aakash8930/langapp.git",
     systemNarrative:
       "An AI-assisted Japanese learning system where conversational AI is one part of a broader learning flow — structured courses, writing practice, listening practice, quizzes and progress tracking, delivered through a React/React Native client and a NestJS backend.",

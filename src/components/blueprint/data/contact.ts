@@ -1,11 +1,8 @@
 /**
  * ISOLATED CONFIGURATION — contact destinations.
  *
- * Only verified information is populated. The GitHub identity is verified
- * from the repository itself (remote github.com/aakash8930/prt-antmy.git).
- * No email, phone or other channel exists in the repository, so `email` is
- * left unset — when a real address is added here, the Contact section will
- * render it as the primary mailto: action with no other changes needed.
+ * Only verified information is populated. The email address is the primary
+ * contact action; the GitHub profile is the secondary reference destination.
  */
 export type ContactInfo = {
   /** Direct email address — renders a mailto: link when set. */
@@ -15,5 +12,6 @@ export type ContactInfo = {
 };
 
 export const CONTACT: ContactInfo = {
+  email: "aakash.singh0953@gmail.com",
   github: "https://github.com/aakash8930",
 };

@@ -4,9 +4,16 @@ import "@/components/blueprint/blueprint.css";
 import "@/components/site/site.css";
 
 export const metadata: Metadata = {
-  title: "System Volume — Blueprint Prototype",
+  title: "Aakash Singh — Full-Stack Software Developer",
   description:
-    "A scroll-driven technical drawing that constructs itself into a software system's architecture.",
+    "Aakash Singh — full-stack software developer building web, mobile and backend systems, APIs, automation and AI-assisted products.",
+  openGraph: {
+    title: "Aakash Singh — Full-Stack Software Developer",
+    description:
+      "Full-stack software developer building web, mobile and backend systems, APIs, automation and AI-assisted products.",
+    type: "website",
+    siteName: "Aakash Singh",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

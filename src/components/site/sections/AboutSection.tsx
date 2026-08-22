@@ -19,9 +19,9 @@ export function AboutSection() {
         </h2>
         <div className="site-prose">
           <p className="site-lead">
-            I build full-stack systems from the data layer up — storage,
-            services, the APIs between them, the interface, and the
-            infrastructure that keeps them running.
+            I&rsquo;m Aakash Singh. I build full-stack systems from the data layer
+            up — storage, services, the APIs between them, the interface, and
+            the infrastructure that keeps them running.
           </p>
           <p>
             The drawing at the top of this page isn&rsquo;t decoration. It&rsquo;s the
@@ -51,8 +51,10 @@ export function AboutSection() {
           <div className="site-spec-row">
             <dt>Focus</dt>
             <dd>
-              <span className="site-placeholder-tag">Content placeholder</span>{" "}
-              — primary focus and specialization to be added.
+              I build full-stack web and mobile systems, with a focus on
+              backend architecture, APIs, automation, and AI-assisted product
+              development. I work across the stack to turn product
+              requirements into reliable, production-ready software.
             </dd>
           </div>
         </dl>
