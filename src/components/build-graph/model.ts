@@ -3,6 +3,11 @@ export type BuildGraphState =
   | "system-thinking"
   | "multi-surface"
   | "engineering-loop"
+  | "capability-peelback"
+  | "beginner-tools"
+  | "spotify-player"
+  | "bellybasket-foundation"
+  | "bellybasket-system"
   | "spotify-limited"
   | "inherited-rebuild"
   | "capability-compression";
@@ -63,7 +68,19 @@ export type GraphNodeId =
   | "connected-capability"
   | "shared-capability"
   | "learning-capability"
-  | "experiment-capability";
+  | "experiment-capability"
+  | "deployment"
+  | "models"
+  | "html"
+  | "css"
+  | "javascript"
+  | "todo"
+  | "tic-tac-toe"
+  | "basic-sites"
+  | "audio"
+  | "admin-surface"
+  | "maps"
+  | "tracking";
 
 export type GraphNode = {
   id: GraphNodeId;
@@ -415,6 +432,275 @@ const engineeringLoop: StateResolver = (viewport) => {
   };
 };
 
+const capabilityPeelback: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  const x = mobile ? 195 : undefined;
+  return {
+    state: "capability-peelback",
+    index: "01A",
+    name: "Accumulated capability recedes",
+    shortName: "Peelback",
+    thesis: "The current system is reduced to the layers learned later",
+    description:
+      "Deployment, models, backend, and data recede as the visual moves from present capability toward the browser where the story began.",
+    annotation: "CURRENT CAPABILITY → EARLY FOUNDATION",
+    preferredComposition: "typography-integrated",
+    canvasHeight: mobile ? 900 : undefined,
+    nodes: mobile
+      ? [
+          node("deployment", "Deployment", "outcome", x!, 120, { emphasis: "branch" }),
+          node("models", "Models", "decision", x!, 270, { emphasis: "branch" }),
+          node("core", "Backend", "service", x!, 420, { emphasis: "branch" }),
+          node("data", "Data", "data", x!, 570, { emphasis: "branch" }),
+          node("browser", "Browser", "interface", x!, 735, { emphasis: "primary" }),
+        ]
+      : [
+          node("deployment", "Deployment", "outcome", 160, 170, { emphasis: "branch" }),
+          node("models", "Models", "decision", 380, 255, { emphasis: "branch" }),
+          node("core", "Backend", "service", 600, 350, { emphasis: "branch" }),
+          node("data", "Data", "data", 820, 445, { emphasis: "branch" }),
+          node("browser", "Browser", "interface", 1040, 535, { emphasis: "primary" }),
+        ],
+    edges: [
+      { id: "peel-deployment-models", from: "deployment", to: "models", kind: "transition" },
+      { id: "peel-models-backend", from: "models", to: "core", kind: "transition" },
+      { id: "peel-backend-data", from: "core", to: "data", kind: "transition" },
+      { id: "peel-data-browser", from: "data", to: "browser", kind: "transition" },
+    ],
+    events: [],
+    callouts: [
+      {
+        id: "peel-note",
+        text: "REMOVE THE LAYERS LEARNED LATER",
+        x: mobile ? 195 : 1115,
+        y: mobile ? 835 : 640,
+        tone: "muted",
+      },
+    ],
+  };
+};
+
+const beginnerTools: StateResolver = (viewport) => {
+  if (viewport === "mobile") {
+    return {
+      state: "beginner-tools",
+      index: "01B",
+      name: "Beginner tools",
+      shortName: "Beginning",
+      thesis: "The system grew from browser primitives",
+      description:
+        "HTML, CSS, and JavaScript converge on a browser, then branch into a Todo app, Tic-Tac-Toe, and basic websites.",
+      annotation: "HTML + CSS + JAVASCRIPT → BROWSER",
+      preferredComposition: "typography-integrated",
+      canvasHeight: 980,
+      nodes: [
+        node("html", "HTML", "component", 195, 105),
+        node("css", "CSS", "component", 195, 230),
+        node("javascript", "JavaScript", "component", 195, 355, { emphasis: "primary" }),
+        node("browser", "Browser", "interface", 195, 520, { emphasis: "resolved" }),
+        node("todo", "Todo", "evidence", 95, 705),
+        node("tic-tac-toe", "Tic-Tac-Toe", "evidence", 295, 705, { width: 145 }),
+        node("basic-sites", "Basic websites", "evidence", 195, 840, { width: 165 }),
+      ],
+      edges: [
+        { id: "beginner-html-browser", from: "html", to: "browser", kind: "branch" },
+        { id: "beginner-css-browser", from: "css", to: "browser", kind: "branch" },
+        { id: "beginner-js-browser", from: "javascript", to: "browser", kind: "primary" },
+        { id: "beginner-browser-todo", from: "browser", to: "todo", kind: "branch" },
+        { id: "beginner-browser-tic", from: "browser", to: "tic-tac-toe", kind: "branch" },
+        { id: "beginner-browser-sites", from: "browser", to: "basic-sites", kind: "branch" },
+      ],
+      events: [{ id: "beginner-build", from: "javascript", to: "browser" }],
+    };
+  }
+
+  return {
+    state: "beginner-tools",
+    index: "01B",
+    name: "Beginner tools",
+    shortName: "Beginning",
+    thesis: "The system grew from browser primitives",
+    description:
+      "HTML, CSS, and JavaScript converge on a browser, then branch into a Todo app, Tic-Tac-Toe, and basic websites.",
+    annotation: "HTML + CSS + JAVASCRIPT → BROWSER",
+    preferredComposition: "typography-integrated",
+    nodes: [
+      node("html", "HTML", "component", 130, 350),
+      node("css", "CSS", "component", 310, 350),
+      node("javascript", "JavaScript", "component", 500, 350, { emphasis: "primary" }),
+      node("browser", "Browser", "interface", 720, 350, { emphasis: "resolved" }),
+      node("todo", "Todo", "evidence", 1010, 155),
+      node("tic-tac-toe", "Tic-Tac-Toe", "evidence", 1010, 350, { width: 145 }),
+      node("basic-sites", "Basic websites", "evidence", 1010, 545, { width: 165 }),
+    ],
+    edges: [
+      { id: "beginner-html-browser", from: "html", to: "browser", kind: "branch" },
+      { id: "beginner-css-browser", from: "css", to: "browser", kind: "branch" },
+      { id: "beginner-js-browser", from: "javascript", to: "browser", kind: "primary" },
+      { id: "beginner-browser-todo", from: "browser", to: "todo", kind: "branch" },
+      { id: "beginner-browser-tic", from: "browser", to: "tic-tac-toe", kind: "branch" },
+      { id: "beginner-browser-sites", from: "browser", to: "basic-sites", kind: "branch" },
+    ],
+    events: [{ id: "beginner-build", from: "javascript", to: "browser" }],
+  };
+};
+
+const spotifyPlayer: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "spotify-player",
+    index: "02A",
+    name: "Browser becomes a player",
+    shortName: "Player",
+    thesis: "The early browser becomes the first project I was proud of",
+    description:
+      "The browser resolves into a Spotify-style audio player before the bundled asset model is exposed.",
+    annotation: "BROWSER → PLAYER → AUDIO",
+    preferredComposition: "embedded",
+    canvasHeight: mobile ? 900 : undefined,
+    nodes: mobile
+      ? [
+          node("browser", "Browser", "interface", 195, 160),
+          node("player", "Spotify player", "component", 195, 430, { emphasis: "primary", width: 190 }),
+          node("audio", "Audio", "outcome", 195, 710, { emphasis: "resolved" }),
+        ]
+      : [
+          node("browser", "Browser", "interface", 230, 350),
+          node("player", "Spotify player", "component", 600, 350, { emphasis: "primary", width: 190 }),
+          node("audio", "Audio", "outcome", 970, 350, { emphasis: "resolved" }),
+        ],
+    edges: [
+      { id: "player-browser-player", from: "browser", to: "player", kind: "primary" },
+      { id: "player-player-audio", from: "player", to: "audio", kind: "primary" },
+    ],
+    events: [{ id: "player-audio-event", from: "player", to: "audio" }],
+    callouts: [
+      { id: "player-worked", text: "WORKED", x: mobile ? 195 : 1080, y: mobile ? 820 : 610, tone: "success" },
+    ],
+  };
+};
+
+const bellybasketFoundation: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  const x = mobile ? 195 : undefined;
+  return {
+    state: "bellybasket-foundation",
+    index: "03A",
+    name: "Backend boundary",
+    shortName: "Boundary",
+    thesis: "The browser gains a system behind it",
+    description:
+      "A frontend crosses an API boundary into backend logic and data—the foundation needed before additional product responsibilities can connect.",
+    annotation: "FRONTEND → API → BACKEND → DATA",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 920 : undefined,
+    nodes: mobile
+      ? [
+          node("interface", "Frontend", "interface", x!, 125),
+          node("api", "API boundary", "api", x!, 330, { emphasis: "primary", width: 165 }),
+          node("core", "Backend", "service", x!, 545, { emphasis: "primary" }),
+          node("data", "Data", "data", x!, 760),
+        ]
+      : [
+          node("interface", "Frontend", "interface", 180, 350),
+          node("api", "API boundary", "api", 460, 350, { emphasis: "primary", width: 165 }),
+          node("core", "Backend", "service", 740, 350, { emphasis: "primary" }),
+          node("data", "Data", "data", 1020, 350),
+        ],
+    edges: [
+      { id: "foundation-interface-api", from: "interface", to: "api", kind: "primary" },
+      { id: "foundation-api-core", from: "api", to: "core", kind: "primary" },
+      { id: "foundation-core-data", from: "core", to: "data", kind: "primary" },
+    ],
+    events: [{ id: "foundation-request", from: "interface", to: "data" }],
+  };
+};
+
+const bellybasketSystem: StateResolver = (viewport) => {
+  if (viewport === "mobile") {
+    return {
+      state: "bellybasket-system",
+      index: "03B",
+      name: "BellyBasket connected system",
+      shortName: "BellyBasket",
+      thesis: "Several product responsibilities now have to agree",
+      description:
+        "Frontend and admin connect through an API and backend to data, payment, location, maps, and live tracking.",
+      annotation: "FIRST REAL SYSTEM / COHERENT STATE",
+      preferredComposition: "full-width",
+      canvasHeight: 1160,
+      nodes: [
+        node("interface", "Frontend", "interface", 100, 120),
+        node("admin-surface", "Admin", "interface", 290, 120),
+        node("api", "API", "api", 195, 280),
+        node("core", "Backend", "service", 195, 445, { emphasis: "primary" }),
+        node("data", "Data", "data", 195, 610),
+        node("payment", "Razorpay", "external", 90, 785, { emphasis: "external" }),
+        node("location", "Location", "external", 300, 785, { emphasis: "external" }),
+        node("maps", "Maps", "component", 90, 965),
+        node("tracking", "Live tracking", "outcome", 300, 965, { width: 150, emphasis: "resolved" }),
+      ],
+      edges: [
+        { id: "belly-frontend-api", from: "interface", to: "api", kind: "primary" },
+        { id: "belly-admin-api", from: "admin-surface", to: "api", kind: "branch" },
+        { id: "belly-api-core", from: "api", to: "core", kind: "primary" },
+        { id: "belly-core-data", from: "core", to: "data", kind: "primary" },
+        { id: "belly-core-payment", from: "core", to: "payment", kind: "branch" },
+        { id: "belly-core-location", from: "core", to: "location", kind: "branch" },
+        { id: "belly-location-maps", from: "location", to: "maps", kind: "branch" },
+        { id: "belly-location-tracking", from: "location", to: "tracking", kind: "branch" },
+      ],
+      events: [
+        { id: "belly-request", from: "interface", to: "core" },
+        { id: "belly-location-event", from: "location", to: "tracking", delay: 1 },
+      ],
+      callouts: [
+        { id: "belly-turning-point", text: "I CAN ACTUALLY BUILD A SYSTEM", x: 195, y: 1090, tone: "success" },
+      ],
+    };
+  }
+
+  return {
+    state: "bellybasket-system",
+    index: "03B",
+    name: "BellyBasket connected system",
+    shortName: "BellyBasket",
+    thesis: "Several product responsibilities now have to agree",
+    description:
+      "Frontend and admin connect through an API and backend to data, payment, location, maps, and live tracking.",
+    annotation: "FIRST REAL SYSTEM / COHERENT STATE",
+    preferredComposition: "full-width",
+    nodes: [
+      node("interface", "Frontend", "interface", 145, 210),
+      node("admin-surface", "Admin", "interface", 145, 490),
+      node("api", "API", "api", 380, 350),
+      node("core", "Backend", "service", 610, 350, { emphasis: "primary" }),
+      node("data", "Data", "data", 840, 350),
+      node("payment", "Razorpay", "external", 870, 115, { emphasis: "external" }),
+      node("location", "Location", "external", 870, 575, { emphasis: "external" }),
+      node("maps", "Maps", "component", 1080, 490),
+      node("tracking", "Live tracking", "outcome", 1080, 620, { width: 150, emphasis: "resolved" }),
+    ],
+    edges: [
+      { id: "belly-frontend-api", from: "interface", to: "api", kind: "primary" },
+      { id: "belly-admin-api", from: "admin-surface", to: "api", kind: "branch" },
+      { id: "belly-api-core", from: "api", to: "core", kind: "primary" },
+      { id: "belly-core-data", from: "core", to: "data", kind: "primary" },
+      { id: "belly-core-payment", from: "core", to: "payment", kind: "branch" },
+      { id: "belly-core-location", from: "core", to: "location", kind: "branch" },
+      { id: "belly-location-maps", from: "location", to: "maps", kind: "branch" },
+      { id: "belly-location-tracking", from: "location", to: "tracking", kind: "branch" },
+    ],
+    events: [
+      { id: "belly-request", from: "interface", to: "core" },
+      { id: "belly-location-event", from: "location", to: "tracking", delay: 1 },
+    ],
+    callouts: [
+      { id: "belly-turning-point", text: "I CAN ACTUALLY BUILD A SYSTEM", x: 1110, y: 670, tone: "success" },
+    ],
+  };
+};
+
 const spotifyLimited: StateResolver = (viewport) => {
   if (viewport === "mobile") {
     return {
@@ -696,12 +982,32 @@ const resolvers: Record<BuildGraphState, StateResolver> = {
   "system-thinking": systemThinking,
   "multi-surface": multiSurface,
   "engineering-loop": engineeringLoop,
+  "capability-peelback": capabilityPeelback,
+  "beginner-tools": beginnerTools,
+  "spotify-player": spotifyPlayer,
+  "bellybasket-foundation": bellybasketFoundation,
+  "bellybasket-system": bellybasketSystem,
   "spotify-limited": spotifyLimited,
   "inherited-rebuild": inheritedRebuild,
   "capability-compression": capabilityCompression,
 };
 
 export const BUILD_GRAPH_STATES: BuildGraphState[] = [
+  "current",
+  "capability-peelback",
+  "beginner-tools",
+  "spotify-player",
+  "spotify-limited",
+  "bellybasket-foundation",
+  "system-thinking",
+  "bellybasket-system",
+  "multi-surface",
+  "engineering-loop",
+  "inherited-rebuild",
+  "capability-compression",
+];
+
+export const BUILD_GRAPH_LAB_STATES: BuildGraphState[] = [
   "current",
   "system-thinking",
   "multi-surface",
@@ -718,7 +1024,7 @@ export function resolveBuildGraph(
   return resolvers[state](viewport);
 }
 
-export const BUILD_GRAPH_STATE_GUIDE = BUILD_GRAPH_STATES.map((state) => {
+export const BUILD_GRAPH_STATE_GUIDE = BUILD_GRAPH_LAB_STATES.map((state) => {
   const definition = resolveBuildGraph(state, "desktop");
   return {
     state,

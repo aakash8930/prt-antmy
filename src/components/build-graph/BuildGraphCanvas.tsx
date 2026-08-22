@@ -14,6 +14,7 @@ type BuildGraphCanvasProps = {
   state: BuildGraphState;
   instanceId: string;
   compact?: boolean;
+  showStateLabel?: boolean;
   context?: {
     chapter?: string;
     annotations?: string[];
@@ -84,7 +85,15 @@ function NodeGlyph({ node, active }: { node: GraphNode; active: boolean }) {
   );
 }
 
-function GraphSvg({ state, viewport }: { state: BuildGraphState; viewport: GraphViewport }) {
+function GraphSvg({
+  state,
+  viewport,
+  showStateLabel,
+}: {
+  state: BuildGraphState;
+  viewport: GraphViewport;
+  showStateLabel: boolean;
+}) {
   const active = resolveBuildGraph(state, viewport);
   const activeNodes = nodeMap(active);
   const allDefinitions = BUILD_GRAPH_STATES.map((candidate) =>
@@ -101,7 +110,6 @@ function GraphSvg({ state, viewport }: { state: BuildGraphState; viewport: Graph
   const canvasWidth = isMobile ? 390 : 1200;
   const canvasHeight = active.canvasHeight ?? (isMobile ? 930 : 700);
   const viewBox = `0 0 ${canvasWidth} ${canvasHeight}`;
-  const stateMax = String(BUILD_GRAPH_STATES.length - 1).padStart(2, "0");
 
   return (
     <svg
@@ -139,9 +147,11 @@ function GraphSvg({ state, viewport }: { state: BuildGraphState; viewport: Graph
       <text x={isMobile ? 20 : 38} y={isMobile ? 58 : 67} className="lbg-sheet-label">
         {active.annotation}
       </text>
-      <text x={isMobile ? 370 : 1162} y={isMobile ? 58 : 67} textAnchor="end" className="lbg-sheet-index">
-        STATE {active.index} / {stateMax}
-      </text>
+      {showStateLabel && (
+        <text x={isMobile ? 370 : 1162} y={isMobile ? 58 : 67} textAnchor="end" className="lbg-sheet-index">
+          STATE {active.index}
+        </text>
+      )}
 
       {active.groups && (
         <g className="lbg-groups" key={`groups-${state}-${viewport}`}>
@@ -229,6 +239,7 @@ export function BuildGraphCanvas({
   state,
   instanceId,
   compact = false,
+  showStateLabel = true,
   context,
 }: BuildGraphCanvasProps) {
   const definition = resolveBuildGraph(state, "desktop");
@@ -241,12 +252,12 @@ export function BuildGraphCanvas({
       aria-labelledby={captionId}
     >
       <div className="lbg-frame">
-        <GraphSvg state={state} viewport="desktop" />
-        <GraphSvg state={state} viewport="mobile" />
-        {context?.annotations && context.annotations.length > 0 && (
+        <GraphSvg state={state} viewport="desktop" showStateLabel={showStateLabel} />
+        <GraphSvg state={state} viewport="mobile" showStateLabel={showStateLabel} />
+        {(context?.chapter || (context?.annotations && context.annotations.length > 0)) && (
           <div className="lbg-context" aria-hidden="true">
             {context.chapter && <span>{context.chapter}</span>}
-            {context.annotations.map((annotation) => (
+            {context.annotations?.map((annotation) => (
               <mark key={annotation}>{annotation}</mark>
             ))}
           </div>
@@ -254,7 +265,7 @@ export function BuildGraphCanvas({
       </div>
       <figcaption id={captionId}>
         <span>
-          State {definition.index} · {definition.name}
+          {showStateLabel ? `State ${definition.index} · ` : ""}{definition.name}
         </span>
         <strong>{definition.thesis}</strong>
         <p>{definition.description}</p>

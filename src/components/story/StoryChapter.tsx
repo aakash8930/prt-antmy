@@ -4,9 +4,14 @@ import { BuildGraph } from "./BuildGraph";
 type StoryChapterProps = {
   chapter: StoryChapterModel;
   projectEntry?: boolean;
+  integrated?: boolean;
 };
 
-export function StoryChapter({ chapter, projectEntry = false }: StoryChapterProps) {
+export function StoryChapter({
+  chapter,
+  projectEntry = false,
+  integrated = false,
+}: StoryChapterProps) {
   const titleId = `${chapter.id}-title`;
   const content = (
     <div className="chapter-copy">
@@ -73,16 +78,23 @@ export function StoryChapter({ chapter, projectEntry = false }: StoryChapterProp
   return (
     <section
       id={chapter.id}
-      className={`story-chapter story-chapter--${chapter.layout}`}
+      className={`story-chapter story-chapter--${chapter.layout}${
+        integrated ? " story-chapter--integrated" : ""
+      }`}
       aria-labelledby={titleId}
+      data-integrated-chapter={integrated ? "true" : undefined}
     >
       {projectEntry && <span id="projects" className="anchor-target" aria-hidden="true" />}
-      <div className="chapter-progress" aria-hidden="true">
-        <span>{chapter.number}</span>
-        <i />
-        <span>09</span>
-      </div>
-      {chapter.layout === "diagram" || chapter.layout === "inspection" ? (
+      {!integrated && (
+        <div className="chapter-progress" aria-hidden="true">
+          <span>{chapter.number}</span>
+          <i />
+          <span>09</span>
+        </div>
+      )}
+      {integrated ? (
+        content
+      ) : chapter.layout === "diagram" || chapter.layout === "inspection" ? (
         <>
           {content}
           {visual}
