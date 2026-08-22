@@ -47,6 +47,7 @@ export function BuildGraphLab() {
           <span>State {active.index}</span>
           <strong>{active.name}</strong>
           {active.description}
+          <small>Preferred composition: {active.preferredComposition}</small>
         </p>
       </section>
 
@@ -103,7 +104,7 @@ export function BuildGraphLab() {
 
       <section className="graph-state-guide" aria-labelledby="state-guide-title">
         <p className="graph-lab-label">Semantic fallback</p>
-        <h2 id="state-guide-title">What the four states must communicate</h2>
+        <h2 id="state-guide-title">What each semantic state must communicate</h2>
         <ol>
           {BUILD_GRAPH_STATE_GUIDE.map((item) => (
             <li key={item.state}>
@@ -112,6 +113,8 @@ export function BuildGraphLab() {
                 <h3>{item.name}</h3>
                 <strong>{item.thesis}</strong>
                 <p>{item.description}</p>
+                <small>{item.annotation}</small>
+                <small>Preferred composition: {item.preferredComposition}</small>
               </div>
             </li>
           ))}

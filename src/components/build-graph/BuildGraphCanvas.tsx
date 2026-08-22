@@ -98,7 +98,10 @@ function GraphSvg({ state, viewport }: { state: BuildGraphState; viewport: Graph
   }
 
   const isMobile = viewport === "mobile";
-  const viewBox = isMobile ? "0 0 390 930" : "0 0 1200 700";
+  const canvasWidth = isMobile ? 390 : 1200;
+  const canvasHeight = active.canvasHeight ?? (isMobile ? 930 : 700);
+  const viewBox = `0 0 ${canvasWidth} ${canvasHeight}`;
+  const stateMax = String(BUILD_GRAPH_STATES.length - 1).padStart(2, "0");
 
   return (
     <svg
@@ -137,8 +140,20 @@ function GraphSvg({ state, viewport }: { state: BuildGraphState; viewport: Graph
         {active.annotation}
       </text>
       <text x={isMobile ? 370 : 1162} y={isMobile ? 58 : 67} textAnchor="end" className="lbg-sheet-index">
-        STATE {active.index} / 03
+        STATE {active.index} / {stateMax}
       </text>
+
+      {active.groups && (
+        <g className="lbg-groups" key={`groups-${state}-${viewport}`}>
+          {active.groups.map((group) => (
+            <g key={group.id} className={`lbg-group lbg-group--${group.tone ?? "default"}`}>
+              <rect x={group.x} y={group.y} width={group.width} height={group.height} rx="2" />
+              <text x={group.x + 12} y={group.y + 18}>{group.label}</text>
+              <path d={`M ${group.x} ${group.y + 28} h 28`} />
+            </g>
+          ))}
+        </g>
+      )}
 
       <g className="lbg-edges">
         {allDefinitions.flatMap((definition) => {
@@ -185,9 +200,26 @@ function GraphSvg({ state, viewport }: { state: BuildGraphState; viewport: Graph
         })}
       </g>
 
+      {active.callouts && (
+        <g className="lbg-callouts" key={`callouts-${state}-${viewport}`}>
+          {active.callouts.map((callout) => (
+            <g
+              key={callout.id}
+              className={`lbg-callout lbg-callout--${callout.tone ?? "muted"}`}
+              transform={`translate(${callout.x} ${callout.y})`}
+            >
+              <line x1="-12" x2="12" y1="-9" y2="-9" />
+              <text textAnchor={callout.x > canvasWidth * 0.72 ? "end" : callout.x < canvasWidth * 0.28 ? "start" : "middle"}>
+                {callout.text}
+              </text>
+            </g>
+          ))}
+        </g>
+      )}
+
       <g className="lbg-axis-note">
-        <line x1={isMobile ? 20 : 38} x2={isMobile ? 370 : 1162} y1={isMobile ? 900 : 665} y2={isMobile ? 900 : 665} />
-        <text x={isMobile ? 20 : 38} y={isMobile ? 920 : 684}>SEMANTIC STATE → GEOMETRY → CONNECTION → EMPHASIS</text>
+        <line x1={isMobile ? 20 : 38} x2={isMobile ? 370 : 1162} y1={canvasHeight - 35} y2={canvasHeight - 35} />
+        <text x={isMobile ? 20 : 38} y={canvasHeight - 16}>SEMANTIC STATE → GEOMETRY → CONNECTION → EMPHASIS</text>
       </g>
     </svg>
   );

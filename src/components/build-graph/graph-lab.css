@@ -80,7 +80,7 @@
 
 .graph-state-buttons {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
   border: 1px solid var(--line);
 }
 
@@ -144,6 +144,14 @@
   margin: 2px 0 4px;
   color: var(--ink);
   font-weight: 650;
+}
+
+.graph-state-announcement small {
+  display: block;
+  margin-top: 5px;
+  color: var(--signal);
+  font-size: 8px;
+  text-transform: uppercase;
 }
 
 .composition-study {
@@ -361,6 +369,62 @@
   fill: var(--signal);
 }
 
+.lbg-group {
+  animation: lbg-group-resolve 420ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.lbg-group rect {
+  fill: rgba(16, 27, 33, .22);
+  stroke: rgba(131, 180, 191, .35);
+  stroke-width: 1;
+  stroke-dasharray: 5 7;
+  vector-effect: non-scaling-stroke;
+}
+
+.lbg-group text {
+  fill: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 1.1px;
+}
+
+.lbg-group path {
+  fill: none;
+  stroke: var(--redline);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.lbg-group--frontend rect {
+  fill: rgba(131, 180, 191, .025);
+  stroke: rgba(131, 180, 191, .48);
+}
+
+.lbg-group--legacy {
+  opacity: .68;
+}
+
+.lbg-group--legacy rect {
+  fill: rgba(113, 131, 138, .025);
+  stroke-dasharray: 3 8;
+}
+
+.lbg-group--rebuilt rect {
+  fill: rgba(131, 180, 191, .035);
+  stroke: rgba(131, 180, 191, .62);
+}
+
+.lbg-group--capability rect {
+  fill: rgba(184, 215, 188, .02);
+  stroke: rgba(184, 215, 188, .28);
+}
+
+@keyframes lbg-group-resolve {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .lbg-edge {
   fill: none;
   stroke: var(--signal);
@@ -378,6 +442,17 @@
 .lbg-edge--feedback {
   stroke: var(--redline);
   stroke-dasharray: 4 7;
+}
+
+.lbg-edge--transition {
+  stroke: var(--redline);
+  stroke-dasharray: 3 8;
+}
+
+.lbg-edge--compression {
+  stroke: var(--complete);
+  stroke-width: 1.8;
+  stroke-dasharray: 12 6;
 }
 
 .lbg-edge.is-active {
@@ -469,6 +544,17 @@
   stroke-dasharray: 6 5;
 }
 
+.lbg-node--component > rect {
+  fill: rgba(131, 180, 191, .07);
+  stroke: var(--signal);
+}
+
+.lbg-node--diagnosis > rect {
+  fill: rgba(239, 115, 83, .055);
+  stroke: var(--redline);
+  stroke-dasharray: 3 5;
+}
+
 .lbg-node--branch > rect {
   stroke: rgba(239, 115, 83, .62);
   stroke-dasharray: 5 4;
@@ -533,6 +619,33 @@
   color: var(--redline);
   background: rgba(9, 17, 22, .9);
   border: 1px solid var(--redline);
+}
+
+.lbg-callout {
+  animation: lbg-callout-resolve 360ms 180ms ease both;
+}
+
+.lbg-callout line {
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.lbg-callout text {
+  fill: currentColor;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 1px;
+}
+
+.lbg-callout--redline { color: var(--redline); }
+.lbg-callout--success { color: var(--complete); }
+.lbg-callout--muted { color: var(--ink-faint); }
+
+@keyframes lbg-callout-resolve {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .living-build-graph figcaption {
@@ -608,6 +721,15 @@
   margin-top: 12px;
   color: var(--ink-soft);
   line-height: 1.65;
+}
+
+.graph-state-guide li small {
+  display: block;
+  margin-top: 12px;
+  color: var(--ink-faint);
+  font: 600 8px/1.4 var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 /* Responsive ---------------------------------------------------------- */
@@ -724,8 +846,13 @@
 
   .lbg-svg--mobile {
     display: block;
-    aspect-ratio: 390 / 930;
-    max-height: min(820px, 205vw);
+    height: auto;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+
+  .living-build-graph--compact .lbg-svg--mobile {
+    max-height: none;
   }
 
   .living-build-graph figcaption {
