@@ -7,7 +7,10 @@ export type IntegratedChapterId =
   | "what-i-build-now"
   | "before-the-system"
   | "spotify-clone"
-  | "first-real-system";
+  | "first-real-system"
+  | "client-work"
+  | "rebuilding-model"
+  | "building-genko";
 
 export type ChapterVisualInput = {
   chapterId: IntegratedChapterId;
@@ -26,7 +29,19 @@ export type ResolvedChapterVisual = {
     | "limited"
     | "backend-boundary"
     | "connected-responsibilities"
-    | "coherent-system";
+    | "coherent-system"
+    | "client-workbench"
+    | "external-constraints"
+    | "client-delivery"
+    | "inherited-system"
+    | "inspection"
+    | "rebuild-growing"
+    | "shared-system"
+    | "shared-capability"
+    | "personal-problem"
+    | "learning-loop"
+    | "ai-product-feature"
+    | "product-capability";
 };
 
 function clamp01(value: number): number {
@@ -67,17 +82,74 @@ export function resolveChapterVisual({
     return { state: "spotify-limited", phase: "limited" };
   }
 
-  if (reducedMotion) {
+  if (chapterId === "first-real-system") {
+    if (reducedMotion) {
+      return { state: "bellybasket-system", phase: "coherent-system" };
+    }
+
+    const connectedStart = viewport === "mobile" ? 0.3 : 0.34;
+    const coherentStart = viewport === "mobile" ? 0.64 : 0.69;
+    if (progress < connectedStart) {
+      return { state: "bellybasket-foundation", phase: "backend-boundary" };
+    }
+    if (progress < coherentStart) {
+      return { state: "system-thinking", phase: "connected-responsibilities" };
+    }
     return { state: "bellybasket-system", phase: "coherent-system" };
   }
 
-  const connectedStart = viewport === "mobile" ? 0.3 : 0.34;
-  const coherentStart = viewport === "mobile" ? 0.64 : 0.69;
-  if (progress < connectedStart) {
-    return { state: "bellybasket-foundation", phase: "backend-boundary" };
+  if (chapterId === "client-work") {
+    if (reducedMotion) {
+      return { state: "client-constraints", phase: "external-constraints" };
+    }
+    const constraintStart = viewport === "mobile" ? 0.25 : 0.3;
+    const deliveryStart = viewport === "mobile" ? 0.65 : 0.72;
+    if (progress < constraintStart) {
+      return { state: "client-workbench", phase: "client-workbench" };
+    }
+    if (progress < deliveryStart) {
+      return { state: "client-constraints", phase: "external-constraints" };
+    }
+    return { state: "client-delivery", phase: "client-delivery" };
   }
-  if (progress < coherentStart) {
-    return { state: "system-thinking", phase: "connected-responsibilities" };
+
+  if (chapterId === "rebuilding-model") {
+    if (reducedMotion) {
+      return { state: "inherited-rebuild", phase: "shared-system" };
+    }
+    const inspectionStart = viewport === "mobile" ? 0.2 : 0.25;
+    const rebuildStart = viewport === "mobile" ? 0.42 : 0.5;
+    const connectedStart = viewport === "mobile" ? 0.65 : 0.75;
+    const extractionStart = viewport === "mobile" ? 0.88 : 0.92;
+    if (progress < inspectionStart) {
+      return { state: "dapigo-inherited", phase: "inherited-system" };
+    }
+    if (progress < rebuildStart) {
+      return { state: "dapigo-inspection", phase: "inspection" };
+    }
+    if (progress < connectedStart) {
+      return { state: "cravecart-growing", phase: "rebuild-growing" };
+    }
+    if (progress < extractionStart) {
+      return { state: "inherited-rebuild", phase: "shared-system" };
+    }
+    return { state: "shared-architecture", phase: "shared-capability" };
   }
-  return { state: "bellybasket-system", phase: "coherent-system" };
+
+  if (reducedMotion) {
+    return { state: "genko-capability", phase: "product-capability" };
+  }
+  const loopStart = viewport === "mobile" ? 0.22 : 0.3;
+  const aiStart = viewport === "mobile" ? 0.55 : 0.7;
+  const extractionStart = viewport === "mobile" ? 0.82 : 0.9;
+  if (progress < loopStart) {
+    return { state: "genko-problem", phase: "personal-problem" };
+  }
+  if (progress < aiStart) {
+    return { state: "genko-loop", phase: "learning-loop" };
+  }
+  if (progress < extractionStart) {
+    return { state: "genko-ai-product", phase: "ai-product-feature" };
+  }
+  return { state: "genko-capability", phase: "product-capability" };
 }

@@ -21,13 +21,41 @@ type BuildGraphCanvasProps = {
   };
 };
 
-const ALL_NODE_IDS = Array.from(
-  new Set(
-    BUILD_GRAPH_STATES.flatMap((state) =>
-      resolveBuildGraph(state, "desktop").nodes.map((node) => node.id),
-    ),
+const DEFINITIONS_BY_VIEWPORT: Record<
+  GraphViewport,
+  Map<BuildGraphState, BuildGraphDefinition>
+> = {
+  desktop: new Map(
+    BUILD_GRAPH_STATES.map((state) => [state, resolveBuildGraph(state, "desktop")]),
   ),
-) as GraphNodeId[];
+  mobile: new Map(
+    BUILD_GRAPH_STATES.map((state) => [state, resolveBuildGraph(state, "mobile")]),
+  ),
+};
+
+function collectFallbackNodes(
+  definitions: Map<BuildGraphState, BuildGraphDefinition>,
+): Map<GraphNodeId, GraphNode> {
+  const nodes = new Map<GraphNodeId, GraphNode>();
+  for (const definition of definitions.values()) {
+    for (const graphNode of definition.nodes) {
+      if (!nodes.has(graphNode.id)) nodes.set(graphNode.id, graphNode);
+    }
+  }
+  return nodes;
+}
+
+const FALLBACK_NODES_BY_VIEWPORT: Record<GraphViewport, Map<GraphNodeId, GraphNode>> = {
+  desktop: collectFallbackNodes(DEFINITIONS_BY_VIEWPORT.desktop),
+  mobile: collectFallbackNodes(DEFINITIONS_BY_VIEWPORT.mobile),
+};
+
+const ALL_NODE_IDS = Array.from(
+  new Set([
+    ...FALLBACK_NODES_BY_VIEWPORT.desktop.keys(),
+    ...FALLBACK_NODES_BY_VIEWPORT.mobile.keys(),
+  ]),
+);
 
 function nodeMap(definition: BuildGraphDefinition): Map<GraphNodeId, GraphNode> {
   return new Map(definition.nodes.map((node) => [node.id, node]));
@@ -94,17 +122,10 @@ function GraphSvg({
   viewport: GraphViewport;
   showStateLabel: boolean;
 }) {
-  const active = resolveBuildGraph(state, viewport);
+  const active = DEFINITIONS_BY_VIEWPORT[viewport].get(state)!;
   const activeNodes = nodeMap(active);
-  const allDefinitions = BUILD_GRAPH_STATES.map((candidate) =>
-    resolveBuildGraph(candidate, viewport),
-  );
-  const fallbackNodes = new Map<GraphNodeId, GraphNode>();
-  for (const definition of allDefinitions) {
-    for (const graphNode of definition.nodes) {
-      if (!fallbackNodes.has(graphNode.id)) fallbackNodes.set(graphNode.id, graphNode);
-    }
-  }
+  const fallbackNodes = FALLBACK_NODES_BY_VIEWPORT[viewport];
+  const allDefinitions = Array.from(DEFINITIONS_BY_VIEWPORT[viewport].values());
 
   const isMobile = viewport === "mobile";
   const canvasWidth = isMobile ? 390 : 1200;

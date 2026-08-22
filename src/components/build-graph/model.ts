@@ -8,6 +8,17 @@ export type BuildGraphState =
   | "spotify-player"
   | "bellybasket-foundation"
   | "bellybasket-system"
+  | "client-workbench"
+  | "client-constraints"
+  | "client-delivery"
+  | "dapigo-inherited"
+  | "dapigo-inspection"
+  | "cravecart-growing"
+  | "shared-architecture"
+  | "genko-problem"
+  | "genko-loop"
+  | "genko-ai-product"
+  | "genko-capability"
   | "spotify-limited"
   | "inherited-rebuild"
   | "capability-compression";
@@ -80,7 +91,30 @@ export type GraphNodeId =
   | "audio"
   | "admin-surface"
   | "maps"
-  | "tracking";
+  | "tracking"
+  | "workbench"
+  | "requirement"
+  | "external-service"
+  | "business-rule"
+  | "existing-system"
+  | "delivery"
+  | "presentation-commerce"
+  | "commerce-flow"
+  | "payment-integration"
+  | "business-integration"
+  | "role-system"
+  | "client-capability"
+  | "interface-capability"
+  | "personal-problem"
+  | "learn"
+  | "practice"
+  | "listen"
+  | "write"
+  | "quiz"
+  | "ai-product"
+  | "continue"
+  | "product-research"
+  | "ai-product-development";
 
 export type GraphNode = {
   id: GraphNodeId;
@@ -778,6 +812,511 @@ const spotifyLimited: StateResolver = (viewport) => {
   };
 };
 
+const clientWorkbench: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "client-workbench",
+    index: "04A",
+    name: "Client workbench",
+    shortName: "Workbench",
+    thesis: "The definition of done no longer belongs to the developer alone",
+    description:
+      "The connected-system capability from BellyBasket enters a professional workbench where an external requirement can constrain the build.",
+    annotation: "PERSONAL BUILD → CLIENT WORKBENCH",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 900 : undefined,
+    nodes: mobile
+      ? [
+          node("interface", "Interface", "interface", 195, 70, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 195, 210, { emphasis: "branch", width: 205, detail: "BellyBasket" }),
+          node("workbench", "Workbench", "service", 195, 440, { emphasis: "primary", detail: "definition of done" }),
+          node("requirement", "External requirement", "external", 195, 720, { emphasis: "external", width: 220 }),
+        ]
+      : [
+          node("interface", "Interface", "interface", 75, 350, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 280, 350, { emphasis: "branch", width: 205, detail: "BellyBasket" }),
+          node("workbench", "Workbench", "service", 640, 350, { emphasis: "primary", detail: "definition of done" }),
+          node("requirement", "External requirement", "external", 1010, 350, { emphasis: "external", width: 220 }),
+        ],
+    edges: [
+      { id: "workbench-interface", from: "interface", to: "connected-capability", kind: "branch" },
+      { id: "workbench-capability", from: "connected-capability", to: "workbench", kind: "transition" },
+      { id: "workbench-requirement", from: "requirement", to: "workbench", kind: "transition" },
+    ],
+    events: [{ id: "requirement-enters", from: "requirement", to: "workbench" }],
+    callouts: [
+      { id: "workbench-question", text: "WHAT DOES SOMEONE ACTUALLY NEED?", x: mobile ? 195 : 1050, y: mobile ? 835 : 625, tone: "redline" },
+    ],
+  };
+};
+
+const clientConstraints: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "client-constraints",
+    index: "04B",
+    name: "Changing client constraints",
+    shortName: "Constraints",
+    thesis: "Different requirements reshape one engineering workbench",
+    description:
+      "Presentation and commerce, commerce flow, payment integration, business-system integration, and organizational roles constrain the same workbench without pretending to document each project's architecture.",
+    annotation: "REQUIREMENTS BECOME SYSTEM CONSTRAINTS",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1160 : undefined,
+    groups: mobile
+      ? [{ id: "client-inputs", label: "AFTER BELLYBASKET / INCOMING CLIENT CONTEXT", x: 22, y: 72, width: 346, height: 655, tone: "frontend" }]
+      : [{ id: "client-inputs", label: "AFTER BELLYBASKET / CHANGING CLIENT CONTEXT", x: 55, y: 75, width: 720, height: 550, tone: "frontend" }],
+    nodes: mobile
+      ? [
+          node("presentation-commerce", "Presentation / commerce", "external", 195, 140, { detail: "UltraCoreWood", width: 245 }),
+          node("commerce-flow", "Commerce flow", "external", 195, 265, { detail: "Makhana Health King", width: 220 }),
+          node("payment-integration", "Payment integration", "external", 195, 390, { detail: "PhonePe Autopay", width: 225 }),
+          node("business-integration", "Business integration", "external", 195, 515, { detail: "SAP HANA", width: 225 }),
+          node("role-system", "Role-based system", "external", 195, 640, { detail: "Preschool platform", width: 215 }),
+          node("workbench", "Client workbench", "service", 195, 825, { emphasis: "primary", width: 195 }),
+          node("delivery", "Delivery", "outcome", 195, 1010, { emphasis: "resolved" }),
+        ]
+      : [
+          node("presentation-commerce", "Presentation / commerce", "external", 230, 145, { detail: "UltraCoreWood", width: 245 }),
+          node("commerce-flow", "Commerce flow", "external", 230, 270, { detail: "Makhana Health King", width: 220 }),
+          node("payment-integration", "Payment integration", "external", 230, 395, { detail: "PhonePe Autopay", width: 225 }),
+          node("business-integration", "Business integration", "external", 560, 210, { detail: "SAP HANA", width: 225 }),
+          node("role-system", "Role-based system", "external", 560, 430, { detail: "Preschool platform", width: 215 }),
+          node("workbench", "Client workbench", "service", 855, 350, { emphasis: "primary", width: 195 }),
+          node("delivery", "Delivery", "outcome", 1080, 350, { emphasis: "resolved" }),
+        ],
+    edges: [
+      { id: "constraint-presentation", from: "presentation-commerce", to: "workbench", kind: "branch" },
+      { id: "constraint-commerce", from: "commerce-flow", to: "workbench", kind: "branch" },
+      { id: "constraint-payment", from: "payment-integration", to: "workbench", kind: "branch" },
+      { id: "constraint-business", from: "business-integration", to: "workbench", kind: "branch" },
+      { id: "constraint-role", from: "role-system", to: "workbench", kind: "branch" },
+      { id: "constraint-delivery", from: "workbench", to: "delivery", kind: "primary" },
+    ],
+    events: [
+      { id: "constraint-payment-event", from: "payment-integration", to: "workbench" },
+      { id: "constraint-business-event", from: "business-integration", to: "workbench", delay: 0.8 },
+    ],
+  };
+};
+
+const clientDelivery: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "client-delivery",
+    index: "04C",
+    name: "Client delivery capability",
+    shortName: "Delivery",
+    thesis: "External requirements become a persistent delivery capability",
+    description:
+      "The changing project constraints compress into client delivery while the workbench receives an existing system—the handoff into inherited software.",
+    annotation: "CONSTRAINTS → DELIVERY → EXISTING SYSTEM",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1000 : undefined,
+    nodes: mobile
+      ? [
+          node("connected-capability", "Connected system", "outcome", 195, 110, { emphasis: "branch", width: 205, detail: "BellyBasket" }),
+          node("requirement", "External requirements", "external", 195, 285, { emphasis: "external", width: 220 }),
+          node("workbench", "Client workbench", "service", 195, 465, { emphasis: "primary", width: 195 }),
+          node("delivery", "Delivered work", "outcome", 195, 645, { emphasis: "resolved" }),
+          node("client-capability", "Client delivery", "outcome", 195, 810, { emphasis: "resolved", width: 190 }),
+          node("existing-system", "Existing system", "evidence", 195, 930, { emphasis: "branch", width: 190 }),
+        ]
+      : [
+          node("connected-capability", "Connected system", "outcome", 125, 165, { emphasis: "branch", width: 205, detail: "BellyBasket" }),
+          node("requirement", "External requirements", "external", 280, 350, { emphasis: "external", width: 220 }),
+          node("workbench", "Client workbench", "service", 565, 350, { emphasis: "primary", width: 195 }),
+          node("delivery", "Delivered work", "outcome", 815, 350, { emphasis: "resolved" }),
+          node("client-capability", "Client delivery", "outcome", 1045, 215, { emphasis: "resolved", width: 190 }),
+          node("existing-system", "Existing system", "evidence", 1045, 490, { emphasis: "branch", width: 190 }),
+        ],
+    edges: [
+      { id: "delivery-backbone", from: "connected-capability", to: "workbench", kind: "branch" },
+      { id: "delivery-requirement", from: "requirement", to: "workbench", kind: "transition" },
+      { id: "delivery-workbench", from: "workbench", to: "delivery", kind: "primary" },
+      { id: "delivery-capability", from: "delivery", to: "client-capability", kind: "compression" },
+      { id: "delivery-existing", from: "delivery", to: "existing-system", kind: "transition" },
+    ],
+    events: [{ id: "existing-system-arrives", from: "delivery", to: "existing-system" }],
+  };
+};
+
+const dapigoInherited: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "dapigo-inherited",
+    index: "05A",
+    name: "Inherited DapiGO",
+    shortName: "Inherited",
+    thesis: "Client delivery now begins inside software that already exists",
+    description:
+      "Only the verified inherited architecture is shown: DapiGO used Flutter with PHP/Laravel. The client-delivery capability remains as subdued context.",
+    annotation: "EXISTING SYSTEM / DAPIGO",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 900 : undefined,
+    groups: mobile
+      ? [{ id: "dapigo-inherited", label: "INHERITED / DAPIGO", x: 25, y: 195, width: 340, height: 630, tone: "legacy" }]
+      : [{ id: "dapigo-inherited", label: "INHERITED SYSTEM / DAPIGO", x: 315, y: 80, width: 835, height: 540, tone: "legacy" }],
+    nodes: mobile
+      ? [
+          node("client-capability", "Client delivery", "outcome", 195, 105, { emphasis: "branch", width: 190 }),
+          node("existing-system", "DapiGO", "evidence", 195, 285, { emphasis: "branch" }),
+          node("legacy-flutter", "Flutter", "interface", 195, 425, { emphasis: "branch" }),
+          node("legacy-php", "PHP / Laravel", "service", 195, 600, { emphasis: "branch", width: 170 }),
+          node("inspection", "Inspection", "diagnosis", 195, 775, { emphasis: "branch", detail: "understand first" }),
+        ]
+      : [
+          node("client-capability", "Client delivery", "outcome", 135, 350, { emphasis: "branch", width: 190 }),
+          node("existing-system", "DapiGO", "evidence", 430, 350, { emphasis: "branch" }),
+          node("legacy-flutter", "Flutter", "interface", 675, 230, { emphasis: "branch" }),
+          node("legacy-php", "PHP / Laravel", "service", 890, 465, { emphasis: "branch", width: 170 }),
+          node("inspection", "Inspection", "diagnosis", 1080, 280, { emphasis: "branch", detail: "understand first" }),
+        ],
+    edges: [
+      { id: "dapigo-client-existing", from: "client-capability", to: "existing-system", kind: "transition" },
+      { id: "dapigo-existing-flutter", from: "existing-system", to: "legacy-flutter", kind: "primary" },
+      { id: "dapigo-flutter-php", from: "legacy-flutter", to: "legacy-php", kind: "primary" },
+      { id: "dapigo-php-inspection", from: "legacy-php", to: "inspection", kind: "transition" },
+    ],
+    events: [{ id: "dapigo-entry", from: "existing-system", to: "legacy-php" }],
+  };
+};
+
+const dapigoInspection: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "dapigo-inspection",
+    index: "05B",
+    name: "Inspect before changing",
+    shortName: "Inspection",
+    thesis: "Understanding the existing model comes before rebuilding it",
+    description:
+      "DapiGO's verified Flutter and PHP/Laravel layers stay visible while inspection represents the initial bug-fixing and understanding work. No unverified modules or bugs are inferred.",
+    annotation: "BUILDING FEATURES → UNDERSTANDING THE MODEL",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 960 : undefined,
+    groups: mobile
+      ? [{ id: "dapigo-inspection", label: "INHERITED / DAPIGO", x: 24, y: 72, width: 342, height: 760, tone: "legacy" }]
+      : [{ id: "dapigo-inspection", label: "INHERITED SYSTEM / DAPIGO", x: 80, y: 82, width: 1040, height: 530, tone: "legacy" }],
+    nodes: mobile
+      ? [
+          node("existing-system", "DapiGO", "evidence", 195, 145, { emphasis: "branch" }),
+          node("legacy-flutter", "Flutter", "interface", 195, 325, { emphasis: "branch" }),
+          node("legacy-php", "PHP / Laravel", "service", 195, 510, { emphasis: "branch", width: 170 }),
+          node("inspection", "Inspection", "diagnosis", 195, 720, { emphasis: "primary", detail: "understand · bug fixing" }),
+        ]
+      : [
+          node("existing-system", "DapiGO", "evidence", 185, 350, { emphasis: "branch" }),
+          node("legacy-flutter", "Flutter", "interface", 430, 225, { emphasis: "branch" }),
+          node("legacy-php", "PHP / Laravel", "service", 680, 475, { emphasis: "branch", width: 170 }),
+          node("inspection", "Inspection", "diagnosis", 975, 350, { emphasis: "primary", detail: "understand · bug fixing" }),
+        ],
+    edges: [
+      { id: "inspection-existing-flutter", from: "existing-system", to: "legacy-flutter", kind: "primary" },
+      { id: "inspection-flutter-php", from: "legacy-flutter", to: "legacy-php", kind: "primary" },
+      { id: "inspection-php-inspect", from: "legacy-php", to: "inspection", kind: "transition" },
+    ],
+    events: [{ id: "inspection-path", from: "existing-system", to: "inspection" }],
+    callouts: [
+      { id: "inspection-first", text: "INSPECT / UNDERSTAND / THEN DECIDE", x: mobile ? 195 : 1010, y: mobile ? 885 : 640, tone: "redline" },
+    ],
+  };
+};
+
+const cravecartGrowing: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "cravecart-growing",
+    index: "05C",
+    name: "A new model grows through the old one",
+    shortName: "New model",
+    thesis: "The rebuild decision changes the model rather than erasing its history",
+    description:
+      "The inherited Flutter and PHP/Laravel layer remains visible while customer and admin surfaces begin connecting to a shared Node backend scaffold.",
+    annotation: "UNDERSTAND → CHANGE THE MODEL",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1160 : undefined,
+    groups: mobile
+      ? [
+          { id: "growing-old", label: "INHERITED / DAPIGO", x: 25, y: 70, width: 340, height: 390, tone: "legacy" },
+          { id: "growing-new", label: "REBUILD GROWING / CRAVECART", x: 20, y: 585, width: 350, height: 475, tone: "rebuilt" },
+        ]
+      : [
+          { id: "growing-old", label: "INHERITED / DAPIGO", x: 45, y: 90, width: 360, height: 510, tone: "legacy" },
+          { id: "growing-new", label: "NEW MODEL GROWING / CRAVECART", x: 540, y: 90, width: 615, height: 510, tone: "rebuilt" },
+        ],
+    nodes: mobile
+      ? [
+          node("legacy-flutter", "Flutter", "interface", 195, 150, { emphasis: "branch" }),
+          node("legacy-php", "PHP / Laravel", "service", 195, 285, { emphasis: "branch", width: 170 }),
+          node("inspection", "Inspection", "diagnosis", 195, 510, { emphasis: "primary" }),
+          node("customer", "Customer", "interface", 105, 665),
+          node("admin", "Admin", "interface", 285, 665),
+          node("core", "Shared Node backend", "service", 195, 855, { emphasis: "primary", width: 215, detail: "scaffolded" }),
+          node("data", "Data", "data", 195, 990, { emphasis: "branch" }),
+        ]
+      : [
+          node("legacy-flutter", "Flutter", "interface", 220, 225, { emphasis: "branch" }),
+          node("legacy-php", "PHP / Laravel", "service", 220, 465, { emphasis: "branch", width: 170 }),
+          node("inspection", "Inspection", "diagnosis", 465, 350, { emphasis: "primary" }),
+          node("customer", "Customer", "interface", 640, 225),
+          node("admin", "Admin", "interface", 640, 475),
+          node("core", "Shared Node backend", "service", 890, 350, { emphasis: "primary", width: 215, detail: "scaffolded" }),
+          node("data", "Data", "data", 1080, 350, { emphasis: "branch" }),
+        ],
+    edges: [
+      { id: "growing-flutter-php", from: "legacy-flutter", to: "legacy-php", kind: "primary" },
+      { id: "growing-php-inspection", from: "legacy-php", to: "inspection", kind: "transition" },
+      { id: "growing-inspection-core", from: "inspection", to: "core", kind: "transition" },
+      { id: "growing-customer-core", from: "customer", to: "core", kind: "branch" },
+      { id: "growing-admin-core", from: "admin", to: "core", kind: "branch" },
+      { id: "growing-core-data", from: "core", to: "data", kind: "primary" },
+    ],
+    events: [{ id: "new-model-grows", from: "inspection", to: "core" }],
+    callouts: [
+      { id: "growing-status", text: "REBUILD IN PROGRESS", x: mobile ? 195 : 1070, y: mobile ? 1095 : 640, tone: "muted" },
+    ],
+  };
+};
+
+const sharedArchitecture: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "shared-architecture",
+    index: "05E",
+    name: "Shared architecture extracted",
+    shortName: "Shared capability",
+    thesis: "The project topology recedes; shared architecture persists",
+    description:
+      "CraveCart's four-surface topology compresses into shared architecture and multi-surface system capability, alongside connected-system and client-delivery context.",
+    annotation: "CRAVECART → SHARED ARCHITECTURE",
+    preferredComposition: "typography-integrated",
+    canvasHeight: mobile ? 1040 : undefined,
+    nodes: mobile
+      ? [
+          node("connected-capability", "Connected system", "outcome", 195, 105, { emphasis: "branch", width: 205 }),
+          node("client-capability", "Client delivery", "outcome", 195, 260, { emphasis: "branch", width: 190 }),
+          node("existing-system", "DapiGO", "evidence", 195, 430, { emphasis: "branch", detail: "historical layer" }),
+          node("cravecart-project", "CraveCart", "evidence", 195, 600, { emphasis: "branch" }),
+          node("shared-capability", "Shared architecture", "outcome", 195, 780, { emphasis: "resolved", width: 225, detail: "multi-surface system" }),
+        ]
+      : [
+          node("connected-capability", "Connected system", "outcome", 150, 175, { emphasis: "branch", width: 205 }),
+          node("client-capability", "Client delivery", "outcome", 150, 500, { emphasis: "branch", width: 190 }),
+          node("existing-system", "DapiGO", "evidence", 430, 175, { emphasis: "branch", detail: "historical layer" }),
+          node("cravecart-project", "CraveCart", "evidence", 620, 350, { emphasis: "branch" }),
+          node("shared-capability", "Shared architecture", "outcome", 980, 350, { emphasis: "resolved", width: 225, detail: "multi-surface system" }),
+        ],
+    edges: [
+      { id: "shared-connected-client", from: "connected-capability", to: "client-capability", kind: "branch" },
+      { id: "shared-history-project", from: "existing-system", to: "cravecart-project", kind: "transition" },
+      { id: "shared-compress", from: "cravecart-project", to: "shared-capability", kind: "compression" },
+      { id: "shared-client-capability", from: "client-capability", to: "shared-capability", kind: "branch" },
+    ],
+    events: [{ id: "shared-extraction", from: "cravecart-project", to: "shared-capability" }],
+    callouts: [
+      { id: "shared-release", text: "KEEP CAPABILITY / RELEASE PROJECT TOPOLOGY", x: mobile ? 195 : 1090, y: mobile ? 960 : 640, tone: "success" },
+    ],
+  };
+};
+
+const genkoProblem: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "genko-problem",
+    index: "06A",
+    name: "A personal product problem",
+    shortName: "Problem",
+    thesis: "The architecture changes because the problem changed",
+    description:
+      "The client topology has compressed. A personal need—to learn Japanese with a suitable free platform—now organizes product research.",
+    annotation: "I WANTED TO LEARN JAPANESE",
+    preferredComposition: "typography-integrated",
+    canvasHeight: mobile ? 960 : undefined,
+    nodes: mobile
+      ? [
+          node("connected-capability", "Connected system", "outcome", 105, 110, { emphasis: "branch", width: 175 }),
+          node("client-capability", "Client delivery", "outcome", 285, 250, { emphasis: "branch", width: 170 }),
+          node("shared-capability", "Shared architecture", "outcome", 105, 390, { emphasis: "branch", width: 185 }),
+          node("personal-problem", "Learn Japanese", "idea", 195, 600, { emphasis: "primary", width: 185 }),
+          node("product-research", "Product research", "evidence", 195, 790, { emphasis: "resolved", width: 195 }),
+        ]
+      : [
+          node("connected-capability", "Connected system", "outcome", 125, 150, { emphasis: "branch", width: 190 }),
+          node("client-capability", "Client delivery", "outcome", 125, 350, { emphasis: "branch", width: 180 }),
+          node("shared-capability", "Shared architecture", "outcome", 125, 550, { emphasis: "branch", width: 205 }),
+          node("personal-problem", "Learn Japanese", "idea", 590, 350, { emphasis: "primary", width: 185 }),
+          node("product-research", "Product research", "evidence", 985, 350, { emphasis: "resolved", width: 195 }),
+        ],
+    edges: [
+      { id: "problem-connected-client", from: "connected-capability", to: "client-capability", kind: "branch" },
+      { id: "problem-client-shared", from: "client-capability", to: "shared-capability", kind: "branch" },
+      { id: "problem-personal-research", from: "personal-problem", to: "product-research", kind: "primary" },
+      { id: "problem-shared-research", from: "shared-capability", to: "product-research", kind: "transition" },
+    ],
+    events: [{ id: "personal-problem-event", from: "personal-problem", to: "product-research" }],
+  };
+};
+
+const genkoLoop: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "genko-loop",
+    index: "06B",
+    name: "GENKŌ learning loop grows",
+    shortName: "Learning loop",
+    thesis: "Courses become a learning flow rather than another backend diagram",
+    description:
+      "Learn, practice, listen, write, and quiz organize the product around the learner. Further work remains scaffolded without implying breakage.",
+    annotation: "LEARN → PRACTICE → LISTEN → WRITE → QUIZ",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1080 : undefined,
+    groups: mobile
+      ? [{ id: "genko-loop", label: "GENKŌ / LEARNING FLOW", x: 25, y: 65, width: 340, height: 910, tone: "rebuilt" }]
+      : [{ id: "genko-loop", label: "GENKŌ / LEARNING FLOW", x: 65, y: 75, width: 1070, height: 540, tone: "rebuilt" }],
+    nodes: mobile
+      ? [
+          node("learn", "Learn", "component", 195, 140, { emphasis: "primary", detail: "courses" }),
+          node("practice", "Practice", "component", 195, 315),
+          node("listen", "Listen", "component", 195, 490),
+          node("write", "Write", "component", 195, 665),
+          node("quiz", "Quiz", "component", 195, 840, { emphasis: "resolved" }),
+        ]
+      : [
+          node("learn", "Learn", "component", 135, 350, { emphasis: "primary", detail: "courses" }),
+          node("practice", "Practice", "component", 355, 350),
+          node("listen", "Listen", "component", 575, 350),
+          node("write", "Write", "component", 795, 350),
+          node("quiz", "Quiz", "component", 1015, 350, { emphasis: "resolved" }),
+        ],
+    edges: [
+      { id: "genko-learn-practice", from: "learn", to: "practice", kind: "primary" },
+      { id: "genko-practice-listen", from: "practice", to: "listen", kind: "primary" },
+      { id: "genko-listen-write", from: "listen", to: "write", kind: "primary" },
+      { id: "genko-write-quiz", from: "write", to: "quiz", kind: "primary" },
+    ],
+    events: [{ id: "genko-practice-event", from: "learn", to: "quiz" }],
+    callouts: [
+      { id: "genko-scaffold", text: "USABLE PATH / FURTHER WORK SCAFFOLDED", x: mobile ? 195 : 1090, y: mobile ? 1015 : 645, tone: "muted" },
+    ],
+  };
+};
+
+const genkoAiProduct: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  const positions = mobile
+    ? [[195, 105], [195, 235], [195, 365], [195, 495], [195, 625], [195, 755], [195, 885]]
+    : [[95, 350], [265, 350], [435, 350], [605, 350], [775, 350], [945, 350], [1110, 350]];
+  return {
+    state: "genko-ai-product",
+    index: "06C",
+    name: "AI inside the GENKŌ product",
+    shortName: "AI product feature",
+    thesis: "AI is one product capability inside the learning loop",
+    description:
+      "The learning flow continues through AI interaction and back into continued learning. This is product behavior—not yet the later engineering-workflow interpretation of AI.",
+    annotation: "AI = PRODUCT FEATURE",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1040 : undefined,
+    nodes: [
+      node("learn", "Learn", "component", positions[0][0], positions[0][1], { emphasis: "primary", detail: "courses" }),
+      node("practice", "Practice", "component", positions[1][0], positions[1][1]),
+      node("listen", "Listen", "component", positions[2][0], positions[2][1]),
+      node("write", "Write", "component", positions[3][0], positions[3][1]),
+      node("quiz", "Quiz", "component", positions[4][0], positions[4][1]),
+      node("ai-product", "AI interaction", "external", positions[5][0], positions[5][1], { emphasis: "external", width: 180, detail: "product feature" }),
+      node("continue", "Continue", "outcome", positions[6][0], positions[6][1], { emphasis: "resolved" }),
+    ],
+    edges: [
+      { id: "ai-learn-practice", from: "learn", to: "practice", kind: "primary" },
+      { id: "ai-practice-listen", from: "practice", to: "listen", kind: "primary" },
+      { id: "ai-listen-write", from: "listen", to: "write", kind: "primary" },
+      { id: "ai-write-quiz", from: "write", to: "quiz", kind: "primary" },
+      { id: "ai-quiz-product", from: "quiz", to: "ai-product", kind: "primary" },
+      { id: "ai-product-continue", from: "ai-product", to: "continue", kind: "primary" },
+      { id: "ai-continue-learn", from: "continue", to: "learn", kind: "feedback" },
+    ],
+    events: [{ id: "ai-learning-event", from: "quiz", to: "continue" }],
+    callouts: [
+      { id: "genko-status", text: "USABLE FOUNDATION / CONTINUING DEVELOPMENT", x: mobile ? 195 : 1085, y: mobile ? 990 : 640, tone: "success" },
+    ],
+  };
+};
+
+const genkoCapability: StateResolver = (viewport) => {
+  const mobile = viewport === "mobile";
+  return {
+    state: "genko-capability",
+    index: "06D",
+    name: "GENKŌ capability extraction",
+    shortName: "Product research",
+    thesis: "The learning topology compresses while the product capability persists",
+    description:
+      "A subdued GENKŌ learning loop remains legible beside the accumulated backbone: interface, connected system, client delivery, shared architecture, and product research.",
+    annotation: "GENKŌ → PRODUCT RESEARCH",
+    preferredComposition: "full-width",
+    canvasHeight: mobile ? 1320 : undefined,
+    groups: mobile
+      ? [
+          { id: "genko-compressed-loop", label: "GENKŌ / USABLE FOUNDATION · CONTINUING DEVELOPMENT", x: 24, y: 65, width: 342, height: 570, tone: "legacy" },
+          { id: "capability-backbone", label: "PERSISTENT CAPABILITY BACKBONE", x: 20, y: 700, width: 350, height: 545, tone: "capability" },
+        ]
+      : [
+          { id: "genko-compressed-loop", label: "GENKŌ / USABLE FOUNDATION · CONTINUING DEVELOPMENT", x: 45, y: 85, width: 430, height: 520, tone: "legacy" },
+          { id: "capability-backbone", label: "PERSISTENT CAPABILITY BACKBONE", x: 525, y: 85, width: 630, height: 520, tone: "capability" },
+        ],
+    nodes: mobile
+      ? [
+          node("learn", "Learn", "component", 100, 150, { emphasis: "branch" }),
+          node("practice", "Practice", "component", 290, 150, { emphasis: "branch" }),
+          node("listen", "Listen", "component", 100, 285, { emphasis: "branch" }),
+          node("write", "Write", "component", 290, 285, { emphasis: "branch" }),
+          node("quiz", "Quiz", "component", 100, 420, { emphasis: "branch" }),
+          node("ai-product", "AI product", "external", 290, 420, { emphasis: "external", width: 145 }),
+          node("continue", "Continue", "outcome", 195, 555, { emphasis: "resolved" }),
+          node("interface-capability", "Interface", "outcome", 195, 765, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 195, 865, { emphasis: "branch", width: 195 }),
+          node("client-capability", "Client delivery", "outcome", 195, 965, { emphasis: "branch", width: 180 }),
+          node("shared-capability", "Shared architecture", "outcome", 195, 1065, { emphasis: "branch", width: 210 }),
+          node("product-research", "Product research", "outcome", 195, 1165, { emphasis: "resolved", width: 195 }),
+          node("ai-product-development", "AI-assisted product development", "outcome", 195, 1260, { emphasis: "resolved", width: 280 }),
+        ]
+      : [
+          node("learn", "Learn", "component", 135, 170, { emphasis: "branch" }),
+          node("practice", "Practice", "component", 365, 170, { emphasis: "branch" }),
+          node("listen", "Listen", "component", 135, 315, { emphasis: "branch" }),
+          node("write", "Write", "component", 365, 315, { emphasis: "branch" }),
+          node("quiz", "Quiz", "component", 135, 460, { emphasis: "branch" }),
+          node("ai-product", "AI product", "external", 365, 460, { emphasis: "external", width: 145 }),
+          node("continue", "Continue", "outcome", 250, 560, { emphasis: "resolved" }),
+          node("interface-capability", "Interface", "outcome", 650, 160, { emphasis: "branch" }),
+          node("connected-capability", "Connected system", "outcome", 880, 160, { emphasis: "branch", width: 195 }),
+          node("client-capability", "Client delivery", "outcome", 1045, 270, { emphasis: "branch", width: 180 }),
+          node("shared-capability", "Shared architecture", "outcome", 1045, 440, { emphasis: "branch", width: 210 }),
+          node("product-research", "Product research", "outcome", 810, 540, { emphasis: "resolved", width: 195 }),
+          node("ai-product-development", "AI-assisted product development", "outcome", 620, 410, { emphasis: "resolved", width: 280 }),
+        ],
+    edges: [
+      { id: "capability-loop-practice", from: "learn", to: "practice", kind: "branch" },
+      { id: "capability-loop-listen", from: "practice", to: "listen", kind: "branch" },
+      { id: "capability-loop-write", from: "listen", to: "write", kind: "branch" },
+      { id: "capability-loop-quiz", from: "write", to: "quiz", kind: "branch" },
+      { id: "capability-loop-ai", from: "quiz", to: "ai-product", kind: "branch" },
+      { id: "capability-loop-continue", from: "ai-product", to: "continue", kind: "branch" },
+      { id: "capability-interface-connected", from: "interface-capability", to: "connected-capability", kind: "branch" },
+      { id: "capability-connected-client", from: "connected-capability", to: "client-capability", kind: "branch" },
+      { id: "capability-client-shared", from: "client-capability", to: "shared-capability", kind: "branch" },
+      { id: "capability-shared-research", from: "shared-capability", to: "product-research", kind: "branch" },
+      { id: "capability-genko-research", from: "continue", to: "product-research", kind: "compression" },
+      { id: "capability-research-ai", from: "product-research", to: "ai-product-development", kind: "branch" },
+    ],
+    events: [{ id: "genko-extraction", from: "continue", to: "product-research" }],
+    callouts: [
+      { id: "capability-status", text: "USABLE FOUNDATION / CONTINUING DEVELOPMENT", x: mobile ? 195 : 1100, y: mobile ? 1295 : 640, tone: "success" },
+    ],
+  };
+};
+
 const inheritedRebuild: StateResolver = (viewport) => {
   if (viewport === "mobile") {
     return {
@@ -987,6 +1526,17 @@ const resolvers: Record<BuildGraphState, StateResolver> = {
   "spotify-player": spotifyPlayer,
   "bellybasket-foundation": bellybasketFoundation,
   "bellybasket-system": bellybasketSystem,
+  "client-workbench": clientWorkbench,
+  "client-constraints": clientConstraints,
+  "client-delivery": clientDelivery,
+  "dapigo-inherited": dapigoInherited,
+  "dapigo-inspection": dapigoInspection,
+  "cravecart-growing": cravecartGrowing,
+  "shared-architecture": sharedArchitecture,
+  "genko-problem": genkoProblem,
+  "genko-loop": genkoLoop,
+  "genko-ai-product": genkoAiProduct,
+  "genko-capability": genkoCapability,
   "spotify-limited": spotifyLimited,
   "inherited-rebuild": inheritedRebuild,
   "capability-compression": capabilityCompression,
@@ -1001,9 +1551,20 @@ export const BUILD_GRAPH_STATES: BuildGraphState[] = [
   "bellybasket-foundation",
   "system-thinking",
   "bellybasket-system",
+  "client-workbench",
+  "client-constraints",
+  "client-delivery",
+  "dapigo-inherited",
+  "dapigo-inspection",
+  "cravecart-growing",
+  "inherited-rebuild",
+  "shared-architecture",
+  "genko-problem",
+  "genko-loop",
+  "genko-ai-product",
+  "genko-capability",
   "multi-surface",
   "engineering-loop",
-  "inherited-rebuild",
   "capability-compression",
 ];
 

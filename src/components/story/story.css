@@ -1277,7 +1277,7 @@ blockquote {
   }
 }
 
-/* Chapters 00–03: one chapter-local Living Build Graph world ---------- */
+/* Chapters 00–06: one chapter-local Living Build Graph world ---------- */
 .story-arc {
   position: relative;
   isolation: isolate;
@@ -1304,7 +1304,10 @@ blockquote {
   transition: width 320ms var(--ease-out, ease), max-width 320ms var(--ease-out, ease);
 }
 
-.story-arc--first-real-system .story-arc-visual {
+.story-arc--first-real-system .story-arc-visual,
+.story-arc--client-work .story-arc-visual,
+.story-arc--rebuilding-model .story-arc-visual,
+.story-arc--building-genko .story-arc-visual {
   width: 100%;
   max-width: 1050px;
   margin-right: auto;
@@ -1333,6 +1336,15 @@ blockquote {
 
 .story-chapter--integrated .chapter-copy {
   pointer-events: auto;
+}
+
+.story-chapter--integrated#client-work,
+.story-chapter--integrated#building-genko {
+  min-height: max(1250px, 180svh);
+}
+
+.story-chapter--integrated#rebuilding-model {
+  min-height: max(1450px, 205svh);
 }
 
 .story-chapter--integrated .chapter-heading,
