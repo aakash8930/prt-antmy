@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import "@/components/story/story.css";
+import "@/components/build-graph/graph-lab.css";
 
 export const metadata: Metadata = {
   title: "Aakash Singh — Full-Stack Software Developer",
