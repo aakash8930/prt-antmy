@@ -1377,6 +1377,19 @@ blockquote {
 }
 
 @media (min-width: 901px) {
+  .story-chapter--integrated .chapter-copy {
+    background: var(--canvas);
+    box-shadow: -24px 0 32px 8px var(--canvas);
+  }
+
+  .story-chapter--integrated .chapter-heading,
+  .story-chapter--integrated .chapter-prose,
+  .story-chapter--integrated blockquote,
+  .story-chapter--integrated .evidence-record {
+    background: transparent;
+    box-shadow: none;
+  }
+
   .story-arc--first-real-system .story-arc-visual {
     max-width: 1120px;
   }
