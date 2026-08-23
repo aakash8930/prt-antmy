@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import type { StoryChapter as StoryChapterModel } from "@/content/story";
 import { StoryChapter } from "@/components/story/StoryChapter";
 import { SoftwareAssembly } from "@/components/workspace/SoftwareAssembly";
-import { BuildGraphCanvas } from "./BuildGraphCanvas";
 import {
   resolveChapterVisual,
   type IntegratedChapterId,
@@ -152,18 +151,6 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
   }, []);
 
   const activeChapter = chapters.find((chapter) => chapter.id === runtime.chapterId);
-  const usesAssemblyPrototype = [
-    "what-i-build-now",
-    "before-the-system",
-    "spotify-clone",
-    "first-real-system",
-    "client-work",
-    "rebuilding-model",
-    "building-genko",
-    "ai-engineering",
-    "quantx-experiment",
-    "how-i-build-now",
-  ].includes(runtime.chapterId);
 
   return (
     <div
@@ -177,28 +164,15 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
       <div className="story-arc-visual-layer">
         <div className="story-arc-visual-sticky">
           <div className="story-arc-visual">
-            {usesAssemblyPrototype ? (
-              <SoftwareAssembly
-                state={runtime.state}
-                reducedMotion={runtime.reducedMotion}
-                chapterLabel={
-                  activeChapter
-                    ? `${activeChapter.number} / ${activeChapter.navLabel}`
-                    : "00 / Now"
-                }
-              />
-            ) : (
-              <BuildGraphCanvas
-                state={runtime.state}
-                instanceId="integrated-story-graph"
-                showStateLabel={false}
-                context={{
-                  chapter: activeChapter
-                    ? `${activeChapter.number} / ${activeChapter.navLabel}`
-                    : "00 / Now",
-                }}
-              />
-            )}
+            <SoftwareAssembly
+              state={runtime.state}
+              reducedMotion={runtime.reducedMotion}
+              chapterLabel={
+                activeChapter
+                  ? `${activeChapter.number} / ${activeChapter.navLabel}`
+                  : "00 / Now"
+              }
+            />
           </div>
         </div>
       </div>

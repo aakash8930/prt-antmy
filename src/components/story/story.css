@@ -1373,12 +1373,6 @@ blockquote {
   width: min(72%, 930px);
 }
 
-.story-arc .living-build-graph figcaption {
-  padding-right: 8px;
-  padding-left: 8px;
-  background: rgba(9, 17, 22, 0.9);
-}
-
 .story-arc-chapters {
   position: relative;
   z-index: 1;
@@ -1447,103 +1441,7 @@ blockquote {
     max-width: 1120px;
   }
 
-  .story-arc--first-real-system:is(
-      [data-visual-state="system-thinking"],
-      [data-visual-state="bellybasket-system"]
-    ) .lbg-node > rect {
-    stroke-opacity: 1;
-  }
 
-  .story-arc--first-real-system:is(
-      [data-visual-state="system-thinking"],
-      [data-visual-state="bellybasket-system"]
-    ) .lbg-edge.is-active {
-    stroke-width: 1.8;
-  }
-
-  .story-arc--first-real-system[data-visual-state="bellybasket-system"]
-    .lbg-node[data-node-id="maps"] {
-    transition-delay: 90ms;
-  }
-
-  .story-arc--first-real-system[data-visual-state="bellybasket-system"]
-    .lbg-node[data-node-id="tracking"] {
-    transition-delay: 210ms;
-  }
-
-  .story-arc--rebuilding-model:is(
-      [data-visual-state="cravecart-growing"],
-      [data-visual-state="inherited-rebuild"]
-    ) .lbg-group--legacy {
-    opacity: 0.42;
-  }
-
-  .story-arc--rebuilding-model:is(
-      [data-visual-state="cravecart-growing"],
-      [data-visual-state="inherited-rebuild"]
-    ) .lbg-group--rebuilt rect {
-    fill: rgba(131, 180, 191, 0.075);
-    stroke: rgba(131, 180, 191, 0.9);
-  }
-
-  .story-arc--rebuilding-model:is(
-      [data-visual-state="cravecart-growing"],
-      [data-visual-state="inherited-rebuild"]
-    ) .lbg-node:is(
-      [data-node-id="legacy-flutter"],
-      [data-node-id="legacy-php"]
-    ) {
-    opacity: 0.48;
-  }
-
-  .story-arc--rebuilding-model:is(
-      [data-visual-state="cravecart-growing"],
-      [data-visual-state="inherited-rebuild"]
-    ) .lbg-edge[data-edge-id="growing-inspection-core"],
-  .story-arc--rebuilding-model[data-visual-state="inherited-rebuild"]
-    .lbg-edge[data-edge-id="rebuild-inspection-core"] {
-    stroke-width: 2.6;
-    opacity: 1;
-  }
-
-  .story-arc--rebuilding-model[data-visual-state="shared-architecture"]
-    .lbg-node[data-node-id="shared-capability"] > rect {
-    stroke-width: 2;
-  }
-
-  .story-arc--how-i-build-now[data-visual-state="capability-provenance"]
-    .lbg-node.lbg-node--evidence.is-active {
-    opacity: 0.62;
-  }
-
-  .story-arc--how-i-build-now[data-visual-state="capability-provenance"]
-    .lbg-edge--compression {
-    stroke-width: 2.2;
-  }
-
-  .story-arc--how-i-build-now[data-visual-state="capability-provenance"]
-    .lbg-edge--branch {
-    stroke-width: 1.8;
-  }
-
-  .story-arc--how-i-build-now[data-visual-state="contact-handoff"]
-    .lbg-node.is-active[data-node-id$="-capability"] {
-    opacity: 0.32;
-  }
-
-  .story-arc--how-i-build-now[data-visual-state="contact-handoff"]
-    .lbg-edge--branch.is-active {
-    opacity: 0.32;
-  }
-
-  .story-arc--how-i-build-now[data-visual-state="contact-handoff"]
-    .lbg-node:is(
-      [data-node-id="open-connection"],
-      [data-node-id="email-contact"],
-      [data-node-id="github-contact"]
-    ) {
-    opacity: 1;
-  }
 }
 
 @media (min-width: 761px) and (max-width: 900px) and (orientation: portrait) {
@@ -1561,10 +1459,6 @@ blockquote {
     max-width: none;
   }
 
-  .story-arc .lbg-frame {
-    height: min(58svh, 620px);
-  }
-
   .story-chapter--integrated .chapter-copy {
     width: min(620px, 86%);
     max-width: 620px;
@@ -1576,16 +1470,6 @@ blockquote {
     padding-bottom: 58svh;
   }
 
-  .story-arc .living-build-graph figcaption {
-    grid-template-columns: minmax(130px, auto) 1fr;
-    gap: 8px 18px;
-    max-height: 92px;
-    overflow: hidden;
-  }
-
-  .story-arc .living-build-graph figcaption p {
-    display: none;
-  }
 }
 
 @media (max-width: 760px) {
@@ -1601,39 +1485,6 @@ blockquote {
   .story-arc--first-real-system .story-arc-visual {
     width: 100%;
     max-width: none;
-  }
-
-  .story-arc .lbg-frame {
-    height: min(59svh, 560px);
-  }
-
-  .story-arc[data-visual-state="ai-proposals"] .lbg-frame,
-  .story-arc[data-visual-state="ai-evaluation"] .lbg-frame,
-  .story-arc[data-visual-state="ai-workflow"] .lbg-frame,
-  .story-arc[data-visual-state="ai-capability"] .lbg-frame,
-  .story-arc[data-visual-state="model-branching"] .lbg-frame,
-  .story-arc[data-visual-state="decision-gates"] .lbg-frame,
-  .story-arc[data-visual-state="quantx-capability"] .lbg-frame,
-  .story-arc[data-visual-state="capability-provenance"] .lbg-frame,
-  .story-arc[data-visual-state="open-frontier"] .lbg-frame,
-  .story-arc[data-visual-state="contact-handoff"] .lbg-frame {
-    height: min(68svh, 620px);
-  }
-
-  .story-arc .lbg-svg--mobile {
-    width: 100%;
-    height: 100%;
-  }
-
-  .story-arc .living-build-graph figcaption {
-    max-height: 105px;
-    padding: 8px 6px 0;
-    overflow: hidden;
-    background: rgba(9, 17, 22, 0.95);
-  }
-
-  .story-arc .living-build-graph figcaption p {
-    display: none;
   }
 
   .story-chapter--integrated {

@@ -133,6 +133,52 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+.software-assembly__fallback {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: clamp(32px, 8vw, 96px);
+  border: 1px solid rgba(131, 180, 191, 0.2);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(9, 17, 22, 0.96), rgba(13, 25, 31, 0.94)),
+    repeating-linear-gradient(90deg, transparent 0 48px, rgba(131, 180, 191, 0.05) 48px 49px);
+  text-align: center;
+}
+
+.software-assembly__fallback::before {
+  content: "";
+  width: min(280px, 70%);
+  height: 1px;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, transparent, var(--redline), transparent);
+}
+
+.software-assembly__fallback span,
+.software-assembly__fallback p {
+  color: var(--ink-faint);
+  font: 650 9px/1.5 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.software-assembly__fallback strong {
+  max-width: 34ch;
+  color: var(--ink);
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-weight: 520;
+  line-height: 1.3;
+}
+
+.software-assembly__fallback p {
+  max-width: 54ch;
+  margin: 0;
+}
+
 .software-assembly--clientConstraints .software-assembly__stage {
   box-shadow:
     inset 0 0 0 1px rgba(239, 115, 83, 0.32),
@@ -282,6 +328,10 @@
   .software-assembly__stage {
     height: min(58svh, 520px);
     min-height: 420px;
+    border-radius: 16px;
+  }
+
+  .software-assembly__fallback {
     border-radius: 16px;
   }
 

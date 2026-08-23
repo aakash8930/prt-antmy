@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import * as THREE from "three";
 import type { BuildGraphState } from "@/components/build-graph/model";
 
@@ -1032,6 +1032,7 @@ function targetsForMode(mode: AssemblyMode) {
 
 export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: SoftwareAssemblyProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [webglUnavailable, setWebglUnavailable] = useState(false);
   const mode = modeForState(state);
   const modeRef = useRef(mode);
   const reducedMotionRef = useRef(reducedMotion);
@@ -1049,11 +1050,30 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance",
+      });
+    } catch {
+      queueMicrotask(() => setWebglUnavailable(true));
+      return;
+    }
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
     renderer.setClearColor(0x071015, 0);
+
+    let contextLost = false;
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      contextLost = true;
+      setWebglUnavailable(true);
+    };
+    canvas.addEventListener("webglcontextlost", handleContextLost);
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x091116, 0.055);
@@ -1090,6 +1110,17 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
     let frame = 0;
     let previousTime = performance.now();
     let portraitViewport = false;
+    let pageVisible = !document.hidden;
+    const cameraTarget = new THREE.Vector3();
+
+    const handleVisibilityChange = () => {
+      pageVisible = !document.hidden;
+      cancelAnimationFrame(frame);
+      if (pageVisible && !contextLost) {
+        previousTime = performance.now();
+        frame = requestAnimationFrame(render);
+      }
+    };
 
     const resize = () => {
       const { clientWidth, clientHeight } = canvas;
@@ -1112,6 +1143,7 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
     };
 
     const render = (time: number) => {
+      if (contextLost) return;
       const dt = Math.min(0.05, (time - previousTime) / 1000);
       previousTime = time;
       const targets = targetsForMode(modeRef.current);
@@ -1205,36 +1237,33 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, targetRotation, factor);
 
       if (!portraitViewport) {
-        const cameraTarget = activeMode === "inspection"
-          ? new THREE.Vector3(6.35, 3.65, 7.25)
-          : isInherited
-            ? new THREE.Vector3(8.35, 5.15, 10.4)
-            : isFinale
-              ? activeMode === "handoff"
-                ? new THREE.Vector3(9.25, 5.1, 12.8)
-                : new THREE.Vector3(8.1, 4.7, 10.2)
-              : isQuantLab
-                ? new THREE.Vector3(8.8, 5.15, 11.4)
-                : isWorkbenchScene
-                ? new THREE.Vector3(8.15, 4.85, 10.1)
-                : new THREE.Vector3(7.4, 4.7, 8.8);
+        if (activeMode === "inspection") cameraTarget.set(6.35, 3.65, 7.25);
+        else if (isInherited) cameraTarget.set(8.35, 5.15, 10.4);
+        else if (activeMode === "handoff") cameraTarget.set(9.25, 5.1, 12.8);
+        else if (isFinale) cameraTarget.set(8.1, 4.7, 10.2);
+        else if (isQuantLab) cameraTarget.set(8.8, 5.15, 11.4);
+        else if (isWorkbenchScene) cameraTarget.set(8.15, 4.85, 10.1);
+        else cameraTarget.set(7.4, 4.7, 8.8);
         camera.position.lerp(cameraTarget, factor * 0.72);
       }
       const lookZ = activeMode === "inspection" ? -0.72 : isInherited ? -0.25 : 0;
       camera.lookAt(0, -0.1, lookZ);
 
       renderer.render(scene, camera);
-      frame = requestAnimationFrame(render);
+      if (pageVisible) frame = requestAnimationFrame(render);
     };
 
     resize();
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(canvas);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     frame = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      canvas.removeEventListener("webglcontextlost", handleContextLost);
       scene.traverse((object) => {
         if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
           object.geometry.dispose();
@@ -1264,6 +1293,13 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         </ol>
         <span className="software-assembly__chapter">{chapterLabel}</span>
       </div>
+      {webglUnavailable && (
+        <div className="software-assembly__fallback" role="status">
+          <span>3D view unavailable</span>
+          <strong>{copy.title}</strong>
+          <p>{copy.labels.join(" · ")}</p>
+        </div>
+      )}
       <figcaption id="software-assembly-title" className="visually-hidden">
         {copy.title} {copy.labels.join(", ")}.
       </figcaption>
