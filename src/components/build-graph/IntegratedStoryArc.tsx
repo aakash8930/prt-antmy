@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { StoryChapter as StoryChapterModel } from "@/content/story";
 import { StoryChapter } from "@/components/story/StoryChapter";
 import { SoftwareAssembly } from "@/components/workspace/SoftwareAssembly";
+import { compositionForChapter } from "@/components/workspace/choreography";
 import {
   resolveChapterVisual,
   type IntegratedChapterId,
@@ -159,6 +160,7 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
       data-active-chapter={runtime.chapterId}
       data-visual-state={runtime.state}
       data-visual-phase={runtime.phase}
+      data-composition={compositionForChapter(runtime.chapterId)}
       data-reduced-motion={runtime.reducedMotion ? "true" : "false"}
     >
       <div className="story-arc-visual-layer">
@@ -166,6 +168,8 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
           <div className="story-arc-visual">
             <SoftwareAssembly
               state={runtime.state}
+              chapterId={runtime.chapterId}
+              viewport={runtime.viewport}
               reducedMotion={runtime.reducedMotion}
               chapterLabel={
                 activeChapter

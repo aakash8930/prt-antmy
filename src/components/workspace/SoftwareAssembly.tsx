@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import * as THREE from "three";
-import type { BuildGraphState } from "@/components/build-graph/model";
+import type { BuildGraphState, GraphViewport } from "@/components/build-graph/model";
+import type { IntegratedChapterId } from "@/components/build-graph/chapterVisualResolver";
+import {
+  sampleChoreography,
+  type ChoreographyRole,
+} from "@/components/workspace/choreography";
 
 type AssemblyMode =
   | "current"
@@ -41,47 +46,13 @@ type AssemblyMode =
 
 type SoftwareAssemblyProps = {
   state: BuildGraphState;
+  chapterId: IntegratedChapterId;
+  viewport: GraphViewport;
   reducedMotion: boolean;
   chapterLabel: string;
 };
 
-type SceneRole =
-  | "interface"
-  | "api"
-  | "service"
-  | "data"
-  | "workbench"
-  | "sources"
-  | "assets"
-  | "admin"
-  | "payment"
-  | "location"
-  | "maps"
-  | "tracking"
-  | "constraints"
-  | "delivery"
-  | "legacy"
-  | "inspection"
-  | "rebuild"
-  | "shared"
-  | "learning"
-  | "productResearch"
-  | "productAI"
-  | "aiInputs"
-  | "decision"
-  | "outcomes"
-  | "implementation"
-  | "testing"
-  | "market"
-  | "features"
-  | "models"
-  | "riskGates"
-  | "actions"
-  | "unresolved"
-  | "capability"
-  | "provenance"
-  | "frontier"
-  | "contact";
+type SceneRole = ChoreographyRole;
 
 type RoleGroup = THREE.Group & { userData: { roleOpacity?: number } };
 
@@ -118,6 +89,15 @@ const EXPANDED_MODES = new Set<AssemblyMode>([
   "quantModels",
   "quantGates",
 ]);
+const PROCEDURAL_X_ROLES = new Set<SceneRole>([
+  "inspection",
+  "rebuild",
+  "productAI",
+  "models",
+  "frontier",
+  "contact",
+]);
+
 const WORKBENCH_MODES = new Set<AssemblyMode>([
   "genkoProblem",
   "genkoLoop",
@@ -1064,17 +1044,33 @@ function targetsForMode(mode: AssemblyMode) {
   } satisfies Record<SceneRole, { opacity: number; y: number; z: number; scale: number }>;
 }
 
-export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: SoftwareAssemblyProps) {
+export function SoftwareAssembly({
+  state,
+  chapterId,
+  viewport,
+  reducedMotion,
+  chapterLabel,
+}: SoftwareAssemblyProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [webglUnavailable, setWebglUnavailable] = useState(false);
   const mode = modeForState(state);
   const modeRef = useRef(mode);
+  const chapterIdRef = useRef(chapterId);
+  const viewportRef = useRef(viewport);
   const reducedMotionRef = useRef(reducedMotion);
   const copy = useMemo(() => MODE_COPY[mode], [mode]);
 
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+
+  useEffect(() => {
+    chapterIdRef.current = chapterId;
+  }, [chapterId]);
+
+  useEffect(() => {
+    viewportRef.current = viewport;
+  }, [viewport]);
 
   useEffect(() => {
     reducedMotionRef.current = reducedMotion;
@@ -1188,20 +1184,40 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       }
       const instant = reducedMotionRef.current;
       const factor = instant ? 1 : 1 - Math.exp(-dt * 5.5);
+      const chapterProgress = THREE.MathUtils.clamp(Number(arc?.dataset.localProgress ?? 0), 0, 1);
+      const choreography = sampleChoreography(
+        chapterIdRef.current,
+        chapterProgress,
+        viewportRef.current,
+        instant,
+      );
+      if (arc?.dataset.composition !== choreography.composition) {
+        arc?.setAttribute("data-composition", choreography.composition);
+      }
+      arc?.style.setProperty("--scene-progress", chapterProgress.toFixed(4));
 
       (Object.keys(roles) as SceneRole[]).forEach((name) => {
         const group = roles[name];
         const target = targets[name];
-        group.position.y = THREE.MathUtils.lerp(group.position.y, basePositions[name].y + target.y, factor);
-        group.position.z = THREE.MathUtils.lerp(group.position.z, basePositions[name].z + target.z, factor);
-        const scale = THREE.MathUtils.lerp(group.scale.x, target.scale, factor);
+        const track = choreography.roles[name];
+        const targetX = basePositions[name].x + (track?.x ?? 0);
+        const targetY = basePositions[name].y + (track?.y ?? target.y);
+        const targetZ = basePositions[name].z + (track?.z ?? target.z);
+        if (!PROCEDURAL_X_ROLES.has(name)) {
+          group.position.x = THREE.MathUtils.lerp(group.position.x, targetX, factor);
+        }
+        group.position.y = THREE.MathUtils.lerp(group.position.y, targetY, factor);
+        group.position.z = THREE.MathUtils.lerp(group.position.z, targetZ, factor);
+        const scale = THREE.MathUtils.lerp(group.scale.x, track?.scale ?? target.scale, factor);
         group.scale.setScalar(scale);
         const currentOpacity = group.userData.roleOpacity ?? 0;
-        setGroupOpacity(group, THREE.MathUtils.lerp(currentOpacity, target.opacity, factor));
+        setGroupOpacity(
+          group,
+          THREE.MathUtils.lerp(currentOpacity, track?.opacity ?? target.opacity, factor),
+        );
       });
 
       const activeMode = modeRef.current;
-      const chapterProgress = THREE.MathUtils.clamp(Number(arc?.dataset.localProgress ?? 0), 0, 1);
       const inspectionX = activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0;
       const rebuildX = activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0;
       const activeAiMode = AI_MODES.has(activeMode);
@@ -1244,14 +1260,26 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       const isWorkbenchScene = WORKBENCH_MODES.has(activeMode);
       const isQuantLab = QUANT_MODES.has(activeMode);
       const isFinale = FINALE_MODES.has(activeMode);
-      const targetRootX = activeMode === "handoff" ? -1.55 : isFinale ? -0.52 : isQuantLab ? -0.68 : isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
-      const targetScale = activeMode === "handoff" ? 0.7 : isFinale ? 0.86 : isQuantLab ? 0.8 : isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
-      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isFinale ? -0.06 : isQuantLab ? -0.08 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
+      const modeRootX = activeMode === "handoff" ? -1.55 : isFinale ? -0.52 : isQuantLab ? -0.68 : isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
+      const modeScale = activeMode === "handoff" ? 0.7 : isFinale ? 0.86 : isQuantLab ? 0.8 : isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
+      const modeRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isFinale ? -0.06 : isQuantLab ? -0.08 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
+      const targetRootX = choreography.root?.x ?? modeRootX;
+      const targetRootY = choreography.root?.y ?? 0;
+      const targetScale = choreography.root?.scale ?? modeScale;
+      const targetRotation = choreography.root?.rotationY ?? modeRotation;
       root.position.x = THREE.MathUtils.lerp(root.position.x, targetRootX, factor);
+      root.position.y = THREE.MathUtils.lerp(root.position.y, targetRootY, factor);
       root.scale.setScalar(THREE.MathUtils.lerp(root.scale.x, targetScale, factor));
       root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, targetRotation, factor);
 
-      if (!portraitViewport) {
+      if (choreography.camera) {
+        cameraTarget.set(
+          choreography.camera.x,
+          choreography.camera.y,
+          choreography.camera.z,
+        );
+        camera.position.lerp(cameraTarget, factor * 0.72);
+      } else if (!portraitViewport) {
         if (activeMode === "inspection") cameraTarget.set(6.35, 3.65, 7.25);
         else if (isInherited) cameraTarget.set(8.35, 5.15, 10.4);
         else if (activeMode === "handoff") cameraTarget.set(9.25, 5.1, 12.8);
@@ -1261,8 +1289,10 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         else cameraTarget.set(7.4, 4.7, 8.8);
         camera.position.lerp(cameraTarget, factor * 0.72);
       }
-      const lookZ = activeMode === "inspection" ? -0.72 : isInherited ? -0.25 : 0;
-      camera.lookAt(0, -0.1, lookZ);
+      const lookX = choreography.camera?.lookX ?? 0;
+      const lookY = choreography.camera?.lookY ?? -0.1;
+      const lookZ = choreography.camera?.lookZ ?? (activeMode === "inspection" ? -0.72 : isInherited ? -0.25 : 0);
+      camera.lookAt(lookX, lookY, lookZ);
 
       renderer.render(scene, camera);
       if (pageVisible) frame = requestAnimationFrame(render);
