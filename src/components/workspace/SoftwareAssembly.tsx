@@ -33,7 +33,11 @@ type AssemblyMode =
   | "quantPipeline"
   | "quantModels"
   | "quantGates"
-  | "quantCapability";
+  | "quantCapability"
+  | "accumulated"
+  | "provenance"
+  | "frontier"
+  | "handoff";
 
 type SoftwareAssemblyProps = {
   state: BuildGraphState;
@@ -73,7 +77,11 @@ type SceneRole =
   | "models"
   | "riskGates"
   | "actions"
-  | "unresolved";
+  | "unresolved"
+  | "capability"
+  | "provenance"
+  | "frontier"
+  | "contact";
 
 type RoleGroup = THREE.Group & { userData: { roleOpacity?: number } };
 
@@ -117,6 +125,10 @@ function modeForState(state: BuildGraphState): AssemblyMode {
   if (state === "model-branching") return "quantModels";
   if (state === "decision-gates") return "quantGates";
   if (state === "quantx-capability") return "quantCapability";
+  if (state === "accumulated-system") return "accumulated";
+  if (state === "capability-provenance") return "provenance";
+  if (state === "open-frontier") return "frontier";
+  if (state === "contact-handoff") return "handoff";
   return "current";
 }
 
@@ -265,6 +277,26 @@ const MODE_COPY: Record<AssemblyMode, { eyebrow: string; title: string; labels: 
     eyebrow: "QUANTX / EXPERIMENTAL CAPABILITY",
     title: "The experiment stays open; its data and ML capability remain.",
     labels: ["Experimental ML", "Risk awareness", "Unresolved branch"],
+  },
+  accumulated: {
+    eyebrow: "CURRENT PRACTICE / ACCUMULATED",
+    title: "Projects compress into one system for moving the next problem forward.",
+    labels: ["Research", "Build", "Debug", "Deliver"],
+  },
+  provenance: {
+    eyebrow: "CURRENT PRACTICE / PROVENANCE",
+    title: "The capability stays connected to the work that formed it.",
+    labels: ["Products", "Client work", "Systems", "Experiments"],
+  },
+  frontier: {
+    eyebrow: "CURRENT PRACTICE / STILL OPEN",
+    title: "The assembly resolves without pretending that the learning is finished.",
+    labels: ["Usable foundation", "Unfinished experiment", "Build further"],
+  },
+  handoff: {
+    eyebrow: "HANDOFF / BEYOND THE SYSTEM",
+    title: "The open port leaves the assembly and points toward the developer.",
+    labels: ["Aakash Singh", "Email", "GitHub"],
   },
 };
 
@@ -765,6 +797,66 @@ function createAssembly(scene: THREE.Scene) {
     }),
   );
 
+  const capability = role("capability");
+  const capabilityColors = [
+    COLORS.interface,
+    COLORS.signal,
+    COLORS.data,
+    COLORS.resolved,
+    COLORS.interface,
+    COLORS.signal,
+    COLORS.data,
+  ];
+  capabilityColors.forEach((color, index) =>
+    addBox(capability, [2.4 - index * 0.13, 0.045, 0.1], [-0.05, -0.12 + index * 0.11, -0.92 + index * 0.3], color, {
+      emissive: color,
+      opacity: index % 3 === 0 ? 0.64 : 0.42,
+      edges: false,
+    }),
+  );
+
+  const provenance = role("provenance");
+  [-0.64, -0.2, 0.24, 0.68].forEach((z, index) =>
+    addBox(provenance, [1.46 - index * 0.08, 0.1, 0.32], [-1.5, 0.72 + index * 0.09, z], index === 3 ? COLORS.signal : COLORS.history, {
+      emissive: index === 3 ? COLORS.signal : 0,
+      opacity: index === 3 ? 0.56 : 0.42,
+      edges: true,
+    }),
+  );
+
+  const frontier = role("frontier");
+  addBox(frontier, [1.68, 0.06, 0.12], [3.42, 0.82, -0.82], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.72,
+    edges: false,
+  });
+  [0, 0.42, 0.84].forEach((offset, index) =>
+    addBox(frontier, [0.28, 0.055, 0.08], [4.38 + offset, 0.82 + offset * 0.2, -0.82 + offset * 0.22], COLORS.signal, {
+      emissive: COLORS.signal,
+      opacity: 0.6 - index * 0.14,
+      edges: false,
+    }),
+  );
+
+  const contact = role("contact");
+  addBox(contact, [2.4, 0.055, 0.08], [3.68, 0.82, -0.82], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.72,
+    edges: false,
+  });
+  [-1.1, -0.54].forEach((z, index) => {
+    addBox(contact, [2.7, 0.045, 0.075], [5.55, 0.82, z], index === 0 ? COLORS.signal : COLORS.interface, {
+      emissive: index === 0 ? COLORS.signal : COLORS.interface,
+      opacity: 0.66,
+      edges: false,
+    });
+    addBox(contact, [0.24, 0.18, 0.34], [6.96, 0.82, z], index === 0 ? COLORS.signal : COLORS.interface, {
+      emissive: index === 0 ? COLORS.signal : COLORS.interface,
+      opacity: 0.58,
+      edges: true,
+    });
+  });
+
   return { root, roles };
 }
 
@@ -775,7 +867,9 @@ function targetsForMode(mode: AssemblyMode) {
   const genkoMode = ["genkoProblem", "genkoLoop", "genkoAI", "genkoCapability"].includes(mode);
   const aiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(mode);
   const quantMode = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(mode);
-  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode || genkoMode || aiMode || quantMode;
+  const finalMode = ["accumulated", "provenance", "frontier", "handoff"].includes(mode);
+  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode || genkoMode || aiMode || quantMode || finalMode;
+  const finalQuiet = mode === "handoff" ? 0.26 : mode === "frontier" ? 0.54 : mode === "provenance" ? 0.74 : 0.9;
   const historicCoreOpacity = mode === "sharedArchitecture" ? 0.62 : inheritedMode ? 0.22 : 0;
   const legacyOpacity = mode === "inherited" || mode === "inspection"
     ? 1
@@ -796,20 +890,20 @@ function targetsForMode(mode: AssemblyMode) {
 
   return {
     interface: visible(
-      completeCore ? 1 : mode === "spotify" || mode === "browser" || mode === "decomposed" ? 1 : historicCoreOpacity,
+      completeCore ? (finalMode ? finalQuiet : 1) : mode === "spotify" || mode === "browser" || mode === "decomposed" ? 1 : historicCoreOpacity,
       mode === "decomposed" ? 0.55 : mode === "spotify" ? 0.25 : inheritedMode ? -0.18 : 0,
       mode === "decomposed" ? 0.45 : inheritedMode ? 0.5 : 0,
       mode === "spotify" ? 1.12 : inheritedMode ? 0.88 : 1,
     ),
-    api: visible(completeCore ? 1 : historicCoreOpacity, mode === "boundary" ? -0.08 : 0, inheritedMode ? 0.5 : 0, inheritedMode ? 0.88 : 1),
+    api: visible(completeCore ? (finalMode ? Math.min(1, finalQuiet + 0.18) : 1) : historicCoreOpacity, mode === "boundary" ? -0.08 : 0, inheritedMode ? 0.5 : 0, inheritedMode ? 0.88 : 1),
     service: visible(
-      completeCore ? 1 : mode === "decomposed" ? 0.2 : historicCoreOpacity,
+      completeCore ? (finalMode ? finalQuiet : 1) : mode === "decomposed" ? 0.2 : historicCoreOpacity,
       mode === "decomposed" ? -0.55 : mode === "boundary" ? -0.18 : inheritedMode ? -0.18 : 0,
       mode === "decomposed" ? -1.2 : inheritedMode ? 0.5 : 0,
       inheritedMode ? 0.88 : 1,
     ),
     data: visible(
-      completeCore ? 1 : mode === "decomposed" ? 0.16 : historicCoreOpacity,
+      completeCore ? (finalMode ? Math.min(1, finalQuiet + 0.08) : 1) : mode === "decomposed" ? 0.16 : historicCoreOpacity,
       mode === "decomposed" ? -0.82 : mode === "boundary" ? -0.28 : inheritedMode ? -0.18 : 0,
       mode === "decomposed" ? -1.65 : inheritedMode ? 0.5 : 0,
       inheritedMode ? 0.88 : 1,
@@ -829,7 +923,11 @@ function targetsForMode(mode: AssemblyMode) {
                   ? 1
                   : quantMode
                     ? 0.42
-                    : 0,
+                    : mode === "accumulated"
+                      ? 0.36
+                      : mode === "provenance"
+                        ? 0.18
+                        : 0,
       0,
       mode === "decomposed" ? -1.2 : 0,
       aiMode ? 1.12 : 1,
@@ -920,6 +1018,15 @@ function targetsForMode(mode: AssemblyMode) {
       mode === "quantProblem" ? 0.36 : mode === "quantGates" ? 0.72 : mode === "quantCapability" ? 1 : 0,
       mode === "quantCapability" ? 0.22 : 0,
     ),
+    capability: visible(
+      mode === "accumulated" ? 1 : mode === "provenance" ? 0.82 : mode === "frontier" ? 0.56 : mode === "handoff" ? 0.24 : 0,
+      mode === "accumulated" ? 0.18 : 0,
+      mode === "accumulated" ? 0.2 : 0,
+      mode === "accumulated" ? 1.08 : 1,
+    ),
+    provenance: visible(mode === "provenance" ? 1 : mode === "frontier" ? 0.58 : mode === "handoff" ? 0.22 : 0, 0, mode === "provenance" ? 0.3 : 0),
+    frontier: visible(mode === "frontier" ? 1 : mode === "handoff" ? 0.28 : 0),
+    contact: visible(mode === "handoff" ? 1 : 0),
   } satisfies Record<SceneRole, { opacity: number; y: number; z: number; scale: number }>;
 }
 
@@ -1042,6 +1149,22 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         ? THREE.MathUtils.clamp((chapterProgress - 0.65) / 0.29, 0, 1)
         : 1;
       roles.riskGates.scale.z = roles.riskGates.scale.x * THREE.MathUtils.lerp(1.32, 1, gateProgress);
+      const capabilityCompression = activeMode === "accumulated"
+        ? THREE.MathUtils.clamp(chapterProgress / 0.22, 0, 1)
+        : 1;
+      roles.capability.scale.z = roles.capability.scale.x * THREE.MathUtils.lerp(1.34, 1, capabilityCompression);
+      const frontierStart = portraitViewport ? 0.62 : 0.72;
+      const contactStart = portraitViewport ? 0.88 : 0.92;
+      const frontierExtension = activeMode === "frontier"
+        ? THREE.MathUtils.clamp((chapterProgress - frontierStart) / (contactStart - frontierStart), 0, 1)
+        : activeMode === "handoff"
+          ? 1
+          : 0;
+      roles.frontier.position.x = THREE.MathUtils.lerp(roles.frontier.position.x, (1 - frontierExtension) * -0.72, factor);
+      const contactExtension = activeMode === "handoff"
+        ? THREE.MathUtils.clamp((chapterProgress - contactStart) / (1 - contactStart), 0, 1)
+        : 0;
+      roles.contact.position.x = THREE.MathUtils.lerp(roles.contact.position.x, (1 - contactExtension) * -0.86, factor);
       const learningRotation = ["genkoLoop", "genkoAI"].includes(activeMode) ? chapterProgress * 1.15 : 0;
       roles.learning.rotation.y = THREE.MathUtils.lerp(roles.learning.rotation.y, learningRotation, factor * 0.6);
 
@@ -1073,9 +1196,10 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         "aiCapability",
       ].includes(activeMode);
       const isQuantLab = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(activeMode);
-      const targetRootX = isQuantLab ? -0.68 : isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
-      const targetScale = isQuantLab ? 0.8 : isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
-      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isQuantLab ? -0.08 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
+      const isFinale = ["accumulated", "provenance", "frontier", "handoff"].includes(activeMode);
+      const targetRootX = activeMode === "handoff" ? -1.55 : isFinale ? -0.52 : isQuantLab ? -0.68 : isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
+      const targetScale = activeMode === "handoff" ? 0.7 : isFinale ? 0.86 : isQuantLab ? 0.8 : isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
+      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isFinale ? -0.06 : isQuantLab ? -0.08 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
       root.position.x = THREE.MathUtils.lerp(root.position.x, targetRootX, factor);
       root.scale.setScalar(THREE.MathUtils.lerp(root.scale.x, targetScale, factor));
       root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, targetRotation, factor);
@@ -1085,9 +1209,13 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
           ? new THREE.Vector3(6.35, 3.65, 7.25)
           : isInherited
             ? new THREE.Vector3(8.35, 5.15, 10.4)
-            : isQuantLab
-              ? new THREE.Vector3(8.8, 5.15, 11.4)
-              : isWorkbenchScene
+            : isFinale
+              ? activeMode === "handoff"
+                ? new THREE.Vector3(9.25, 5.1, 12.8)
+                : new THREE.Vector3(8.1, 4.7, 10.2)
+              : isQuantLab
+                ? new THREE.Vector3(8.8, 5.15, 11.4)
+                : isWorkbenchScene
                 ? new THREE.Vector3(8.15, 4.85, 10.1)
                 : new THREE.Vector3(7.4, 4.7, 8.8);
         camera.position.lerp(cameraTarget, factor * 0.72);

@@ -3,6 +3,11 @@ import { CONTACT } from "@/components/blueprint/data/contact";
 export function StoryFooter() {
   return (
     <footer id="contact" className="story-footer" aria-labelledby="contact-title">
+      <div className="story-footer-handoff" aria-hidden="true">
+        <span className="story-footer-handoff__line" />
+        <span className="story-footer-handoff__port" />
+        <span className="story-footer-handoff__label">System boundary / human contact</span>
+      </div>
       <div className="story-footer-index" aria-hidden="true">HANDOFF / 10</div>
       <div className="story-footer-copy">
         <p className="chapter-kicker"><span>Contact</span></p>

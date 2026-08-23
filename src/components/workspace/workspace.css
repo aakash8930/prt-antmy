@@ -188,6 +188,20 @@
     linear-gradient(145deg, rgba(12, 23, 29, 0.97), rgba(4, 9, 13, 0.8));
 }
 
+.software-assembly--accumulated .software-assembly__stage,
+.software-assembly--provenance .software-assembly__stage,
+.software-assembly--frontier .software-assembly__stage,
+.software-assembly--handoff .software-assembly__stage {
+  background:
+    radial-gradient(circle at 62% 48%, rgba(131, 180, 191, 0.1), transparent 34%),
+    linear-gradient(145deg, rgba(13, 23, 28, 0.92), rgba(4, 9, 13, 0.68));
+}
+
+.software-assembly--handoff .software-assembly__stage {
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.18);
+}
+
 .story-arc--what-i-build-now .story-arc-visual,
 .story-arc--before-the-system .story-arc-visual,
 .story-arc--spotify-clone .story-arc-visual,
@@ -196,7 +210,8 @@
 .story-arc--rebuilding-model .story-arc-visual,
 .story-arc--building-genko .story-arc-visual,
 .story-arc--ai-engineering .story-arc-visual,
-.story-arc--quantx-experiment .story-arc-visual {
+.story-arc--quantx-experiment .story-arc-visual,
+.story-arc--how-i-build-now .story-arc-visual {
   width: 100%;
   max-width: 1180px;
   margin-right: auto;
@@ -232,7 +247,8 @@
   .story-arc--rebuilding-model:has(.software-assembly) .software-assembly__stage,
   .story-arc--building-genko:has(.software-assembly) .software-assembly__stage,
   .story-arc--ai-engineering:has(.software-assembly) .software-assembly__stage,
-  .story-arc--quantx-experiment:has(.software-assembly) .software-assembly__stage {
+  .story-arc--quantx-experiment:has(.software-assembly) .software-assembly__stage,
+  .story-arc--how-i-build-now:has(.software-assembly) .software-assembly__stage {
     height: min(76svh, 760px);
   }
 
@@ -240,7 +256,8 @@
   .story-arc--rebuilding-model:has(.software-assembly) .chapter-copy,
   .story-arc--building-genko:has(.software-assembly) .chapter-copy,
   .story-arc--ai-engineering:has(.software-assembly) .chapter-copy,
-  .story-arc--quantx-experiment:has(.software-assembly) .chapter-copy {
+  .story-arc--quantx-experiment:has(.software-assembly) .chapter-copy,
+  .story-arc--how-i-build-now:has(.software-assembly) .chapter-copy {
     max-width: 560px;
   }
 }

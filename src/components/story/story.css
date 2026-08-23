@@ -888,6 +888,7 @@ blockquote {
 
 /* Contact ------------------------------------------------------------- */
 .story-footer {
+  position: relative;
   width: min(100%, var(--page-max));
   min-height: 70svh;
   margin: 0 auto;
@@ -898,6 +899,58 @@ blockquote {
   gap: 48px;
   background:
     radial-gradient(circle at 75% 45%, rgba(131, 180, 191, 0.08), transparent 35%);
+}
+
+.story-footer-handoff {
+  position: absolute;
+  top: 0;
+  right: var(--gutter);
+  left: var(--gutter);
+  height: 64px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+.story-footer-handoff__line {
+  position: absolute;
+  top: 0;
+  right: 14%;
+  width: min(42vw, 540px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--redline) 30%, rgba(239, 115, 83, 0.68));
+}
+
+.story-footer-handoff__port {
+  position: absolute;
+  top: -4px;
+  right: calc(14% - 4px);
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--redline);
+  background: var(--page, #091116);
+  transform: rotate(45deg);
+}
+
+.story-footer-handoff__label {
+  position: absolute;
+  top: 14px;
+  right: 14%;
+  font: 600 8px/1.2 var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transform: translateX(4px);
+}
+
+@media (max-width: 760px) {
+  .story-footer-handoff__line {
+    right: 5%;
+    width: 62vw;
+  }
+
+  .story-footer-handoff__port,
+  .story-footer-handoff__label {
+    right: 5%;
+  }
 }
 
 .story-footer-index {
