@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { StoryChapter as StoryChapterModel } from "@/content/story";
 import { StoryChapter } from "@/components/story/StoryChapter";
+import { SoftwareAssembly } from "@/components/workspace/SoftwareAssembly";
 import { BuildGraphCanvas } from "./BuildGraphCanvas";
 import {
   resolveChapterVisual,
@@ -151,6 +152,12 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
   }, []);
 
   const activeChapter = chapters.find((chapter) => chapter.id === runtime.chapterId);
+  const usesAssemblyPrototype = [
+    "what-i-build-now",
+    "before-the-system",
+    "spotify-clone",
+    "first-real-system",
+  ].includes(runtime.chapterId);
 
   return (
     <div
@@ -164,16 +171,28 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
       <div className="story-arc-visual-layer">
         <div className="story-arc-visual-sticky">
           <div className="story-arc-visual">
-            <BuildGraphCanvas
-              state={runtime.state}
-              instanceId="integrated-story-graph"
-              showStateLabel={false}
-              context={{
-                chapter: activeChapter
-                  ? `${activeChapter.number} / ${activeChapter.navLabel}`
-                  : "00 / Now",
-              }}
-            />
+            {usesAssemblyPrototype ? (
+              <SoftwareAssembly
+                state={runtime.state}
+                reducedMotion={runtime.reducedMotion}
+                chapterLabel={
+                  activeChapter
+                    ? `${activeChapter.number} / ${activeChapter.navLabel}`
+                    : "00 / Now"
+                }
+              />
+            ) : (
+              <BuildGraphCanvas
+                state={runtime.state}
+                instanceId="integrated-story-graph"
+                showStateLabel={false}
+                context={{
+                  chapter: activeChapter
+                    ? `${activeChapter.number} / ${activeChapter.navLabel}`
+                    : "00 / Now",
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

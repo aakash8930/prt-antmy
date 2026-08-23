@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import "@/components/story/story.css";
 import "@/components/build-graph/graph-lab.css";
+import "@/components/workspace/workspace.css";
 
 export const metadata: Metadata = {
   title: "Aakash Singh — Full-Stack Software Developer",
