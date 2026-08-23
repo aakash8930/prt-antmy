@@ -157,6 +157,8 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
     "before-the-system",
     "spotify-clone",
     "first-real-system",
+    "client-work",
+    "rebuilding-model",
   ].includes(runtime.chapterId);
 
   return (

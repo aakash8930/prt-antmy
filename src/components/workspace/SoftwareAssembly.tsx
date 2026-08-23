@@ -11,7 +11,15 @@ type AssemblyMode =
   | "spotify"
   | "boundary"
   | "growing"
-  | "system";
+  | "system"
+  | "clientWorkbench"
+  | "clientConstraints"
+  | "clientDelivery"
+  | "inherited"
+  | "inspection"
+  | "rebuildGrowing"
+  | "rebuild"
+  | "sharedArchitecture";
 
 type SoftwareAssemblyProps = {
   state: BuildGraphState;
@@ -31,7 +39,13 @@ type SceneRole =
   | "payment"
   | "location"
   | "maps"
-  | "tracking";
+  | "tracking"
+  | "constraints"
+  | "delivery"
+  | "legacy"
+  | "inspection"
+  | "rebuild"
+  | "shared";
 
 type RoleGroup = THREE.Group & { userData: { roleOpacity?: number } };
 
@@ -53,6 +67,14 @@ function modeForState(state: BuildGraphState): AssemblyMode {
   if (state === "bellybasket-foundation") return "boundary";
   if (state === "system-thinking") return "growing";
   if (state === "bellybasket-system") return "system";
+  if (state === "client-workbench") return "clientWorkbench";
+  if (state === "client-constraints") return "clientConstraints";
+  if (state === "client-delivery") return "clientDelivery";
+  if (state === "dapigo-inherited") return "inherited";
+  if (state === "dapigo-inspection") return "inspection";
+  if (state === "cravecart-growing") return "rebuildGrowing";
+  if (state === "inherited-rebuild") return "rebuild";
+  if (state === "shared-architecture") return "sharedArchitecture";
   return "current";
 }
 
@@ -91,6 +113,46 @@ const MODE_COPY: Record<AssemblyMode, { eyebrow: string; title: string; labels: 
     eyebrow: "BELLYBASKET / FIRST REAL SYSTEM",
     title: "The workspace expands into a coherent product system.",
     labels: ["Backend", "Payment", "Maps", "Live tracking"],
+  },
+  clientWorkbench: {
+    eyebrow: "CLIENT WORK / ANOTHER PERSON'S PROBLEM",
+    title: "A capable workspace now receives requirements from outside.",
+    labels: ["Working system", "External brief", "Delivery boundary"],
+  },
+  clientConstraints: {
+    eyebrow: "CLIENT WORK / CONSTRAINTS ATTACH",
+    title: "Requirements begin shaping what the system is allowed to become.",
+    labels: ["Scope", "Feedback", "Business need", "Definition of done"],
+  },
+  clientDelivery: {
+    eyebrow: "CLIENT WORK / DELIVERY",
+    title: "The system settles only when an external definition of done is met.",
+    labels: ["Requirements resolved", "Delivery path", "Client outcome"],
+  },
+  inherited: {
+    eyebrow: "DAPIGO / AN EXISTING SYSTEM ARRIVES",
+    title: "The next build begins inside software with its own history.",
+    labels: ["Flutter surface", "PHP / Laravel", "Inherited model"],
+  },
+  inspection: {
+    eyebrow: "DAPIGO / INSPECT BEFORE CHANGING",
+    title: "The inherited system stays intact while its paths are understood.",
+    labels: ["Trace behavior", "Understand", "Then decide"],
+  },
+  rebuildGrowing: {
+    eyebrow: "CRAVECART / A NEW MODEL GROWS",
+    title: "The replacement begins around the knowledge recovered through inspection.",
+    labels: ["Customer", "Admin", "Shared Node backend", "Shared data"],
+  },
+  rebuild: {
+    eyebrow: "DAPIGO → CRAVECART / REBUILD",
+    title: "The inherited model remains visible while shared architecture moves forward.",
+    labels: ["Inherited layer", "Inspection seam", "Four surfaces", "Shared core"],
+  },
+  sharedArchitecture: {
+    eyebrow: "CRAVECART / CAPABILITY RETAINED",
+    title: "Project structure recedes. Shared architecture remains in the assembly.",
+    labels: ["Shared backend", "Shared state", "Multi-surface system"],
   },
 };
 
@@ -297,17 +359,168 @@ function createAssembly(scene: THREE.Scene) {
   );
   tracking.add(tube);
 
+  const constraints = role("constraints");
+  addBox(constraints, [5.65, 0.055, 0.08], [0, 1.72, -1.48], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.72,
+    edges: false,
+  });
+  addBox(constraints, [5.65, 0.055, 0.08], [0, -1.62, -1.48], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.72,
+    edges: false,
+  });
+  addBox(constraints, [0.055, 3.38, 0.08], [-2.82, 0.05, -1.48], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.72,
+    edges: false,
+  });
+  addBox(constraints, [0.055, 3.38, 0.08], [2.82, 0.05, -1.48], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.72,
+    edges: false,
+  });
+  [-1.75, -0.58, 0.58, 1.75].forEach((x, index) =>
+    addBox(constraints, [0.72, 0.2, 0.5], [x, 1.62, -1.35], index === 2 ? COLORS.signal : COLORS.history, {
+      emissive: index === 2 ? COLORS.signal : 0,
+      opacity: 0.82,
+      edges: true,
+    }),
+  );
+
+  const delivery = role("delivery");
+  addBox(delivery, [4.8, 0.07, 0.11], [0.18, -1.78, 1.42], COLORS.resolved, {
+    emissive: COLORS.resolved,
+    opacity: 0.88,
+    edges: false,
+  });
+  addBox(delivery, [0.5, 0.5, 0.5], [2.56, -1.55, 1.42], COLORS.resolved, {
+    emissive: COLORS.resolved,
+    opacity: 0.84,
+    edges: true,
+  });
+
+  const legacy = role("legacy");
+  addBox(legacy, [2.5, 0.18, 1.76], [-1.55, 0.72, -1.65], COLORS.history, {
+    opacity: 0.52,
+    edges: true,
+  });
+  addBox(legacy, [2.12, 0.7, 1.42], [-1.55, -0.02, -1.72], COLORS.body, {
+    opacity: 0.72,
+    edges: true,
+  });
+  [-0.45, 0, 0.45].forEach((z) =>
+    addBox(legacy, [1.54, 0.055, 0.1], [-1.55, 0.92, -1.65 + z], COLORS.history, {
+      emissive: COLORS.history,
+      edges: false,
+    }),
+  );
+
+  const inspection = role("inspection");
+  addBox(inspection, [0.075, 3.25, 2.55], [-0.02, 0.04, -1.15], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.18,
+    edges: false,
+  });
+  const inspectionRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.12, 0.04, 10, 48),
+    material(COLORS.signal, 0.82, COLORS.signal),
+  );
+  inspectionRing.position.set(-1.55, 0.25, -1.28);
+  inspectionRing.rotation.x = Math.PI / 2;
+  inspection.add(inspectionRing);
+
+  const rebuild = role("rebuild");
+  const surfacePositions: [number, number, number][] = [
+    [0.5, 1.25, -0.42],
+    [1.82, 1.25, -0.42],
+    [0.5, 0.42, -0.42],
+    [1.82, 0.42, -0.42],
+  ];
+  surfacePositions.forEach((position, index) =>
+    addBox(rebuild, [1.02, 0.12, 0.66], position, index === 0 ? COLORS.signal : COLORS.interface, {
+      emissive: index === 0 ? COLORS.signal : COLORS.interface,
+      opacity: index === 0 ? 0.7 : 0.38,
+      edges: true,
+    }),
+  );
+  addBox(rebuild, [2.52, 0.86, 1.5], [1.15, -0.48, -0.5], COLORS.bodyRaised, {
+    opacity: 0.96,
+    edges: true,
+  });
+  addBox(rebuild, [1.7, 0.16, 1.02], [1.15, -0.23, -0.32], COLORS.interface, {
+    emissive: COLORS.interface,
+    opacity: 0.28,
+    edges: true,
+  });
+
+  const shared = role("shared");
+  const sharedRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.48, 0.08, 12, 64),
+    material(COLORS.resolved, 0.72, COLORS.resolved),
+  );
+  sharedRing.position.set(0.4, -0.38, 0.05);
+  sharedRing.rotation.x = Math.PI / 2;
+  shared.add(sharedRing);
+  [-0.72, 0, 0.72].forEach((x) =>
+    addBox(shared, [0.42, 0.08, 1.38], [0.4 + x, -0.28, 0.05], COLORS.resolved, {
+      emissive: COLORS.resolved,
+      opacity: 0.4,
+      edges: false,
+    }),
+  );
+
   return { root, roles };
 }
 
 function targetsForMode(mode: AssemblyMode) {
   const visible = (value: number, y = 0, z = 0, scale = 1) => ({ opacity: value, y, z, scale });
+  const clientMode = ["clientWorkbench", "clientConstraints", "clientDelivery"].includes(mode);
+  const inheritedMode = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(mode);
+  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode;
+  const historicCoreOpacity = mode === "sharedArchitecture" ? 0.62 : inheritedMode ? 0.22 : 0;
+  const legacyOpacity = mode === "inherited" || mode === "inspection"
+    ? 1
+    : mode === "rebuildGrowing"
+      ? 0.78
+      : mode === "rebuild"
+        ? 0.48
+        : mode === "sharedArchitecture"
+          ? 0.18
+          : 0;
+  const rebuildOpacity = mode === "rebuildGrowing"
+    ? 0.58
+    : mode === "rebuild"
+      ? 1
+      : mode === "sharedArchitecture"
+        ? 0.34
+        : 0;
+
   return {
-    interface: visible(1, mode === "decomposed" ? 0.55 : mode === "spotify" ? 0.25 : 0, mode === "decomposed" ? 0.45 : 0, mode === "spotify" ? 1.12 : 1),
-    api: visible(["current", "boundary", "growing", "system"].includes(mode) ? 1 : 0, mode === "boundary" ? -0.08 : 0),
-    service: visible(["current", "boundary", "growing", "system"].includes(mode) ? 1 : mode === "decomposed" ? 0.2 : 0, mode === "decomposed" ? -0.55 : mode === "boundary" ? -0.18 : 0, mode === "decomposed" ? -1.2 : 0),
-    data: visible(["current", "boundary", "growing", "system"].includes(mode) ? 1 : mode === "decomposed" ? 0.16 : 0, mode === "decomposed" ? -0.82 : mode === "boundary" ? -0.28 : 0, mode === "decomposed" ? -1.65 : 0),
-    workbench: visible(mode === "current" ? 0.8 : mode === "system" ? 0.34 : 0, 0, mode === "decomposed" ? -1.2 : 0),
+    interface: visible(
+      completeCore ? 1 : mode === "spotify" || mode === "browser" || mode === "decomposed" ? 1 : historicCoreOpacity,
+      mode === "decomposed" ? 0.55 : mode === "spotify" ? 0.25 : inheritedMode ? -0.18 : 0,
+      mode === "decomposed" ? 0.45 : inheritedMode ? 0.5 : 0,
+      mode === "spotify" ? 1.12 : inheritedMode ? 0.88 : 1,
+    ),
+    api: visible(completeCore ? 1 : historicCoreOpacity, mode === "boundary" ? -0.08 : 0, inheritedMode ? 0.5 : 0, inheritedMode ? 0.88 : 1),
+    service: visible(
+      completeCore ? 1 : mode === "decomposed" ? 0.2 : historicCoreOpacity,
+      mode === "decomposed" ? -0.55 : mode === "boundary" ? -0.18 : inheritedMode ? -0.18 : 0,
+      mode === "decomposed" ? -1.2 : inheritedMode ? 0.5 : 0,
+      inheritedMode ? 0.88 : 1,
+    ),
+    data: visible(
+      completeCore ? 1 : mode === "decomposed" ? 0.16 : historicCoreOpacity,
+      mode === "decomposed" ? -0.82 : mode === "boundary" ? -0.28 : inheritedMode ? -0.18 : 0,
+      mode === "decomposed" ? -1.65 : inheritedMode ? 0.5 : 0,
+      inheritedMode ? 0.88 : 1,
+    ),
+    workbench: visible(
+      mode === "current" ? 0.8 : mode === "system" ? 0.34 : clientMode ? 0.72 : mode === "inspection" ? 0.48 : 0,
+      0,
+      mode === "decomposed" ? -1.2 : 0,
+    ),
     sources: visible(mode === "decomposed" || mode === "browser" ? 1 : 0, mode === "browser" ? -0.45 : 0, 0, mode === "browser" ? 0.9 : 1),
     assets: visible(mode === "spotify" ? 1 : 0),
     admin: visible(mode === "growing" || mode === "system" ? 1 : 0),
@@ -315,6 +528,17 @@ function targetsForMode(mode: AssemblyMode) {
     location: visible(mode === "growing" || mode === "system" ? 1 : 0),
     maps: visible(mode === "system" ? 1 : 0),
     tracking: visible(mode === "system" ? 1 : 0),
+    constraints: visible(
+      mode === "clientWorkbench" ? 0.34 : mode === "clientConstraints" ? 1 : mode === "clientDelivery" ? 0.42 : 0,
+      mode === "clientWorkbench" ? 0.28 : 0,
+      0,
+      mode === "clientWorkbench" ? 1.08 : 1,
+    ),
+    delivery: visible(mode === "clientDelivery" ? 1 : 0),
+    legacy: visible(legacyOpacity, 0, mode === "inherited" || mode === "inspection" ? 0.3 : 0, mode === "inherited" ? 1.08 : 1),
+    inspection: visible(mode === "inspection" ? 1 : mode === "rebuildGrowing" ? 0.72 : mode === "rebuild" ? 0.28 : 0),
+    rebuild: visible(rebuildOpacity, mode === "rebuildGrowing" ? 0.18 : 0, mode === "rebuildGrowing" ? -0.28 : 0, mode === "rebuildGrowing" ? 0.82 : 1),
+    shared: visible(mode === "sharedArchitecture" ? 1 : mode === "rebuild" ? 0.26 : 0, 0, mode === "sharedArchitecture" ? 0.34 : 0),
   } satisfies Record<SceneRole, { opacity: number; y: number; z: number; scale: number }>;
 }
 
@@ -361,6 +585,7 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
     scene.add(cool);
 
     const { root, roles } = createAssembly(scene);
+    const arc = canvas.closest<HTMLElement>(".story-arc");
     const basePositions = Object.fromEntries(
       Object.entries(roles).map(([name, group]) => [name, group.position.clone()]),
     ) as Record<SceneRole, THREE.Vector3>;
@@ -376,6 +601,7 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
 
     let frame = 0;
     let previousTime = performance.now();
+    let portraitViewport = false;
 
     const resize = () => {
       const { clientWidth, clientHeight } = canvas;
@@ -385,7 +611,8 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       renderer.setPixelRatio(pixelRatio);
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
-      if (camera.aspect < 0.9) {
+      portraitViewport = camera.aspect < 0.9;
+      if (portraitViewport) {
         camera.position.set(7.8, 5.4, 13.4);
         camera.fov = 40;
       } else {
@@ -414,11 +641,32 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         setGroupOpacity(group, THREE.MathUtils.lerp(currentOpacity, target.opacity, factor));
       });
 
-      const isExpanded = modeRef.current === "growing" || modeRef.current === "system";
-      const targetRootX = isExpanded ? -0.35 : 0.15;
+      const activeMode = modeRef.current;
+      const chapterProgress = THREE.MathUtils.clamp(Number(arc?.dataset.localProgress ?? 0), 0, 1);
+      const inspectionX = activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0;
+      const rebuildX = activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0;
+      roles.inspection.position.x = THREE.MathUtils.lerp(roles.inspection.position.x, inspectionX, factor);
+      roles.rebuild.position.x = THREE.MathUtils.lerp(roles.rebuild.position.x, rebuildX, factor);
+
+      const isExpanded = ["growing", "system", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(activeMode);
+      const isInherited = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(activeMode);
+      const targetRootX = isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
+      const targetScale = isExpanded ? 0.88 : isInherited ? 0.93 : 1;
+      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isExpanded ? -0.18 : -0.34;
       root.position.x = THREE.MathUtils.lerp(root.position.x, targetRootX, factor);
-      root.scale.setScalar(THREE.MathUtils.lerp(root.scale.x, isExpanded ? 0.92 : 1, factor));
-      root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, isExpanded ? -0.18 : -0.34, factor);
+      root.scale.setScalar(THREE.MathUtils.lerp(root.scale.x, targetScale, factor));
+      root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, targetRotation, factor);
+
+      if (!portraitViewport) {
+        const cameraTarget = activeMode === "inspection"
+          ? new THREE.Vector3(6.35, 3.65, 7.25)
+          : isInherited
+            ? new THREE.Vector3(8.35, 5.15, 10.4)
+            : new THREE.Vector3(7.4, 4.7, 8.8);
+        camera.position.lerp(cameraTarget, factor * 0.72);
+      }
+      const lookZ = activeMode === "inspection" ? -0.72 : isInherited ? -0.25 : 0;
+      camera.lookAt(0, -0.1, lookZ);
 
       renderer.render(scene, camera);
       frame = requestAnimationFrame(render);

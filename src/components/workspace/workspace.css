@@ -133,10 +133,35 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+.software-assembly--clientConstraints .software-assembly__stage {
+  box-shadow:
+    inset 0 0 0 1px rgba(239, 115, 83, 0.32),
+    inset 0 0 90px rgba(239, 115, 83, 0.06),
+    0 36px 100px rgba(0, 0, 0, 0.32);
+}
+
+.software-assembly--inspection .software-assembly__stage {
+  background:
+    radial-gradient(circle at 38% 46%, rgba(239, 115, 83, 0.13), transparent 31%),
+    radial-gradient(circle at 72% 52%, rgba(73, 117, 128, 0.1), transparent 38%),
+    linear-gradient(145deg, rgba(17, 27, 33, 0.94), rgba(5, 11, 15, 0.76));
+}
+
+.software-assembly--rebuildGrowing .software-assembly__stage,
+.software-assembly--rebuild .software-assembly__stage,
+.software-assembly--sharedArchitecture .software-assembly__stage {
+  background:
+    radial-gradient(circle at 72% 42%, rgba(131, 180, 191, 0.16), transparent 34%),
+    radial-gradient(circle at 30% 54%, rgba(85, 101, 107, 0.11), transparent 28%),
+    linear-gradient(145deg, rgba(17, 27, 33, 0.94), rgba(5, 11, 15, 0.76));
+}
+
 .story-arc--what-i-build-now .story-arc-visual,
 .story-arc--before-the-system .story-arc-visual,
 .story-arc--spotify-clone .story-arc-visual,
-.story-arc--first-real-system .story-arc-visual {
+.story-arc--first-real-system .story-arc-visual,
+.story-arc--client-work .story-arc-visual,
+.story-arc--rebuilding-model .story-arc-visual {
   width: 100%;
   max-width: 1180px;
   margin-right: auto;
@@ -168,11 +193,13 @@
     box-shadow: -24px 0 38px rgba(9, 17, 22, 0.86);
   }
 
-  .story-arc--first-real-system:has(.software-assembly) .software-assembly__stage {
+  .story-arc--first-real-system:has(.software-assembly) .software-assembly__stage,
+  .story-arc--rebuilding-model:has(.software-assembly) .software-assembly__stage {
     height: min(76svh, 760px);
   }
 
-  .story-arc--first-real-system:has(.software-assembly) .chapter-copy {
+  .story-arc--first-real-system:has(.software-assembly) .chapter-copy,
+  .story-arc--rebuilding-model:has(.software-assembly) .chapter-copy {
     max-width: 560px;
   }
 }
