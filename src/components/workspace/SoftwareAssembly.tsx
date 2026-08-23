@@ -96,6 +96,40 @@ const COLORS = {
   ink: 0xe6edef,
 };
 
+const CLIENT_MODES = new Set<AssemblyMode>(["clientWorkbench", "clientConstraints", "clientDelivery"]);
+const INHERITED_MODES = new Set<AssemblyMode>(["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"]);
+const GENKO_MODES = new Set<AssemblyMode>(["genkoProblem", "genkoLoop", "genkoAI", "genkoCapability"]);
+const AI_MODES = new Set<AssemblyMode>(["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"]);
+const QUANT_MODES = new Set<AssemblyMode>(["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"]);
+const FINALE_MODES = new Set<AssemblyMode>(["accumulated", "provenance", "frontier", "handoff"]);
+const COMPLETE_CORE_MODES = new Set<AssemblyMode>(["current", "boundary", "growing", "system"]);
+const EXPANDED_MODES = new Set<AssemblyMode>([
+  "growing",
+  "system",
+  "rebuildGrowing",
+  "rebuild",
+  "sharedArchitecture",
+  "genkoLoop",
+  "genkoAI",
+  "aiInputs",
+  "aiDecision",
+  "aiWorkflow",
+  "quantPipeline",
+  "quantModels",
+  "quantGates",
+]);
+const WORKBENCH_MODES = new Set<AssemblyMode>([
+  "genkoProblem",
+  "genkoLoop",
+  "genkoAI",
+  "genkoCapability",
+  "aiBoundary",
+  "aiInputs",
+  "aiDecision",
+  "aiWorkflow",
+  "aiCapability",
+]);
+
 function modeForState(state: BuildGraphState): AssemblyMode {
   if (state === "capability-peelback") return "decomposed";
   if (state === "beginner-tools") return "browser";
@@ -862,13 +896,13 @@ function createAssembly(scene: THREE.Scene) {
 
 function targetsForMode(mode: AssemblyMode) {
   const visible = (value: number, y = 0, z = 0, scale = 1) => ({ opacity: value, y, z, scale });
-  const clientMode = ["clientWorkbench", "clientConstraints", "clientDelivery"].includes(mode);
-  const inheritedMode = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(mode);
-  const genkoMode = ["genkoProblem", "genkoLoop", "genkoAI", "genkoCapability"].includes(mode);
-  const aiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(mode);
-  const quantMode = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(mode);
-  const finalMode = ["accumulated", "provenance", "frontier", "handoff"].includes(mode);
-  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode || genkoMode || aiMode || quantMode || finalMode;
+  const clientMode = CLIENT_MODES.has(mode);
+  const inheritedMode = INHERITED_MODES.has(mode);
+  const genkoMode = GENKO_MODES.has(mode);
+  const aiMode = AI_MODES.has(mode);
+  const quantMode = QUANT_MODES.has(mode);
+  const finalMode = FINALE_MODES.has(mode);
+  const completeCore = COMPLETE_CORE_MODES.has(mode) || clientMode || genkoMode || aiMode || quantMode || finalMode;
   const finalQuiet = mode === "handoff" ? 0.26 : mode === "frontier" ? 0.54 : mode === "provenance" ? 0.74 : 0.9;
   const historicCoreOpacity = mode === "sharedArchitecture" ? 0.62 : inheritedMode ? 0.22 : 0;
   const legacyOpacity = mode === "inherited" || mode === "inspection"
@@ -1097,10 +1131,11 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
     const basePositions = Object.fromEntries(
       Object.entries(roles).map(([name, group]) => [name, group.position.clone()]),
     ) as Record<SceneRole, THREE.Vector3>;
-    const initialTargets = targetsForMode(modeRef.current);
+    let renderedMode = modeRef.current;
+    let targets = targetsForMode(renderedMode);
     (Object.keys(roles) as SceneRole[]).forEach((name) => {
       const group = roles[name];
-      const target = initialTargets[name];
+      const target = targets[name];
       group.position.y = basePositions[name].y + target.y;
       group.position.z = basePositions[name].z + target.z;
       group.scale.setScalar(target.scale);
@@ -1126,11 +1161,12 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       const { clientWidth, clientHeight } = canvas;
       const width = Math.max(1, clientWidth);
       const height = Math.max(1, clientHeight);
-      const pixelRatio = Math.min(window.devicePixelRatio, 1.75);
-      renderer.setPixelRatio(pixelRatio);
-      renderer.setSize(width, height, false);
       camera.aspect = width / height;
       portraitViewport = camera.aspect < 0.9;
+      const compactViewport = width <= 760 || portraitViewport;
+      const pixelRatio = Math.min(window.devicePixelRatio, compactViewport ? 1.35 : 1.75);
+      renderer.setPixelRatio(pixelRatio);
+      renderer.setSize(width, height, false);
       if (portraitViewport) {
         camera.position.set(7.8, 5.4, 13.4);
         camera.fov = 40;
@@ -1146,7 +1182,10 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       if (contextLost) return;
       const dt = Math.min(0.05, (time - previousTime) / 1000);
       previousTime = time;
-      const targets = targetsForMode(modeRef.current);
+      if (renderedMode !== modeRef.current) {
+        renderedMode = modeRef.current;
+        targets = targetsForMode(renderedMode);
+      }
       const instant = reducedMotionRef.current;
       const factor = instant ? 1 : 1 - Math.exp(-dt * 5.5);
 
@@ -1165,8 +1204,8 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       const chapterProgress = THREE.MathUtils.clamp(Number(arc?.dataset.localProgress ?? 0), 0, 1);
       const inspectionX = activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0;
       const rebuildX = activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0;
-      const activeAiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(activeMode);
-      const activeQuantMode = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(activeMode);
+      const activeAiMode = AI_MODES.has(activeMode);
+      const activeQuantMode = QUANT_MODES.has(activeMode);
       const aiDetachProgress = activeMode === "aiBoundary" ? THREE.MathUtils.clamp(chapterProgress / 0.3, 0, 1) : activeAiMode ? 1 : 0;
       roles.inspection.position.x = THREE.MathUtils.lerp(roles.inspection.position.x, inspectionX, factor);
       roles.rebuild.position.x = THREE.MathUtils.lerp(roles.rebuild.position.x, rebuildX, factor);
@@ -1197,38 +1236,14 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         ? THREE.MathUtils.clamp((chapterProgress - contactStart) / (1 - contactStart), 0, 1)
         : 0;
       roles.contact.position.x = THREE.MathUtils.lerp(roles.contact.position.x, (1 - contactExtension) * -0.86, factor);
-      const learningRotation = ["genkoLoop", "genkoAI"].includes(activeMode) ? chapterProgress * 1.15 : 0;
+      const learningRotation = activeMode === "genkoLoop" || activeMode === "genkoAI" ? chapterProgress * 1.15 : 0;
       roles.learning.rotation.y = THREE.MathUtils.lerp(roles.learning.rotation.y, learningRotation, factor * 0.6);
 
-      const isExpanded = [
-        "growing",
-        "system",
-        "rebuildGrowing",
-        "rebuild",
-        "sharedArchitecture",
-        "genkoLoop",
-        "genkoAI",
-        "aiInputs",
-        "aiDecision",
-        "aiWorkflow",
-        "quantPipeline",
-        "quantModels",
-        "quantGates",
-      ].includes(activeMode);
-      const isInherited = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(activeMode);
-      const isWorkbenchScene = [
-        "genkoProblem",
-        "genkoLoop",
-        "genkoAI",
-        "genkoCapability",
-        "aiBoundary",
-        "aiInputs",
-        "aiDecision",
-        "aiWorkflow",
-        "aiCapability",
-      ].includes(activeMode);
-      const isQuantLab = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(activeMode);
-      const isFinale = ["accumulated", "provenance", "frontier", "handoff"].includes(activeMode);
+      const isExpanded = EXPANDED_MODES.has(activeMode);
+      const isInherited = INHERITED_MODES.has(activeMode);
+      const isWorkbenchScene = WORKBENCH_MODES.has(activeMode);
+      const isQuantLab = QUANT_MODES.has(activeMode);
+      const isFinale = FINALE_MODES.has(activeMode);
       const targetRootX = activeMode === "handoff" ? -1.55 : isFinale ? -0.52 : isQuantLab ? -0.68 : isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
       const targetScale = activeMode === "handoff" ? 0.7 : isFinale ? 0.86 : isQuantLab ? 0.8 : isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
       const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isFinale ? -0.06 : isQuantLab ? -0.08 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
