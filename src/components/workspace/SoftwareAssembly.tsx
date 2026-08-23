@@ -19,7 +19,16 @@ type AssemblyMode =
   | "inspection"
   | "rebuildGrowing"
   | "rebuild"
-  | "sharedArchitecture";
+  | "sharedArchitecture"
+  | "genkoProblem"
+  | "genkoLoop"
+  | "genkoAI"
+  | "genkoCapability"
+  | "aiBoundary"
+  | "aiInputs"
+  | "aiDecision"
+  | "aiWorkflow"
+  | "aiCapability";
 
 type SoftwareAssemblyProps = {
   state: BuildGraphState;
@@ -45,7 +54,15 @@ type SceneRole =
   | "legacy"
   | "inspection"
   | "rebuild"
-  | "shared";
+  | "shared"
+  | "learning"
+  | "productResearch"
+  | "productAI"
+  | "aiInputs"
+  | "decision"
+  | "outcomes"
+  | "implementation"
+  | "testing";
 
 type RoleGroup = THREE.Group & { userData: { roleOpacity?: number } };
 
@@ -75,6 +92,15 @@ function modeForState(state: BuildGraphState): AssemblyMode {
   if (state === "cravecart-growing") return "rebuildGrowing";
   if (state === "inherited-rebuild") return "rebuild";
   if (state === "shared-architecture") return "sharedArchitecture";
+  if (state === "genko-problem") return "genkoProblem";
+  if (state === "genko-loop") return "genkoLoop";
+  if (state === "genko-ai-product") return "genkoAI";
+  if (state === "genko-capability") return "genkoCapability";
+  if (state === "ai-workbench") return "aiBoundary";
+  if (state === "ai-proposals") return "aiInputs";
+  if (state === "ai-evaluation") return "aiDecision";
+  if (state === "ai-workflow") return "aiWorkflow";
+  if (state === "ai-capability") return "aiCapability";
   return "current";
 }
 
@@ -153,6 +179,51 @@ const MODE_COPY: Record<AssemblyMode, { eyebrow: string; title: string; labels: 
     eyebrow: "CRAVECART / CAPABILITY RETAINED",
     title: "Project structure recedes. Shared architecture remains in the assembly.",
     labels: ["Shared backend", "Shared state", "Multi-surface system"],
+  },
+  genkoProblem: {
+    eyebrow: "GENKŌ / A PERSONAL LEARNING PROBLEM",
+    title: "The assembly changes purpose before it changes scale.",
+    labels: ["Learning problem", "Product research", "Continuity"],
+  },
+  genkoLoop: {
+    eyebrow: "GENKŌ / LEARNING LOOP",
+    title: "Practice becomes a loop that returns the learner to the product.",
+    labels: ["Learn", "Listen", "Write", "Quiz", "Continue"],
+  },
+  genkoAI: {
+    eyebrow: "GENKŌ / AI INSIDE THE PRODUCT",
+    title: "AI begins as one interaction inside a researched learning system.",
+    labels: ["Learning loop", "AI interaction", "Product feature"],
+  },
+  genkoCapability: {
+    eyebrow: "GENKŌ / PRODUCT CAPABILITY",
+    title: "The product settles into a reusable research and learning foundation.",
+    labels: ["Product research", "Learning system", "Continuing development"],
+  },
+  aiBoundary: {
+    eyebrow: "AI / PRODUCT FEATURE → ENGINEERING TOOL",
+    title: "The AI element leaves the product and docks into the workbench.",
+    labels: ["GENKŌ", "AI tool", "Engineering workbench"],
+  },
+  aiInputs: {
+    eyebrow: "AI / PROPOSALS ARE INPUTS",
+    title: "AI, documentation and repository context enter one working surface.",
+    labels: ["AI proposal", "Documentation", "Repository", "Research"],
+  },
+  aiDecision: {
+    eyebrow: "AI / ENGINEERING JUDGMENT",
+    title: "Nothing crosses into the build before an engineering decision.",
+    labels: ["Accept", "Revise", "Reject"],
+  },
+  aiWorkflow: {
+    eyebrow: "AI / IMPLEMENTATION LOOP",
+    title: "Accepted work enters implementation, testing and correction.",
+    labels: ["Implement", "Test", "Debug", "Working system"],
+  },
+  aiCapability: {
+    eyebrow: "AI / CAPABILITY RETAINED",
+    title: "The workbench remains useful because judgment stays at its center.",
+    labels: ["Research", "Engineering decision", "Tested software"],
   },
 };
 
@@ -470,6 +541,109 @@ function createAssembly(scene: THREE.Scene) {
     }),
   );
 
+  const learning = role("learning");
+  const learningRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.42, 0.055, 10, 72),
+    material(COLORS.interface, 0.66, COLORS.interface),
+  );
+  learningRing.position.set(-0.15, 1.08, 0.02);
+  learningRing.rotation.x = Math.PI / 2;
+  learning.add(learningRing);
+  const learningPositions: [number, number, number][] = [
+    [-1.25, 1.18, -0.62],
+    [-0.58, 1.18, 0.92],
+    [0.52, 1.18, 0.92],
+    [1.06, 1.18, -0.22],
+    [0.2, 1.18, -1.08],
+  ];
+  learningPositions.forEach((position, index) =>
+    addBox(learning, [0.68, 0.1, 0.48], position, index === 4 ? COLORS.resolved : COLORS.interface, {
+      emissive: index === 4 ? COLORS.resolved : COLORS.interface,
+      opacity: index === 4 ? 0.72 : 0.34,
+      edges: true,
+    }),
+  );
+
+  const productResearch = role("productResearch");
+  addBox(productResearch, [1.85, 0.16, 1.18], [2.78, 0.32, -0.32], COLORS.bodyRaised, {
+    opacity: 0.94,
+    edges: true,
+  });
+  [-0.34, 0, 0.34].forEach((z, index) =>
+    addBox(productResearch, [1.32 - index * 0.14, 0.045, 0.1], [2.78, 0.44, -0.32 + z], index === 1 ? COLORS.signal : COLORS.interface, {
+      emissive: index === 1 ? COLORS.signal : COLORS.interface,
+      opacity: 0.66,
+      edges: false,
+    }),
+  );
+
+  const productAI = role("productAI");
+  addBox(productAI, [0.86, 0.18, 0.86], [1.18, 1.38, 0.2], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.78,
+    edges: true,
+  }).rotation.y = Math.PI / 4;
+  addBox(productAI, [1.22, 0.035, 0.08], [1.18, 1.52, 0.2], COLORS.ink, {
+    opacity: 0.72,
+    edges: false,
+  });
+
+  const aiInputs = role("aiInputs");
+  const inputColors = [COLORS.signal, COLORS.interface, COLORS.history];
+  [-0.72, 0, 0.72].forEach((z, index) =>
+    addBox(aiInputs, [1.12, 0.16, 0.48], [3.08, 0.34, z], inputColors[index], {
+      emissive: index < 2 ? inputColors[index] : 0,
+      opacity: index === 0 ? 0.76 : 0.46,
+      edges: true,
+    }),
+  );
+
+  const decision = role("decision");
+  const decisionPlate = addBox(decision, [1.05, 0.2, 1.05], [1.55, -0.12, 0], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.82,
+    edges: true,
+  });
+  decisionPlate.rotation.y = Math.PI / 4;
+  addBox(decision, [0.32, 0.34, 0.32], [1.55, 0.08, 0], COLORS.bodyRaised, {
+    edges: true,
+  });
+
+  const outcomes = role("outcomes");
+  const outcomeColors = [COLORS.resolved, COLORS.signal, COLORS.history];
+  [-0.88, 0, 0.88].forEach((z, index) =>
+    addBox(outcomes, [1.2, 0.12, 0.38], [2.86, -0.38, z], outcomeColors[index], {
+      emissive: index < 2 ? outcomeColors[index] : 0,
+      opacity: index === 0 ? 0.7 : 0.46,
+      edges: true,
+    }),
+  );
+
+  const implementation = role("implementation");
+  addBox(implementation, [1.78, 0.72, 1.46], [0.42, -0.62, 0], COLORS.bodyRaised, {
+    opacity: 0.98,
+    edges: true,
+  });
+  addBox(implementation, [1.18, 0.12, 0.9], [0.42, -0.31, 0], COLORS.signal, {
+    emissive: COLORS.signal,
+    opacity: 0.36,
+    edges: true,
+  });
+
+  const testing = role("testing");
+  const testRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.72, 0.055, 10, 48),
+    material(COLORS.resolved, 0.82, COLORS.resolved),
+  );
+  testRing.position.set(-0.92, -0.55, 0.18);
+  testRing.rotation.x = Math.PI / 2;
+  testing.add(testRing);
+  addBox(testing, [0.62, 0.2, 0.62], [-0.92, -0.5, 0.18], COLORS.resolved, {
+    emissive: COLORS.resolved,
+    opacity: 0.58,
+    edges: true,
+  });
+
   return { root, roles };
 }
 
@@ -477,7 +651,9 @@ function targetsForMode(mode: AssemblyMode) {
   const visible = (value: number, y = 0, z = 0, scale = 1) => ({ opacity: value, y, z, scale });
   const clientMode = ["clientWorkbench", "clientConstraints", "clientDelivery"].includes(mode);
   const inheritedMode = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(mode);
-  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode;
+  const genkoMode = ["genkoProblem", "genkoLoop", "genkoAI", "genkoCapability"].includes(mode);
+  const aiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(mode);
+  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode || genkoMode || aiMode;
   const historicCoreOpacity = mode === "sharedArchitecture" ? 0.62 : inheritedMode ? 0.22 : 0;
   const legacyOpacity = mode === "inherited" || mode === "inspection"
     ? 1
@@ -517,9 +693,22 @@ function targetsForMode(mode: AssemblyMode) {
       inheritedMode ? 0.88 : 1,
     ),
     workbench: visible(
-      mode === "current" ? 0.8 : mode === "system" ? 0.34 : clientMode ? 0.72 : mode === "inspection" ? 0.48 : 0,
+      mode === "current"
+        ? 0.8
+        : mode === "system"
+          ? 0.34
+          : clientMode
+            ? 0.72
+            : mode === "inspection"
+              ? 0.48
+              : genkoMode
+                ? 0.58
+                : aiMode
+                  ? 1
+                  : 0,
       0,
       mode === "decomposed" ? -1.2 : 0,
+      aiMode ? 1.12 : 1,
     ),
     sources: visible(mode === "decomposed" || mode === "browser" ? 1 : 0, mode === "browser" ? -0.45 : 0, 0, mode === "browser" ? 0.9 : 1),
     assets: visible(mode === "spotify" ? 1 : 0),
@@ -539,6 +728,46 @@ function targetsForMode(mode: AssemblyMode) {
     inspection: visible(mode === "inspection" ? 1 : mode === "rebuildGrowing" ? 0.72 : mode === "rebuild" ? 0.28 : 0),
     rebuild: visible(rebuildOpacity, mode === "rebuildGrowing" ? 0.18 : 0, mode === "rebuildGrowing" ? -0.28 : 0, mode === "rebuildGrowing" ? 0.82 : 1),
     shared: visible(mode === "sharedArchitecture" ? 1 : mode === "rebuild" ? 0.26 : 0, 0, mode === "sharedArchitecture" ? 0.34 : 0),
+    learning: visible(
+      mode === "genkoProblem"
+        ? 0.38
+        : mode === "genkoLoop" || mode === "genkoAI"
+          ? 1
+          : mode === "genkoCapability"
+            ? 0.56
+            : mode === "aiBoundary"
+              ? 0.24
+              : 0,
+      mode === "genkoProblem" ? 0.18 : 0,
+      0,
+      mode === "genkoProblem" ? 0.86 : 1,
+    ),
+    productResearch: visible(genkoMode ? 1 : aiMode ? 0.74 : 0),
+    productAI: visible(
+      mode === "genkoAI"
+        ? 1
+        : mode === "genkoCapability"
+          ? 0.58
+          : mode === "aiBoundary"
+            ? 1
+            : mode === "aiInputs"
+              ? 0.82
+              : mode === "aiDecision"
+                ? 0.56
+                : mode === "aiWorkflow" || mode === "aiCapability"
+                  ? 0.3
+                  : 0,
+      mode === "aiBoundary" || aiMode ? -0.72 : 0,
+      mode === "aiBoundary" || aiMode ? 0.38 : 0,
+      mode === "aiBoundary" ? 1.08 : 1,
+    ),
+    aiInputs: visible(
+      mode === "aiInputs" ? 1 : mode === "aiDecision" ? 0.76 : mode === "aiWorkflow" ? 0.36 : mode === "aiCapability" ? 0.22 : 0,
+    ),
+    decision: visible(mode === "aiDecision" || mode === "aiWorkflow" ? 1 : mode === "aiCapability" ? 0.78 : 0),
+    outcomes: visible(mode === "aiDecision" ? 1 : mode === "aiWorkflow" ? 0.68 : mode === "aiCapability" ? 0.28 : 0),
+    implementation: visible(mode === "aiWorkflow" ? 1 : mode === "aiCapability" ? 0.72 : 0),
+    testing: visible(mode === "aiWorkflow" || mode === "aiCapability" ? 1 : 0),
   } satisfies Record<SceneRole, { opacity: number; y: number; z: number; scale: number }>;
 }
 
@@ -645,14 +874,41 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       const chapterProgress = THREE.MathUtils.clamp(Number(arc?.dataset.localProgress ?? 0), 0, 1);
       const inspectionX = activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0;
       const rebuildX = activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0;
+      const activeAiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(activeMode);
+      const aiDetachProgress = activeMode === "aiBoundary" ? THREE.MathUtils.clamp(chapterProgress / 0.3, 0, 1) : activeAiMode ? 1 : 0;
       roles.inspection.position.x = THREE.MathUtils.lerp(roles.inspection.position.x, inspectionX, factor);
       roles.rebuild.position.x = THREE.MathUtils.lerp(roles.rebuild.position.x, rebuildX, factor);
+      roles.productAI.position.x = THREE.MathUtils.lerp(roles.productAI.position.x, aiDetachProgress * 1.35, factor);
+      const learningRotation = ["genkoLoop", "genkoAI"].includes(activeMode) ? chapterProgress * 1.15 : 0;
+      roles.learning.rotation.y = THREE.MathUtils.lerp(roles.learning.rotation.y, learningRotation, factor * 0.6);
 
-      const isExpanded = ["growing", "system", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(activeMode);
+      const isExpanded = [
+        "growing",
+        "system",
+        "rebuildGrowing",
+        "rebuild",
+        "sharedArchitecture",
+        "genkoLoop",
+        "genkoAI",
+        "aiInputs",
+        "aiDecision",
+        "aiWorkflow",
+      ].includes(activeMode);
       const isInherited = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(activeMode);
-      const targetRootX = isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
-      const targetScale = isExpanded ? 0.88 : isInherited ? 0.93 : 1;
-      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isExpanded ? -0.18 : -0.34;
+      const isWorkbenchScene = [
+        "genkoProblem",
+        "genkoLoop",
+        "genkoAI",
+        "genkoCapability",
+        "aiBoundary",
+        "aiInputs",
+        "aiDecision",
+        "aiWorkflow",
+        "aiCapability",
+      ].includes(activeMode);
+      const targetRootX = isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
+      const targetScale = isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
+      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
       root.position.x = THREE.MathUtils.lerp(root.position.x, targetRootX, factor);
       root.scale.setScalar(THREE.MathUtils.lerp(root.scale.x, targetScale, factor));
       root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, targetRotation, factor);
@@ -662,7 +918,9 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
           ? new THREE.Vector3(6.35, 3.65, 7.25)
           : isInherited
             ? new THREE.Vector3(8.35, 5.15, 10.4)
-            : new THREE.Vector3(7.4, 4.7, 8.8);
+            : isWorkbenchScene
+              ? new THREE.Vector3(8.15, 4.85, 10.1)
+              : new THREE.Vector3(7.4, 4.7, 8.8);
         camera.position.lerp(cameraTarget, factor * 0.72);
       }
       const lookZ = activeMode === "inspection" ? -0.72 : isInherited ? -0.25 : 0;

@@ -156,12 +156,35 @@
     linear-gradient(145deg, rgba(17, 27, 33, 0.94), rgba(5, 11, 15, 0.76));
 }
 
+.software-assembly--genkoProblem .software-assembly__stage,
+.software-assembly--genkoLoop .software-assembly__stage,
+.software-assembly--genkoAI .software-assembly__stage,
+.software-assembly--genkoCapability .software-assembly__stage {
+  background:
+    radial-gradient(circle at 54% 38%, rgba(131, 180, 191, 0.18), transparent 35%),
+    radial-gradient(circle at 78% 50%, rgba(184, 215, 188, 0.08), transparent 30%),
+    linear-gradient(145deg, rgba(14, 26, 31, 0.96), rgba(5, 11, 15, 0.76));
+}
+
+.software-assembly--aiBoundary .software-assembly__stage,
+.software-assembly--aiInputs .software-assembly__stage,
+.software-assembly--aiDecision .software-assembly__stage,
+.software-assembly--aiWorkflow .software-assembly__stage,
+.software-assembly--aiCapability .software-assembly__stage {
+  background:
+    radial-gradient(circle at 76% 44%, rgba(239, 115, 83, 0.14), transparent 30%),
+    radial-gradient(circle at 52% 56%, rgba(131, 180, 191, 0.13), transparent 36%),
+    linear-gradient(145deg, rgba(17, 27, 33, 0.96), rgba(5, 11, 15, 0.78));
+}
+
 .story-arc--what-i-build-now .story-arc-visual,
 .story-arc--before-the-system .story-arc-visual,
 .story-arc--spotify-clone .story-arc-visual,
 .story-arc--first-real-system .story-arc-visual,
 .story-arc--client-work .story-arc-visual,
-.story-arc--rebuilding-model .story-arc-visual {
+.story-arc--rebuilding-model .story-arc-visual,
+.story-arc--building-genko .story-arc-visual,
+.story-arc--ai-engineering .story-arc-visual {
   width: 100%;
   max-width: 1180px;
   margin-right: auto;
@@ -194,12 +217,16 @@
   }
 
   .story-arc--first-real-system:has(.software-assembly) .software-assembly__stage,
-  .story-arc--rebuilding-model:has(.software-assembly) .software-assembly__stage {
+  .story-arc--rebuilding-model:has(.software-assembly) .software-assembly__stage,
+  .story-arc--building-genko:has(.software-assembly) .software-assembly__stage,
+  .story-arc--ai-engineering:has(.software-assembly) .software-assembly__stage {
     height: min(76svh, 760px);
   }
 
   .story-arc--first-real-system:has(.software-assembly) .chapter-copy,
-  .story-arc--rebuilding-model:has(.software-assembly) .chapter-copy {
+  .story-arc--rebuilding-model:has(.software-assembly) .chapter-copy,
+  .story-arc--building-genko:has(.software-assembly) .chapter-copy,
+  .story-arc--ai-engineering:has(.software-assembly) .chapter-copy {
     max-width: 560px;
   }
 }
