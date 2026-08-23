@@ -134,10 +134,10 @@ export function resolveChapterVisual({
     if (reducedMotion) {
       return { state: "inherited-rebuild", phase: "shared-system" };
     }
-    const inspectionStart = viewport === "mobile" ? 0.2 : 0.25;
-    const rebuildStart = viewport === "mobile" ? 0.42 : 0.5;
-    const connectedStart = viewport === "mobile" ? 0.65 : 0.75;
-    const extractionStart = viewport === "mobile" ? 0.88 : 0.92;
+    const inspectionStart = viewport === "mobile" ? 0.2 : 0.22;
+    const rebuildStart = viewport === "mobile" ? 0.42 : 0.46;
+    const connectedStart = viewport === "mobile" ? 0.65 : 0.68;
+    const extractionStart = viewport === "mobile" ? 0.88 : 0.87;
     if (progress < inspectionStart) {
       return { state: "dapigo-inherited", phase: "inherited-system" };
     }
@@ -221,9 +221,9 @@ export function resolveChapterVisual({
   if (reducedMotion) {
     return { state: "contact-handoff", phase: "contact" };
   }
-  const provenanceStart = viewport === "mobile" ? 0.3 : 0.4;
-  const frontierStart = viewport === "mobile" ? 0.62 : 0.7;
-  const contactStart = viewport === "mobile" ? 0.88 : 0.94;
+  const provenanceStart = viewport === "mobile" ? 0.3 : 0.22;
+  const frontierStart = viewport === "mobile" ? 0.62 : 0.72;
+  const contactStart = viewport === "mobile" ? 0.88 : 0.92;
   if (progress < provenanceStart) {
     return { state: "accumulated-system", phase: "accumulated-capability" };
   }

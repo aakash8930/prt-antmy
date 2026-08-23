@@ -93,6 +93,7 @@ function NodeGlyph({ node, active }: { node: GraphNode; active: boolean }) {
   return (
     <g
       className={`lbg-node lbg-node--${node.type}${node.emphasis ? ` lbg-node--${node.emphasis}` : ""}${active ? " is-active" : ""}`}
+      data-node-id={node.id}
       style={{
         "--node-x": `${active ? node.x : 600}px`,
         "--node-y": `${active ? node.y : 350}px`,
@@ -201,6 +202,7 @@ function GraphSvg({
               key={`${definition.state}-${edge.id}`}
               d={edgePath(edge, nodes)}
               className={`lbg-edge lbg-edge--${edge.kind ?? "primary"}${definition.state === state ? " is-active" : ""}`}
+              data-edge-id={edge.id}
               markerEnd={`url(#lbg-arrow-${viewport})`}
             />
           ));

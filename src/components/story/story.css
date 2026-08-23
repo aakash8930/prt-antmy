@@ -1376,6 +1376,110 @@ blockquote {
   transition: none;
 }
 
+@media (min-width: 901px) {
+  .story-arc--first-real-system .story-arc-visual {
+    max-width: 1120px;
+  }
+
+  .story-arc--first-real-system:is(
+      [data-visual-state="system-thinking"],
+      [data-visual-state="bellybasket-system"]
+    ) .lbg-node > rect {
+    stroke-opacity: 1;
+  }
+
+  .story-arc--first-real-system:is(
+      [data-visual-state="system-thinking"],
+      [data-visual-state="bellybasket-system"]
+    ) .lbg-edge.is-active {
+    stroke-width: 1.8;
+  }
+
+  .story-arc--first-real-system[data-visual-state="bellybasket-system"]
+    .lbg-node[data-node-id="maps"] {
+    transition-delay: 90ms;
+  }
+
+  .story-arc--first-real-system[data-visual-state="bellybasket-system"]
+    .lbg-node[data-node-id="tracking"] {
+    transition-delay: 210ms;
+  }
+
+  .story-arc--rebuilding-model:is(
+      [data-visual-state="cravecart-growing"],
+      [data-visual-state="inherited-rebuild"]
+    ) .lbg-group--legacy {
+    opacity: 0.42;
+  }
+
+  .story-arc--rebuilding-model:is(
+      [data-visual-state="cravecart-growing"],
+      [data-visual-state="inherited-rebuild"]
+    ) .lbg-group--rebuilt rect {
+    fill: rgba(131, 180, 191, 0.075);
+    stroke: rgba(131, 180, 191, 0.9);
+  }
+
+  .story-arc--rebuilding-model:is(
+      [data-visual-state="cravecart-growing"],
+      [data-visual-state="inherited-rebuild"]
+    ) .lbg-node:is(
+      [data-node-id="legacy-flutter"],
+      [data-node-id="legacy-php"]
+    ) {
+    opacity: 0.48;
+  }
+
+  .story-arc--rebuilding-model:is(
+      [data-visual-state="cravecart-growing"],
+      [data-visual-state="inherited-rebuild"]
+    ) .lbg-edge[data-edge-id="growing-inspection-core"],
+  .story-arc--rebuilding-model[data-visual-state="inherited-rebuild"]
+    .lbg-edge[data-edge-id="rebuild-inspection-core"] {
+    stroke-width: 2.6;
+    opacity: 1;
+  }
+
+  .story-arc--rebuilding-model[data-visual-state="shared-architecture"]
+    .lbg-node[data-node-id="shared-capability"] > rect {
+    stroke-width: 2;
+  }
+
+  .story-arc--how-i-build-now[data-visual-state="capability-provenance"]
+    .lbg-node.lbg-node--evidence.is-active {
+    opacity: 0.62;
+  }
+
+  .story-arc--how-i-build-now[data-visual-state="capability-provenance"]
+    .lbg-edge--compression {
+    stroke-width: 2.2;
+  }
+
+  .story-arc--how-i-build-now[data-visual-state="capability-provenance"]
+    .lbg-edge--branch {
+    stroke-width: 1.8;
+  }
+
+  .story-arc--how-i-build-now[data-visual-state="contact-handoff"]
+    .lbg-node.is-active[data-node-id$="-capability"] {
+    opacity: 0.32;
+  }
+
+  .story-arc--how-i-build-now[data-visual-state="contact-handoff"]
+    .lbg-edge--branch.is-active {
+    opacity: 0.32;
+  }
+
+  .story-arc--how-i-build-now[data-visual-state="contact-handoff"]
+    .lbg-node:is(
+      [data-node-id="open-connection"],
+      [data-node-id="email-contact"],
+      [data-node-id="github-contact"]
+    ) {
+    opacity: 1;
+  }
+}
+
 @media (min-width: 761px) and (max-width: 900px) and (orientation: portrait) {
   .story-arc-visual-sticky {
     top: 72px;
