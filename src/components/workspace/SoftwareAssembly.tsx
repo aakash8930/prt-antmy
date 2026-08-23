@@ -28,7 +28,12 @@ type AssemblyMode =
   | "aiInputs"
   | "aiDecision"
   | "aiWorkflow"
-  | "aiCapability";
+  | "aiCapability"
+  | "quantProblem"
+  | "quantPipeline"
+  | "quantModels"
+  | "quantGates"
+  | "quantCapability";
 
 type SoftwareAssemblyProps = {
   state: BuildGraphState;
@@ -62,7 +67,13 @@ type SceneRole =
   | "decision"
   | "outcomes"
   | "implementation"
-  | "testing";
+  | "testing"
+  | "market"
+  | "features"
+  | "models"
+  | "riskGates"
+  | "actions"
+  | "unresolved";
 
 type RoleGroup = THREE.Group & { userData: { roleOpacity?: number } };
 
@@ -101,6 +112,11 @@ function modeForState(state: BuildGraphState): AssemblyMode {
   if (state === "ai-evaluation") return "aiDecision";
   if (state === "ai-workflow") return "aiWorkflow";
   if (state === "ai-capability") return "aiCapability";
+  if (state === "quantx-problem") return "quantProblem";
+  if (state === "market-pipeline") return "quantPipeline";
+  if (state === "model-branching") return "quantModels";
+  if (state === "decision-gates") return "quantGates";
+  if (state === "quantx-capability") return "quantCapability";
   return "current";
 }
 
@@ -224,6 +240,31 @@ const MODE_COPY: Record<AssemblyMode, { eyebrow: string; title: string; labels: 
     eyebrow: "AI / CAPABILITY RETAINED",
     title: "The workbench remains useful because judgment stays at its center.",
     labels: ["Research", "Engineering decision", "Tested software"],
+  },
+  quantProblem: {
+    eyebrow: "QUANTX / AN UNFINISHED EXPERIMENT",
+    title: "A market question docks at the open edge of the assembly.",
+    labels: ["Market information", "Experimental system", "Open question"],
+  },
+  quantPipeline: {
+    eyebrow: "QUANTX / MARKET ANALYSIS",
+    title: "Raw signals become features before they reach a model.",
+    labels: ["Market inputs", "Analysis", "Feature extraction"],
+  },
+  quantModels: {
+    eyebrow: "QUANTX / EXPERIMENTAL MODELS",
+    title: "Several model chambers branch from the same prepared evidence.",
+    labels: ["Model A", "Model B", "Model C", "Low confidence"],
+  },
+  quantGates: {
+    eyebrow: "QUANTX / DECISION + RISK GATES",
+    title: "A prediction is not an action until both gates allow it through.",
+    labels: ["Decision", "Risk", "Action", "No action"],
+  },
+  quantCapability: {
+    eyebrow: "QUANTX / EXPERIMENTAL CAPABILITY",
+    title: "The experiment stays open; its data and ML capability remain.",
+    labels: ["Experimental ML", "Risk awareness", "Unresolved branch"],
   },
 };
 
@@ -644,6 +685,86 @@ function createAssembly(scene: THREE.Scene) {
     edges: true,
   });
 
+  const market = role("market");
+  [-0.76, 0, 0.76].forEach((z, index) => {
+    addBox(market, [0.86, 0.12, 0.42], [4.06, 0.56 - index * 0.08, z], index === 1 ? COLORS.interface : COLORS.data, {
+      emissive: index === 1 ? COLORS.interface : COLORS.data,
+      opacity: index === 1 ? 0.62 : 0.46,
+      edges: true,
+    });
+    addBox(market, [0.76, 0.035, 0.055], [3.28, 0.48, z], COLORS.data, {
+      emissive: COLORS.data,
+      opacity: 0.72,
+      edges: false,
+    });
+  });
+
+  const features = role("features");
+  addBox(features, [0.72, 0.42, 2.02], [2.72, 0.35, 0], COLORS.bodyRaised, {
+    opacity: 0.96,
+    edges: true,
+  });
+  [-0.72, -0.36, 0, 0.36, 0.72].forEach((z, index) =>
+    addBox(features, [0.94 - Math.abs(index - 2) * 0.08, 0.06, 0.07], [2.72, 0.6, z], COLORS.interface, {
+      emissive: COLORS.interface,
+      opacity: 0.58,
+      edges: false,
+    }),
+  );
+
+  const models = role("models");
+  [-1.05, 0, 1.05].forEach((z, index) => {
+    addBox(models, [0.92, 0.7, 0.72], [1.55, 0.18 + index * 0.06, z], index === 1 ? COLORS.interface : COLORS.bodyRaised, {
+      emissive: index === 1 ? COLORS.interface : 0,
+      opacity: index === 1 ? 0.38 : 0.8,
+      edges: true,
+    });
+    addBox(models, [0.46, 0.08, 0.38], [1.55, 0.58 + index * 0.06, z], index === 2 ? COLORS.history : COLORS.signal, {
+      emissive: index === 2 ? 0 : COLORS.signal,
+      opacity: index === 2 ? 0.38 : 0.56,
+      edges: true,
+    });
+  });
+
+  const riskGates = role("riskGates");
+  const gateFrame = (x: number, color: number, height: number) => {
+    addBox(riskGates, [0.12, height, 0.12], [x, 0.25, -0.72], color, { emissive: color, opacity: 0.72, edges: false });
+    addBox(riskGates, [0.12, height, 0.12], [x, 0.25, 0.72], color, { emissive: color, opacity: 0.72, edges: false });
+    addBox(riskGates, [0.12, 0.12, 1.56], [x, 0.25 + height / 2, 0], color, { emissive: color, opacity: 0.72, edges: false });
+    addBox(riskGates, [0.12, 0.12, 1.56], [x, 0.25 - height / 2, 0], color, { emissive: color, opacity: 0.72, edges: false });
+  };
+  gateFrame(0.48, COLORS.signal, 1.34);
+  gateFrame(-0.38, COLORS.resolved, 1.06);
+
+  const actions = role("actions");
+  addBox(actions, [1.38, 0.1, 0.22], [-1.18, 0.12, -0.38], COLORS.resolved, {
+    emissive: COLORS.resolved,
+    opacity: 0.78,
+    edges: false,
+  });
+  addBox(actions, [1.14, 0.1, 0.22], [-1.08, 0.12, 0.48], COLORS.history, {
+    opacity: 0.46,
+    edges: false,
+  });
+  addBox(actions, [0.44, 0.24, 0.48], [-1.94, 0.12, -0.38], COLORS.resolved, {
+    emissive: COLORS.resolved,
+    opacity: 0.66,
+    edges: true,
+  });
+  addBox(actions, [0.44, 0.24, 0.48], [-1.76, 0.12, 0.48], COLORS.bodyRaised, {
+    opacity: 0.8,
+    edges: true,
+  });
+
+  const unresolved = role("unresolved");
+  [0, 0.42, 0.84].forEach((offset, index) =>
+    addBox(unresolved, [0.3, 0.055, 0.08], [-2.35 - offset, 0.08 + offset * 0.26, 0.58 + offset * 0.34], COLORS.signal, {
+      emissive: COLORS.signal,
+      opacity: 0.62 - index * 0.12,
+      edges: false,
+    }),
+  );
+
   return { root, roles };
 }
 
@@ -653,7 +774,8 @@ function targetsForMode(mode: AssemblyMode) {
   const inheritedMode = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(mode);
   const genkoMode = ["genkoProblem", "genkoLoop", "genkoAI", "genkoCapability"].includes(mode);
   const aiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(mode);
-  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode || genkoMode || aiMode;
+  const quantMode = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(mode);
+  const completeCore = ["current", "boundary", "growing", "system"].includes(mode) || clientMode || genkoMode || aiMode || quantMode;
   const historicCoreOpacity = mode === "sharedArchitecture" ? 0.62 : inheritedMode ? 0.22 : 0;
   const legacyOpacity = mode === "inherited" || mode === "inspection"
     ? 1
@@ -705,7 +827,9 @@ function targetsForMode(mode: AssemblyMode) {
                 ? 0.58
                 : aiMode
                   ? 1
-                  : 0,
+                  : quantMode
+                    ? 0.42
+                    : 0,
       0,
       mode === "decomposed" ? -1.2 : 0,
       aiMode ? 1.12 : 1,
@@ -768,6 +892,34 @@ function targetsForMode(mode: AssemblyMode) {
     outcomes: visible(mode === "aiDecision" ? 1 : mode === "aiWorkflow" ? 0.68 : mode === "aiCapability" ? 0.28 : 0),
     implementation: visible(mode === "aiWorkflow" ? 1 : mode === "aiCapability" ? 0.72 : 0),
     testing: visible(mode === "aiWorkflow" || mode === "aiCapability" ? 1 : 0),
+    market: visible(
+      mode === "quantProblem"
+        ? 0.48
+        : mode === "quantPipeline"
+          ? 1
+          : mode === "quantModels" || mode === "quantGates"
+            ? 0.62
+            : mode === "quantCapability"
+              ? 0.18
+              : 0,
+      mode === "quantProblem" ? 0.28 : 0,
+      mode === "quantProblem" ? 0.5 : 0,
+    ),
+    features: visible(
+      mode === "quantPipeline" || mode === "quantModels" ? 1 : mode === "quantGates" ? 0.52 : mode === "quantCapability" ? 0.36 : 0,
+    ),
+    models: visible(
+      mode === "quantModels" || mode === "quantGates" ? 1 : mode === "quantCapability" ? 0.44 : 0,
+      mode === "quantModels" ? 0.16 : 0,
+      0,
+      mode === "quantModels" ? 1.08 : 1,
+    ),
+    riskGates: visible(mode === "quantGates" ? 1 : mode === "quantCapability" ? 0.7 : 0),
+    actions: visible(mode === "quantGates" ? 1 : mode === "quantCapability" ? 0.52 : 0),
+    unresolved: visible(
+      mode === "quantProblem" ? 0.36 : mode === "quantGates" ? 0.72 : mode === "quantCapability" ? 1 : 0,
+      mode === "quantCapability" ? 0.22 : 0,
+    ),
   } satisfies Record<SceneRole, { opacity: number; y: number; z: number; scale: number }>;
 }
 
@@ -875,10 +1027,21 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
       const inspectionX = activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0;
       const rebuildX = activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0;
       const activeAiMode = ["aiBoundary", "aiInputs", "aiDecision", "aiWorkflow", "aiCapability"].includes(activeMode);
+      const activeQuantMode = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(activeMode);
       const aiDetachProgress = activeMode === "aiBoundary" ? THREE.MathUtils.clamp(chapterProgress / 0.3, 0, 1) : activeAiMode ? 1 : 0;
       roles.inspection.position.x = THREE.MathUtils.lerp(roles.inspection.position.x, inspectionX, factor);
       roles.rebuild.position.x = THREE.MathUtils.lerp(roles.rebuild.position.x, rebuildX, factor);
       roles.productAI.position.x = THREE.MathUtils.lerp(roles.productAI.position.x, aiDetachProgress * 1.35, factor);
+      const modelBranchProgress = activeMode === "quantModels"
+        ? THREE.MathUtils.clamp((chapterProgress - 0.45) / 0.2, 0, 1)
+        : activeQuantMode
+          ? 1
+          : 0;
+      roles.models.position.x = THREE.MathUtils.lerp(roles.models.position.x, (1 - modelBranchProgress) * 0.64, factor);
+      const gateProgress = activeMode === "quantGates"
+        ? THREE.MathUtils.clamp((chapterProgress - 0.65) / 0.29, 0, 1)
+        : 1;
+      roles.riskGates.scale.z = roles.riskGates.scale.x * THREE.MathUtils.lerp(1.32, 1, gateProgress);
       const learningRotation = ["genkoLoop", "genkoAI"].includes(activeMode) ? chapterProgress * 1.15 : 0;
       roles.learning.rotation.y = THREE.MathUtils.lerp(roles.learning.rotation.y, learningRotation, factor * 0.6);
 
@@ -893,6 +1056,9 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         "aiInputs",
         "aiDecision",
         "aiWorkflow",
+        "quantPipeline",
+        "quantModels",
+        "quantGates",
       ].includes(activeMode);
       const isInherited = ["inherited", "inspection", "rebuildGrowing", "rebuild", "sharedArchitecture"].includes(activeMode);
       const isWorkbenchScene = [
@@ -906,9 +1072,10 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
         "aiWorkflow",
         "aiCapability",
       ].includes(activeMode);
-      const targetRootX = isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
-      const targetScale = isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
-      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
+      const isQuantLab = ["quantProblem", "quantPipeline", "quantModels", "quantGates", "quantCapability"].includes(activeMode);
+      const targetRootX = isQuantLab ? -0.68 : isWorkbenchScene ? -0.42 : isExpanded ? -0.3 : isInherited ? 0.05 : 0.15;
+      const targetScale = isQuantLab ? 0.8 : isExpanded ? 0.88 : isInherited ? 0.93 : isWorkbenchScene ? 0.91 : 1;
+      const targetRotation = activeMode === "inspection" ? -0.48 : isInherited ? -0.2 : isQuantLab ? -0.08 : isWorkbenchScene ? -0.14 : isExpanded ? -0.18 : -0.34;
       root.position.x = THREE.MathUtils.lerp(root.position.x, targetRootX, factor);
       root.scale.setScalar(THREE.MathUtils.lerp(root.scale.x, targetScale, factor));
       root.rotation.y = THREE.MathUtils.lerp(root.rotation.y, targetRotation, factor);
@@ -918,9 +1085,11 @@ export function SoftwareAssembly({ state, reducedMotion, chapterLabel }: Softwar
           ? new THREE.Vector3(6.35, 3.65, 7.25)
           : isInherited
             ? new THREE.Vector3(8.35, 5.15, 10.4)
-            : isWorkbenchScene
-              ? new THREE.Vector3(8.15, 4.85, 10.1)
-              : new THREE.Vector3(7.4, 4.7, 8.8);
+            : isQuantLab
+              ? new THREE.Vector3(8.8, 5.15, 11.4)
+              : isWorkbenchScene
+                ? new THREE.Vector3(8.15, 4.85, 10.1)
+                : new THREE.Vector3(7.4, 4.7, 8.8);
         camera.position.lerp(cameraTarget, factor * 0.72);
       }
       const lookZ = activeMode === "inspection" ? -0.72 : isInherited ? -0.25 : 0;

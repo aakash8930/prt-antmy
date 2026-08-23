@@ -161,6 +161,7 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
     "rebuilding-model",
     "building-genko",
     "ai-engineering",
+    "quantx-experiment",
   ].includes(runtime.chapterId);
 
   return (

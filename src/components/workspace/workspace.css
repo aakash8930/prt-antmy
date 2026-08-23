@@ -177,6 +177,17 @@
     linear-gradient(145deg, rgba(17, 27, 33, 0.96), rgba(5, 11, 15, 0.78));
 }
 
+.software-assembly--quantProblem .software-assembly__stage,
+.software-assembly--quantPipeline .software-assembly__stage,
+.software-assembly--quantModels .software-assembly__stage,
+.software-assembly--quantGates .software-assembly__stage,
+.software-assembly--quantCapability .software-assembly__stage {
+  background:
+    radial-gradient(circle at 78% 42%, rgba(73, 117, 128, 0.18), transparent 34%),
+    radial-gradient(circle at 30% 58%, rgba(239, 115, 83, 0.09), transparent 28%),
+    linear-gradient(145deg, rgba(12, 23, 29, 0.97), rgba(4, 9, 13, 0.8));
+}
+
 .story-arc--what-i-build-now .story-arc-visual,
 .story-arc--before-the-system .story-arc-visual,
 .story-arc--spotify-clone .story-arc-visual,
@@ -184,7 +195,8 @@
 .story-arc--client-work .story-arc-visual,
 .story-arc--rebuilding-model .story-arc-visual,
 .story-arc--building-genko .story-arc-visual,
-.story-arc--ai-engineering .story-arc-visual {
+.story-arc--ai-engineering .story-arc-visual,
+.story-arc--quantx-experiment .story-arc-visual {
   width: 100%;
   max-width: 1180px;
   margin-right: auto;
@@ -219,14 +231,16 @@
   .story-arc--first-real-system:has(.software-assembly) .software-assembly__stage,
   .story-arc--rebuilding-model:has(.software-assembly) .software-assembly__stage,
   .story-arc--building-genko:has(.software-assembly) .software-assembly__stage,
-  .story-arc--ai-engineering:has(.software-assembly) .software-assembly__stage {
+  .story-arc--ai-engineering:has(.software-assembly) .software-assembly__stage,
+  .story-arc--quantx-experiment:has(.software-assembly) .software-assembly__stage {
     height: min(76svh, 760px);
   }
 
   .story-arc--first-real-system:has(.software-assembly) .chapter-copy,
   .story-arc--rebuilding-model:has(.software-assembly) .chapter-copy,
   .story-arc--building-genko:has(.software-assembly) .chapter-copy,
-  .story-arc--ai-engineering:has(.software-assembly) .chapter-copy {
+  .story-arc--ai-engineering:has(.software-assembly) .chapter-copy,
+  .story-arc--quantx-experiment:has(.software-assembly) .chapter-copy {
     max-width: 560px;
   }
 }
