@@ -1,6 +1,18 @@
+"use client";
+
+import { useRef } from "react";
 import { chapters, quickLinks } from "@/content/story";
 
 export function StoryNavigation() {
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+
+  const closeMobileMenu = (chapterId: string) => {
+    if (mobileMenuRef.current) mobileMenuRef.current.open = false;
+    requestAnimationFrame(() => {
+      document.getElementById(`${chapterId}-title`)?.focus({ preventScroll: true });
+    });
+  };
+
   return (
     <header className="story-nav">
       <nav className="story-nav-inner" aria-label="Portfolio navigation">
@@ -30,12 +42,12 @@ export function StoryNavigation() {
           </ol>
         </div>
 
-        <details className="story-nav-menu">
+        <details ref={mobileMenuRef} className="story-nav-menu">
           <summary>Chapters</summary>
           <ol>
             {chapters.map((chapter) => (
               <li key={chapter.id}>
-                <a href={`#${chapter.id}`}>
+                <a href={`#${chapter.id}`} onClick={() => closeMobileMenu(chapter.id)}>
                   <span>{chapter.number}</span>
                   {chapter.navLabel}
                 </a>

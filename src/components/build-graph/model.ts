@@ -222,7 +222,7 @@ export type BuildGraphDefinition = {
   callouts?: GraphCallout[];
 };
 
-export type GraphViewport = "desktop" | "mobile";
+export type GraphViewport = "desktop" | "tablet" | "mobile";
 
 type StateResolver = (viewport: GraphViewport) => BuildGraphDefinition;
 
@@ -234,6 +234,472 @@ const node = (
   y: number,
   options: Pick<GraphNode, "detail" | "width" | "emphasis"> = {},
 ): GraphNode => ({ id, label, type, x, y, ...options });
+
+const mobileReadabilityOverrides: Partial<
+  Record<BuildGraphState, () => BuildGraphDefinition>
+> = {
+  "ai-proposals": () => ({
+    state: "ai-proposals",
+    index: "07B",
+    name: "Multiple proposal inputs",
+    shortName: "Proposals",
+    thesis: "AI is one source among documentation, repository, and the running system",
+    description:
+      "Research opens grouped proposal inputs—AI, documentation, repository evidence, and the running system—before approaches are compared.",
+    annotation: "PROPOSALS → COMPARE → DECIDE",
+    preferredComposition: "full-width",
+    canvasHeight: 780,
+    nodes: [
+      node("problem", "Problem", "idea", 195, 85),
+      node("research", "Research", "evidence", 195, 205, { emphasis: "primary" }),
+      node("sources", "Proposal inputs", "external", 195, 370, {
+        emphasis: "external",
+        width: 250,
+        detail: "AI · docs · repository · system",
+      }),
+      node("compare-approaches", "Compare approaches", "diagnosis", 195, 545, {
+        emphasis: "primary",
+        width: 220,
+      }),
+      node("decision", "Engineering decision", "decision", 195, 700, {
+        emphasis: "branch",
+        width: 220,
+      }),
+    ],
+    edges: [
+      { id: "mobile-proposal-problem", from: "problem", to: "research", kind: "primary" },
+      { id: "mobile-proposal-inputs", from: "research", to: "sources", kind: "primary" },
+      { id: "mobile-proposal-compare", from: "sources", to: "compare-approaches", kind: "primary" },
+      { id: "mobile-proposal-decision", from: "compare-approaches", to: "decision", kind: "primary" },
+    ],
+    events: [{ id: "mobile-proposal-event", from: "research", to: "decision" }],
+  }),
+  "ai-evaluation": () => ({
+    state: "ai-evaluation",
+    index: "07C",
+    name: "Engineering evaluation gate",
+    shortName: "Evaluation",
+    thesis: "Possibilities stop at engineering judgment before they reach implementation",
+    description:
+      "Grouped proposal inputs reach the workbench and decision boundary, which can accept, revise, reject, or return to research.",
+    annotation: "INPUTS → WORKBENCH → JUDGMENT",
+    preferredComposition: "full-width",
+    canvasHeight: 880,
+    nodes: [
+      node("sources", "Proposal inputs", "external", 195, 95, {
+        emphasis: "external",
+        width: 250,
+        detail: "AI · docs · repository · system",
+      }),
+      node("workbench", "Engineering workbench", "service", 195, 260, {
+        emphasis: "primary",
+        width: 230,
+      }),
+      node("decision", "Engineering decision", "decision", 195, 425, {
+        emphasis: "primary",
+        width: 220,
+      }),
+      node("accept", "Accept", "outcome", 65, 600, { emphasis: "resolved" }),
+      node("revise", "Revise", "outcome", 195, 600, { emphasis: "branch" }),
+      node("reject", "Reject", "outcome", 325, 600, { emphasis: "branch" }),
+      node("research-again", "Research again", "evidence", 195, 790, {
+        emphasis: "branch",
+        width: 170,
+      }),
+    ],
+    edges: [
+      { id: "mobile-eval-inputs", from: "sources", to: "workbench", kind: "primary" },
+      { id: "mobile-eval-decision", from: "workbench", to: "decision", kind: "primary" },
+      { id: "mobile-eval-accept", from: "decision", to: "accept", kind: "branch" },
+      { id: "mobile-eval-revise", from: "decision", to: "revise", kind: "branch" },
+      { id: "mobile-eval-reject", from: "decision", to: "reject", kind: "branch" },
+      { id: "mobile-eval-research", from: "revise", to: "research-again", kind: "feedback" },
+      { id: "mobile-eval-reject-research", from: "reject", to: "research-again", kind: "feedback" },
+    ],
+    events: [{ id: "mobile-eval-event", from: "sources", to: "decision" }],
+  }),
+  "ai-workflow": () => ({
+    state: "ai-workflow",
+    index: "07D",
+    name: "AI-assisted engineering workflow",
+    shortName: "Workflow",
+    thesis: "Judgment determines which accelerated possibility becomes part of the system",
+    description:
+      "Proposal inputs pass through engineering decision. Accepted work is implemented, inspected, debugged, tested, and evaluated as a working system.",
+    annotation: "POSSIBILITIES → JUDGMENT → SYSTEM",
+    preferredComposition: "full-width",
+    canvasHeight: 980,
+    nodes: [
+      node("sources", "Proposal inputs", "external", 195, 80, {
+        emphasis: "external",
+        width: 250,
+        detail: "AI · docs · repository · system",
+      }),
+      node("decision", "Engineering decision", "decision", 195, 235, {
+        emphasis: "primary",
+        width: 220,
+      }),
+      node("accept", "Accept", "outcome", 65, 400, { emphasis: "resolved" }),
+      node("revise", "Revise", "outcome", 195, 400, { emphasis: "branch" }),
+      node("reject", "Reject", "outcome", 325, 400, { emphasis: "branch" }),
+      node("research-again", "Research again", "evidence", 195, 535, {
+        emphasis: "branch",
+        width: 170,
+      }),
+      node("implement", "Implement", "service", 195, 665, {
+        emphasis: "primary",
+        detail: "inspect · debug",
+      }),
+      node("test", "Test", "evidence", 195, 805),
+      node("working", "Working system", "outcome", 195, 915, {
+        emphasis: "resolved",
+        width: 170,
+      }),
+    ],
+    edges: [
+      { id: "mobile-workflow-decision", from: "sources", to: "decision", kind: "primary" },
+      { id: "mobile-workflow-accept", from: "decision", to: "accept", kind: "branch" },
+      { id: "mobile-workflow-revise", from: "decision", to: "revise", kind: "branch" },
+      { id: "mobile-workflow-reject", from: "decision", to: "reject", kind: "branch" },
+      { id: "mobile-workflow-research", from: "revise", to: "research-again", kind: "feedback" },
+      { id: "mobile-workflow-reject-research", from: "reject", to: "research-again", kind: "feedback" },
+      { id: "mobile-workflow-implement", from: "accept", to: "implement", kind: "primary" },
+      { id: "mobile-workflow-test", from: "implement", to: "test", kind: "primary" },
+      { id: "mobile-workflow-working", from: "test", to: "working", kind: "primary" },
+      { id: "mobile-workflow-loop", from: "research-again", to: "decision", kind: "feedback" },
+    ],
+    events: [{ id: "mobile-workflow-event", from: "accept", to: "working" }],
+  }),
+  "ai-capability": () => ({
+    state: "ai-capability",
+    index: "07E",
+    name: "AI-assisted engineering extracted",
+    shortName: "AI capability",
+    thesis: "The workflow compresses into a capability governed by engineering judgment",
+    description:
+      "Grouped evidence still passes through engineering decision before a working system becomes persistent AI-assisted engineering capability.",
+    annotation: "WORKFLOW → PERSISTENT CAPABILITY",
+    preferredComposition: "typography-integrated",
+    canvasHeight: 820,
+    nodes: [
+      node("product-research", "Product research", "outcome", 195, 90, {
+        emphasis: "branch",
+        width: 190,
+      }),
+      node("sources", "Engineering inputs", "external", 195, 245, {
+        emphasis: "external",
+        width: 220,
+        detail: "AI · evidence · running system",
+      }),
+      node("decision", "Engineering decision", "decision", 195, 415, {
+        emphasis: "primary",
+        width: 220,
+      }),
+      node("working", "Working system", "outcome", 195, 580, {
+        emphasis: "resolved",
+        width: 170,
+      }),
+      node("ai-engineering-capability", "AI-assisted engineering", "outcome", 195, 735, {
+        emphasis: "resolved",
+        width: 260,
+      }),
+    ],
+    edges: [
+      { id: "mobile-ai-cap-research", from: "product-research", to: "sources", kind: "branch" },
+      { id: "mobile-ai-cap-decision", from: "sources", to: "decision", kind: "primary" },
+      { id: "mobile-ai-cap-working", from: "decision", to: "working", kind: "primary" },
+      { id: "mobile-ai-cap-compress", from: "working", to: "ai-engineering-capability", kind: "compression" },
+    ],
+    events: [{ id: "mobile-ai-cap-event", from: "working", to: "ai-engineering-capability" }],
+  }),
+  "model-branching": () => ({
+    state: "model-branching",
+    index: "08C",
+    name: "Experimental model branches",
+    shortName: "Models",
+    thesis: "Several model approaches remain experiments; none is declared the winner",
+    description:
+      "XGBoost, LSTM, and other experiments form one readable model group before a decision candidate can remain low-confidence or unresolved.",
+    annotation: "MODEL EXPERIMENTS / NO WINNER",
+    preferredComposition: "full-width",
+    canvasHeight: 900,
+    nodes: [
+      node("features", "Features", "data", 195, 75),
+      node("model", "Model experiments", "decision", 195, 210, {
+        emphasis: "primary",
+        width: 200,
+      }),
+      node("xgboost", "XGBoost", "component", 65, 375),
+      node("lstm", "LSTM", "component", 195, 375),
+      node("experimental-model", "Other", "component", 325, 375),
+      node("decision", "Decision candidate", "decision", 195, 555, {
+        emphasis: "branch",
+        width: 195,
+      }),
+      node("insufficient-confidence", "Low confidence", "outcome", 100, 735, {
+        emphasis: "branch",
+        width: 170,
+      }),
+      node("unresolved", "Unresolved", "outcome", 290, 735, { emphasis: "branch" }),
+    ],
+    edges: [
+      { id: "mobile-model-feature", from: "features", to: "model", kind: "primary" },
+      { id: "mobile-model-xgb", from: "model", to: "xgboost", kind: "branch" },
+      { id: "mobile-model-lstm", from: "model", to: "lstm", kind: "branch" },
+      { id: "mobile-model-other", from: "model", to: "experimental-model", kind: "branch" },
+      { id: "mobile-xgb-decision", from: "xgboost", to: "decision", kind: "branch" },
+      { id: "mobile-lstm-decision", from: "lstm", to: "decision", kind: "branch" },
+      { id: "mobile-other-decision", from: "experimental-model", to: "decision", kind: "branch" },
+      { id: "mobile-model-confidence", from: "decision", to: "insufficient-confidence", kind: "branch" },
+      { id: "mobile-model-unresolved", from: "decision", to: "unresolved", kind: "branch" },
+    ],
+    events: [{ id: "mobile-model-event", from: "features", to: "decision" }],
+  }),
+  "decision-gates": () => ({
+    state: "decision-gates",
+    index: "08D",
+    name: "Decision and risk gates",
+    shortName: "Gates",
+    thesis: "A model output is not automatically an action",
+    description:
+      "The readable spine reaches grouped model experiments, decision, and risk before explicit action, no-action, confidence, rejection, and unresolved outcomes.",
+    annotation: "MODEL OUTPUT ≠ ACTION",
+    preferredComposition: "full-width",
+    canvasHeight: 1080,
+    nodes: [
+      node("market-information", "Market", "external", 195, 65, { emphasis: "external" }),
+      node("analysis", "Analysis", "diagnosis", 195, 170),
+      node("features", "Features", "data", 195, 275),
+      node("model", "Model experiments", "decision", 195, 395, {
+        emphasis: "primary",
+        width: 205,
+        detail: "XGBoost · LSTM · other",
+      }),
+      node("decision", "Decision", "decision", 195, 535, { emphasis: "primary" }),
+      node("risk", "Risk", "decision", 195, 660, { emphasis: "primary" }),
+      node("execution", "Action path", "service", 65, 805, { emphasis: "branch" }),
+      node("no-action", "No action", "outcome", 195, 805, { emphasis: "branch" }),
+      node("insufficient-confidence", "Low confidence", "outcome", 315, 805, {
+        emphasis: "branch",
+        width: 145,
+      }),
+      node("risk-rejected", "Risk rejected", "outcome", 105, 950, {
+        emphasis: "branch",
+        width: 155,
+      }),
+      node("unresolved", "Unresolved", "outcome", 285, 950, { emphasis: "branch" }),
+    ],
+    edges: [
+      { id: "mobile-gates-market", from: "market-information", to: "analysis", kind: "primary" },
+      { id: "mobile-gates-features", from: "analysis", to: "features", kind: "primary" },
+      { id: "mobile-gates-model", from: "features", to: "model", kind: "primary" },
+      { id: "mobile-gates-decision", from: "model", to: "decision", kind: "primary" },
+      { id: "mobile-gates-risk", from: "decision", to: "risk", kind: "primary" },
+      { id: "mobile-gates-action", from: "risk", to: "execution", kind: "branch" },
+      { id: "mobile-gates-no-action", from: "risk", to: "no-action", kind: "branch" },
+      { id: "mobile-gates-confidence", from: "decision", to: "insufficient-confidence", kind: "branch" },
+      { id: "mobile-gates-rejected", from: "risk", to: "risk-rejected", kind: "branch" },
+      { id: "mobile-gates-unresolved", from: "risk", to: "unresolved", kind: "feedback" },
+    ],
+    events: [{ id: "mobile-gates-event", from: "model", to: "risk" }],
+    callouts: [
+      { id: "mobile-quantx-status", text: "UNFINISHED ACTIVE EXPERIMENT", x: 195, y: 1035, tone: "redline" },
+    ],
+  }),
+  "quantx-capability": () => ({
+    state: "quantx-capability",
+    index: "08E",
+    name: "Unfinished QuantX capability",
+    shortName: "ML experimentation",
+    thesis: "Unresolved experiment branches can still develop reusable decision-system capability",
+    description:
+      "A concise market-to-risk spine remains unresolved while QuantX contributes ML experimentation and decision-system capability.",
+    annotation: "QUANTX → ML EXPERIMENTATION",
+    preferredComposition: "full-width",
+    canvasHeight: 860,
+    nodes: [
+      node("market-information", "Market", "external", 195, 75, { emphasis: "external" }),
+      node("model", "Model experiments", "decision", 195, 220, {
+        emphasis: "branch",
+        width: 205,
+        detail: "XGBoost · LSTM · other",
+      }),
+      node("risk", "Decision + risk", "decision", 195, 380, {
+        emphasis: "branch",
+        width: 190,
+      }),
+      node("unresolved", "Unresolved", "outcome", 195, 525, { emphasis: "branch" }),
+      node("quantx-project", "QuantX", "evidence", 195, 655, { emphasis: "branch" }),
+      node("experiment-capability", "ML experimentation", "outcome", 195, 785, {
+        emphasis: "resolved",
+        width: 220,
+        detail: "decision systems",
+      }),
+    ],
+    edges: [
+      { id: "mobile-quantx-model", from: "market-information", to: "model", kind: "branch" },
+      { id: "mobile-quantx-risk", from: "model", to: "risk", kind: "branch" },
+      { id: "mobile-quantx-unresolved", from: "risk", to: "unresolved", kind: "feedback" },
+      { id: "mobile-quantx-project", from: "unresolved", to: "quantx-project", kind: "transition" },
+      { id: "mobile-quantx-capability", from: "quantx-project", to: "experiment-capability", kind: "compression" },
+    ],
+    events: [{ id: "mobile-quantx-event", from: "quantx-project", to: "experiment-capability" }],
+  }),
+  "capability-provenance": () => {
+    const records = [
+      ["interface-capability", "Interface", "early web work"],
+      ["connected-capability", "Connected system", "BellyBasket"],
+      ["client-capability", "Client delivery", "Duforge"],
+      ["shared-capability", "Shared architecture", "CraveCart"],
+      ["product-research", "Product research", "GENKŌ"],
+      ["ai-engineering-capability", "AI-assisted engineering", "development workflow"],
+      ["experiment-capability", "ML experimentation", "QuantX"],
+    ] as const;
+    return {
+      state: "capability-provenance",
+      index: "09B",
+      name: "Capability with provenance",
+      shortName: "Provenance",
+      thesis: "Every persistent capability points back to work that developed it",
+      description:
+        "A readable mobile capability stack places one concise, verified source directly inside each capability node.",
+      annotation: "CAPABILITY / WHERE IT CAME FROM",
+      preferredComposition: "full-width",
+      canvasHeight: 930,
+      nodes: records.map(([id, label, detail], index) =>
+        node(id, label, "outcome", 195, 85 + index * 125, {
+          emphasis: index === records.length - 1 ? "resolved" : "branch",
+          width: label.length > 18 ? 255 : 220,
+          detail,
+        }),
+      ),
+      edges: records.slice(0, -1).map(([id], index) => ({
+        id: `mobile-provenance-${index}`,
+        from: id,
+        to: records[index + 1][0],
+        kind: "branch" as const,
+      })),
+      events: [],
+    };
+  },
+  "open-frontier": () => ({
+    state: "open-frontier",
+    index: "09C",
+    name: "Open capability frontier",
+    shortName: "Open frontier",
+    thesis: "Accumulated capability supports continued work; it does not imply completion",
+    description:
+      "The detailed backbone becomes one quiet capability group before learning, development, the next experiment, and the unknown remain visibly open.",
+    annotation: "CAPABILITY → WHAT IS STILL DEVELOPING",
+    preferredComposition: "full-width",
+    canvasHeight: 850,
+    nodes: [
+      node("sources", "Accumulated capability", "outcome", 195, 100, {
+        emphasis: "resolved",
+        width: 260,
+        detail: "7 capabilities · verified provenance",
+      }),
+      node("learning-frontier", "Learning", "idea", 90, 300, { emphasis: "branch" }),
+      node("development-frontier", "In development", "idea", 300, 300, {
+        emphasis: "branch",
+        width: 165,
+      }),
+      node("next-experiment", "Next experiment", "idea", 90, 475, {
+        emphasis: "branch",
+        width: 165,
+      }),
+      node("unknown-yet", "Unknown yet", "idea", 300, 475, { emphasis: "branch" }),
+      node("build-further", "Build further", "outcome", 195, 650, {
+        emphasis: "resolved",
+        width: 175,
+      }),
+      node("open-connection", "Open connection", "idea", 195, 780, {
+        emphasis: "branch",
+        width: 180,
+      }),
+    ],
+    edges: [
+      { id: "mobile-frontier-learning", from: "sources", to: "learning-frontier", kind: "branch" },
+      { id: "mobile-frontier-development", from: "sources", to: "development-frontier", kind: "branch" },
+      { id: "mobile-frontier-experiment", from: "sources", to: "next-experiment", kind: "branch" },
+      { id: "mobile-frontier-unknown", from: "sources", to: "unknown-yet", kind: "branch" },
+      { id: "mobile-frontier-learning-build", from: "learning-frontier", to: "build-further", kind: "branch" },
+      { id: "mobile-frontier-development-build", from: "development-frontier", to: "build-further", kind: "branch" },
+      { id: "mobile-frontier-experiment-build", from: "next-experiment", to: "build-further", kind: "branch" },
+      { id: "mobile-frontier-unknown-build", from: "unknown-yet", to: "build-further", kind: "branch" },
+      { id: "mobile-frontier-open", from: "build-further", to: "open-connection", kind: "transition" },
+    ],
+    events: [],
+  }),
+  "contact-handoff": () => ({
+    state: "contact-handoff",
+    index: "09D",
+    name: "Quiet contact handoff",
+    shortName: "Handoff",
+    thesis: "The open system hands off to a real person",
+    description:
+      "Seven attributed capabilities become one quiet, readable summary before an open connection reaches Aakash's email and GitHub.",
+    annotation: "CAPABILITY → CONTACT",
+    preferredComposition: "typography-integrated",
+    canvasHeight: 720,
+    nodes: [
+      node("sources", "Capability + provenance", "outcome", 195, 100, {
+        emphasis: "resolved",
+        width: 265,
+        detail: "7 capabilities · attributed work",
+      }),
+      node("open-connection", "Open connection", "idea", 195, 290, {
+        emphasis: "primary",
+        width: 180,
+      }),
+      node("email-contact", "aakash.singh0953@gmail.com", "outcome", 195, 485, {
+        emphasis: "resolved",
+        width: 300,
+      }),
+      node("github-contact", "github.com/aakash8930", "evidence", 195, 630, {
+        emphasis: "branch",
+        width: 250,
+      }),
+    ],
+    edges: [
+      { id: "mobile-contact-open", from: "sources", to: "open-connection", kind: "transition" },
+      { id: "mobile-contact-email", from: "open-connection", to: "email-contact", kind: "primary" },
+      { id: "mobile-contact-github", from: "open-connection", to: "github-contact", kind: "branch" },
+    ],
+    events: [],
+  }),
+};
+
+function adaptMobileDefinitionForTablet(
+  definition: BuildGraphDefinition,
+): BuildGraphDefinition {
+  const xScale = 768 / 390;
+  const yScale = 0.68;
+  const scaleX = (value: number) => Math.round(value * xScale);
+  const scaleY = (value: number) => Math.round(value * yScale);
+
+  return {
+    ...definition,
+    canvasHeight: Math.max(560, scaleY(definition.canvasHeight ?? 930)),
+    nodes: definition.nodes.map((graphNode) => ({
+      ...graphNode,
+      x: scaleX(graphNode.x),
+      y: scaleY(graphNode.y),
+    })),
+    groups: definition.groups?.map((group) => ({
+      ...group,
+      x: scaleX(group.x),
+      y: scaleY(group.y),
+      width: scaleX(group.width),
+      height: scaleY(group.height),
+    })),
+    callouts: definition.callouts?.map((callout) => ({
+      ...callout,
+      x: scaleX(callout.x),
+      y: scaleY(callout.y),
+    })),
+  };
+}
 
 const current: StateResolver = (viewport) => {
   const mobile = viewport === "mobile";
@@ -2399,7 +2865,17 @@ export function resolveBuildGraph(
   state: BuildGraphState,
   viewport: GraphViewport,
 ): BuildGraphDefinition {
-  return resolvers[state](viewport);
+  if (viewport === "mobile") {
+    return mobileReadabilityOverrides[state]?.() ?? resolvers[state]("mobile");
+  }
+
+  if (viewport === "tablet") {
+    const mobileDefinition =
+      mobileReadabilityOverrides[state]?.() ?? resolvers[state]("mobile");
+    return adaptMobileDefinitionForTablet(mobileDefinition);
+  }
+
+  return resolvers[state]("desktop");
 }
 
 export const BUILD_GRAPH_STATE_GUIDE = BUILD_GRAPH_LAB_STATES.map((state) => {

@@ -1376,6 +1376,48 @@ blockquote {
   transition: none;
 }
 
+@media (min-width: 761px) and (max-width: 900px) and (orientation: portrait) {
+  .story-arc-visual-sticky {
+    top: 72px;
+    min-height: calc(100svh - 72px);
+    align-items: flex-end;
+    padding-bottom: 18px;
+  }
+
+  .story-arc-visual,
+  .story-arc--spotify-clone .story-arc-visual,
+  .story-arc--first-real-system .story-arc-visual {
+    width: 100%;
+    max-width: none;
+  }
+
+  .story-arc .lbg-frame {
+    height: min(58svh, 620px);
+  }
+
+  .story-chapter--integrated .chapter-copy {
+    width: min(620px, 86%);
+    max-width: 620px;
+    margin-top: 46svh;
+    grid-column: 1 / -1 !important;
+  }
+
+  .story-chapter--integrated {
+    padding-bottom: 58svh;
+  }
+
+  .story-arc .living-build-graph figcaption {
+    grid-template-columns: minmax(130px, auto) 1fr;
+    gap: 8px 18px;
+    max-height: 92px;
+    overflow: hidden;
+  }
+
+  .story-arc .living-build-graph figcaption p {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .story-arc-visual-sticky {
     top: 64px;
@@ -1393,6 +1435,19 @@ blockquote {
 
   .story-arc .lbg-frame {
     height: min(59svh, 560px);
+  }
+
+  .story-arc[data-visual-state="ai-proposals"] .lbg-frame,
+  .story-arc[data-visual-state="ai-evaluation"] .lbg-frame,
+  .story-arc[data-visual-state="ai-workflow"] .lbg-frame,
+  .story-arc[data-visual-state="ai-capability"] .lbg-frame,
+  .story-arc[data-visual-state="model-branching"] .lbg-frame,
+  .story-arc[data-visual-state="decision-gates"] .lbg-frame,
+  .story-arc[data-visual-state="quantx-capability"] .lbg-frame,
+  .story-arc[data-visual-state="capability-provenance"] .lbg-frame,
+  .story-arc[data-visual-state="open-frontier"] .lbg-frame,
+  .story-arc[data-visual-state="contact-handoff"] .lbg-frame {
+    height: min(68svh, 620px);
   }
 
   .story-arc .lbg-svg--mobile {
@@ -1419,6 +1474,12 @@ blockquote {
 
   .story-chapter--integrated:not(.story-chapter--hero) .chapter-copy {
     margin-top: 36svh;
+  }
+
+  .story-chapter--integrated#ai-engineering .chapter-copy,
+  .story-chapter--integrated#quantx-experiment .chapter-copy,
+  .story-chapter--integrated#how-i-build-now .chapter-copy {
+    margin-top: 50svh;
   }
 
   .story-chapter--integrated .chapter-heading,

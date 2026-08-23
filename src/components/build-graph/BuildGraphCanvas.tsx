@@ -28,6 +28,9 @@ const DEFINITIONS_BY_VIEWPORT: Record<
   desktop: new Map(
     BUILD_GRAPH_STATES.map((state) => [state, resolveBuildGraph(state, "desktop")]),
   ),
+  tablet: new Map(
+    BUILD_GRAPH_STATES.map((state) => [state, resolveBuildGraph(state, "tablet")]),
+  ),
   mobile: new Map(
     BUILD_GRAPH_STATES.map((state) => [state, resolveBuildGraph(state, "mobile")]),
   ),
@@ -47,12 +50,14 @@ function collectFallbackNodes(
 
 const FALLBACK_NODES_BY_VIEWPORT: Record<GraphViewport, Map<GraphNodeId, GraphNode>> = {
   desktop: collectFallbackNodes(DEFINITIONS_BY_VIEWPORT.desktop),
+  tablet: collectFallbackNodes(DEFINITIONS_BY_VIEWPORT.tablet),
   mobile: collectFallbackNodes(DEFINITIONS_BY_VIEWPORT.mobile),
 };
 
 const ALL_NODE_IDS = Array.from(
   new Set([
     ...FALLBACK_NODES_BY_VIEWPORT.desktop.keys(),
+    ...FALLBACK_NODES_BY_VIEWPORT.tablet.keys(),
     ...FALLBACK_NODES_BY_VIEWPORT.mobile.keys(),
   ]),
 );
@@ -128,8 +133,10 @@ function GraphSvg({
   const allDefinitions = Array.from(DEFINITIONS_BY_VIEWPORT[viewport].values());
 
   const isMobile = viewport === "mobile";
-  const canvasWidth = isMobile ? 390 : 1200;
-  const canvasHeight = active.canvasHeight ?? (isMobile ? 930 : 700);
+  const isTablet = viewport === "tablet";
+  const canvasWidth = isMobile ? 390 : isTablet ? 768 : 1200;
+  const canvasHeight = active.canvasHeight ?? (isMobile ? 930 : isTablet ? 640 : 700);
+  const canvasInset = isMobile ? 20 : 38;
   const viewBox = `0 0 ${canvasWidth} ${canvasHeight}`;
 
   return (
@@ -161,15 +168,15 @@ function GraphSvg({
       <rect width="100%" height="100%" fill={`url(#lbg-grid-${viewport})`} />
 
       <g className="lbg-registration">
-        <path d={isMobile ? "M 18 32 h 24 M 30 20 v 24" : "M 24 32 h 26 M 37 19 v 26"} />
-        <path d={isMobile ? "M 348 32 h 24 M 360 20 v 24" : "M 1150 32 h 26 M 1163 19 v 26"} />
+        <path d={isMobile ? "M 18 32 h 24 M 30 20 v 24" : isTablet ? "M 24 32 h 26 M 37 19 v 26" : "M 24 32 h 26 M 37 19 v 26"} />
+        <path d={isMobile ? "M 348 32 h 24 M 360 20 v 24" : isTablet ? "M 718 32 h 26 M 731 19 v 26" : "M 1150 32 h 26 M 1163 19 v 26"} />
       </g>
 
-      <text x={isMobile ? 20 : 38} y={isMobile ? 58 : 67} className="lbg-sheet-label">
+      <text x={canvasInset} y={isMobile ? 58 : 67} className="lbg-sheet-label">
         {active.annotation}
       </text>
       {showStateLabel && (
-        <text x={isMobile ? 370 : 1162} y={isMobile ? 58 : 67} textAnchor="end" className="lbg-sheet-index">
+        <text x={canvasWidth - canvasInset} y={isMobile ? 58 : 67} textAnchor="end" className="lbg-sheet-index">
           STATE {active.index}
         </text>
       )}
@@ -249,8 +256,8 @@ function GraphSvg({
       )}
 
       <g className="lbg-axis-note">
-        <line x1={isMobile ? 20 : 38} x2={isMobile ? 370 : 1162} y1={canvasHeight - 35} y2={canvasHeight - 35} />
-        <text x={isMobile ? 20 : 38} y={canvasHeight - 16}>SEMANTIC STATE → GEOMETRY → CONNECTION → EMPHASIS</text>
+        <line x1={canvasInset} x2={canvasWidth - canvasInset} y1={canvasHeight - 35} y2={canvasHeight - 35} />
+        <text x={canvasInset} y={canvasHeight - 16}>SEMANTIC STATE → GEOMETRY → CONNECTION → EMPHASIS</text>
       </g>
     </svg>
   );
@@ -274,6 +281,7 @@ export function BuildGraphCanvas({
     >
       <div className="lbg-frame">
         <GraphSvg state={state} viewport="desktop" showStateLabel={showStateLabel} />
+        <GraphSvg state={state} viewport="tablet" showStateLabel={showStateLabel} />
         <GraphSvg state={state} viewport="mobile" showStateLabel={showStateLabel} />
         {(context?.chapter || (context?.annotations && context.annotations.length > 0)) && (
           <div className="lbg-context" aria-hidden="true">

@@ -26,7 +26,7 @@ export function StoryChapter({
           <span>{chapter.number}</span>
           <span>{chapter.navLabel}</span>
         </p>
-        <h2 id={titleId}>{chapter.title}</h2>
+        <h2 id={titleId} tabIndex={-1}>{chapter.title}</h2>
         <p className="chapter-message">{chapter.message}</p>
       </div>
 

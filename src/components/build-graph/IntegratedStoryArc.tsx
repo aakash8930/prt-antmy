@@ -61,7 +61,12 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
 
     const measure = () => {
       frameRef.current = null;
-      const viewport: GraphViewport = window.innerWidth <= 760 ? "mobile" : "desktop";
+      const viewport: GraphViewport =
+        window.innerWidth <= 760
+          ? "mobile"
+          : window.innerWidth <= 900 && window.innerHeight > window.innerWidth
+            ? "tablet"
+            : "desktop";
       const reducedMotion = motionQuery.matches;
       const navHeight =
         document.querySelector<HTMLElement>(".story-nav")?.getBoundingClientRect().height ?? 0;
