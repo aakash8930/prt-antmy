@@ -25,8 +25,16 @@
 <body>
   <a class="skip-link" href="#story">Skip to story</a>
   <div class="loader" aria-live="polite">
-    <div class="loader__mark" aria-hidden="true"><i></i><i></i></div>
-    <p>Preparing descent</p><span>00</span>
+    <div class="loader__identity"><b>D·01</b><span>Deep Ocean Expedition</span></div>
+    <p>System initializing</p>
+    <ul aria-hidden="true">
+      <li>Pressure frame <i></i><strong>Ready</strong></li>
+      <li>Navigation <i></i><strong>Ready</strong></li>
+      <li>Sensors <i></i><strong>Ready</strong></li>
+      <li>Core <i></i><strong>Ready</strong></li>
+    </ul>
+    <div class="loader__progress"><i></i><span>00</span></div>
+    <small>Descent ready</small>
   </div>
 
   <header class="masthead">
@@ -60,6 +68,13 @@
       <span data-scene-system>CORE 00%</span>
     </div>
     <div class="scene__reticle"><i></i><i></i><i></i><i></i></div>
+    <div class="scene__callouts">
+      <span data-component-label="core">Pressure core</span>
+      <span data-component-label="viewport">Primary sensor</span>
+      <span data-component-label="module">Power system</span>
+      <span data-component-label="crown">Navigation</span>
+    </div>
+    <div class="scene__sonar"><i></i><span>Sonar return</span></div>
     <div class="scene__frames" role="presentation">
       <picture class="scene__frame" data-frame="0">
         <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-01-awakening.jpg" />
@@ -108,7 +123,7 @@
       <div class="opening-title">
         <p class="eyebrow">Field record · expedition 01</p>
         <h1>The Anatomy<br />of a <em>Descent</em></h1>
-        <p class="opening-title__note">One vessel. Six thousand metres. A world beyond daylight.</p>
+        <p class="opening-title__note">How far would you go to see what lies beneath?</p>
       </div>
       <p class="scroll-cue"><span></span>Scroll to initiate</p>
     </section>

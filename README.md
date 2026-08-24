@@ -8,7 +8,13 @@ A complete cinematic, scroll-driven field story and fictional expedition archive
 npm start
 ```
 
-Open `http://localhost:3000`.
+Open the local URL printed by the server. If port 3000 is occupied, development automatically selects the next available port.
+
+Create the dependency-free production directory with:
+
+```bash
+npm run build
+```
 
 ## Interaction
 

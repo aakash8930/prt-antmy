@@ -6,7 +6,7 @@ import { createStoryScene } from "./story-scene.js";
   const frameImages = frames.map((frame) => frame.querySelector("img"));
   const links = [...document.querySelectorAll(".chapter-menu a")];
   const loader = document.querySelector(".loader");
-  const loaderCount = loader.querySelector("span");
+  const loaderCount = loader.querySelector(".loader__progress span");
   const depthReadout = document.querySelector(".masthead__depth strong");
   const indexButton = document.querySelector(".masthead__index");
   const menu = document.querySelector(".chapter-menu");
@@ -15,9 +15,8 @@ import { createStoryScene } from "./story-scene.js";
   let storyScene = { setProgress() {}, resize() {} };
   try {
     if (!reduceMotion.matches) storyScene = createStoryScene(document.querySelector(".story-canvas"), reduceMotion);
-  } catch (error) {
+  } catch {
     document.documentElement.classList.add("no-webgl");
-    console.error("WebGL story scene unavailable", error);
   }
 
   let metrics = [];
@@ -36,7 +35,9 @@ import { createStoryScene } from "./story-scene.js";
     if (readyFrames.has(index)) return;
     readyFrames.add(index);
     loaded += 1;
-    loaderCount.textContent = String(Math.round((loaded / frames.length) * 100)).padStart(2, "0");
+    const percentage = Math.round((loaded / frames.length) * 100);
+    loaderCount.textContent = String(percentage).padStart(2, "0");
+    loader.style.setProperty("--loader-progress", `${percentage}%`);
     if (!firstReady && [0, 1, 2].every((frame) => readyFrames.has(frame))) {
       firstReady = true;
       requestAnimationFrame(() => loader.classList.add("is-gone"));
@@ -111,15 +112,12 @@ import { createStoryScene } from "./story-scene.js";
       if (copy) {
         copy.style.setProperty("--copy-opacity", visibility.toFixed(3));
         copy.style.setProperty("--copy-y", `${((1 - visibility) * 34).toFixed(1)}px`);
-        copy.style.setProperty("--copy-blur", `${((1 - visibility) * 7).toFixed(1)}px`);
         copy.style.setProperty("--copy-scale", (0.985 + visibility * 0.015).toFixed(4));
       }
     });
 
-    const lower = Math.floor(narrative);
-    const upper = Math.min(metrics.length - 1, lower + 1);
-    const fraction = narrative - lower;
-    const depth = metrics[lower].depth + (metrics[upper].depth - metrics[lower].depth) * fraction;
+    const normalizedProgress = narrative / Math.max(1, metrics.length - 1);
+    const depth = normalizedProgress * 6000;
     depthReadout.textContent = `${Math.round(depth).toString().padStart(4, "0")} m`;
 
     const side = active.chapter.classList.contains("chapter--right")
