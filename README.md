@@ -12,8 +12,8 @@ Open `http://localhost:3000`.
 
 ## Interaction
 
-Scroll position is mapped deterministically across nine visual chapters. Scrolling upward reconstructs the same sequence in reverse. Reduced-motion preferences switch the crossfades to static chapter frames.
+Scroll position drives one persistent Three.js scene across nine visual chapters. The vessel's pressure shell, chamber, core, viewport, ballast, crown, modules and manipulator arms separate, rotate and physically reassemble while the camera follows a continuous cinematic path. Later progress activates the core, descent environment, pressure response, bioluminescent field, sampling arms and final transmission network. Scrolling upward reconstructs the same states in reverse. Reduced-motion and WebGL-failure modes use static chapter frames.
 
-The experience includes dedicated landscape and portrait artwork, an accessible chapter index, live depth telemetry, responsive vessel specifications, a linked field record, and a concise interactive case file.
+The experience includes an accessible chapter index, live depth telemetry, responsive vessel specifications, a linked field record, and a concise interactive case file.
 
 The cinematic artwork was generated specifically for this project and is not a third-party stock asset.

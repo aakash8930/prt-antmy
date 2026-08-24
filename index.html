@@ -15,7 +15,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preload" as="image" href="assets/abyssal-01-awakening.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="styles.css" />
-  <script src="script.js" defer></script>
+  <script src="script.js" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#story">Skip to story</a>
@@ -48,7 +48,14 @@
   </nav>
 
   <div class="scene" aria-hidden="true">
-    <div class="scene__frames">
+    <canvas class="story-canvas"></canvas>
+    <div class="scene__telemetry">
+      <span data-scene-state>PRESSURE FRAME / STANDBY</span>
+      <i></i>
+      <span data-scene-system>CORE 00%</span>
+    </div>
+    <div class="scene__reticle"><i></i><i></i><i></i><i></i></div>
+    <div class="scene__frames" role="presentation">
       <picture class="scene__frame" data-frame="0">
         <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-01-awakening.jpg" />
         <img src="assets/abyssal-01-awakening.jpg" alt="" fetchpriority="high"  />
@@ -239,7 +246,7 @@
           <article><span>03</span><h4>Progressive delivery</h4><p>The opening sequence loads first. Remaining scenes are prepared in the background, with a readable static experience when scripts are unavailable.</p></article>
           <article><span>04</span><h4>Inclusive by default</h4><p>Reduced-motion visitors receive complete static chapter frames, while semantic headings, native controls and keyboard navigation remain available.</p></article>
         </div>
-        <p class="case-file__stack"><span>Built with</span>Semantic HTML · Responsive CSS · Vanilla JavaScript · Generated cinematic artwork</p>
+        <p class="case-file__stack"><span>Built with</span>Semantic HTML · Responsive CSS · Three.js · Scroll-scrubbed WebGL</p>
       </div>
     </div>
 

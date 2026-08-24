@@ -1,3 +1,5 @@
+import { createStoryScene } from "./story-scene.js";
+
 (() => {
   const chapters = [...document.querySelectorAll(".chapter")];
   const frames = [...document.querySelectorAll(".scene__frame")];
@@ -10,6 +12,13 @@
   const menu = document.querySelector(".chapter-menu");
   const archive = document.querySelector(".archive");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  let storyScene = { setProgress() {}, resize() {} };
+  try {
+    if (!reduceMotion.matches) storyScene = createStoryScene(document.querySelector(".story-canvas"), reduceMotion);
+  } catch (error) {
+    document.documentElement.classList.add("no-webgl");
+    console.error("WebGL story scene unavailable", error);
+  }
 
   let metrics = [];
   let framePending = false;
@@ -77,6 +86,7 @@
     const viewportHeight = window.innerHeight;
     const focus = window.scrollY + viewportHeight * 0.5;
     const narrative = getNarrativePosition(focus);
+    storyScene.setProgress(narrative / Math.max(1, metrics.length - 1));
     const activeIndex = Math.round(narrative);
     const active = metrics[activeIndex];
 
@@ -97,10 +107,12 @@
       const distance = Math.abs(rect.top + rect.height / 2 - viewportHeight * 0.5);
       const range = viewportHeight * 0.62;
       const visibility = reduceMotion.matches ? 1 : ease(1 - distance / range);
-      const copy = chapter.querySelector(".chapter__copy");
+      const copy = chapter.querySelector(".chapter__copy, .opening-title, .final-copy");
       if (copy) {
         copy.style.setProperty("--copy-opacity", visibility.toFixed(3));
         copy.style.setProperty("--copy-y", `${((1 - visibility) * 34).toFixed(1)}px`);
+        copy.style.setProperty("--copy-blur", `${((1 - visibility) * 7).toFixed(1)}px`);
+        copy.style.setProperty("--copy-scale", (0.985 + visibility * 0.015).toFixed(4));
       }
     });
 
@@ -157,7 +169,10 @@
   });
 
   window.addEventListener("scroll", schedule, { passive: true });
-  window.addEventListener("resize", measure);
+  window.addEventListener("resize", () => {
+    storyScene.resize();
+    measure();
+  });
   reduceMotion.addEventListener("change", schedule);
   window.addEventListener("load", measure, { once: true });
   measure();
