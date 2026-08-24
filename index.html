@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#020506" />
   <meta name="description" content="Abyssal One — a scroll-driven cinematic story of construction and descent." />
   <title>Abyssal One — An Anatomy of Descent</title>
+  <script>document.documentElement.classList.add("js")</script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preload" as="image" href="assets/abyssal-01-awakening.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="styles.css" />
@@ -42,15 +43,42 @@
 
   <div class="scene" aria-hidden="true">
     <div class="scene__frames">
-      <img class="scene__frame" data-frame="0" src="assets/abyssal-01-awakening.jpg" alt="" fetchpriority="high" />
-      <img class="scene__frame" data-frame="1" src="assets/abyssal-02-frame.jpg" alt="" loading="eager" />
-      <img class="scene__frame" data-frame="2" src="assets/abyssal-03-assembly.jpg" alt="" loading="eager" />
-      <img class="scene__frame" data-frame="3" src="assets/abyssal-04-sealed.jpg" alt="" loading="lazy" />
-      <img class="scene__frame" data-frame="4" src="assets/abyssal-05-descent.jpg" alt="" loading="lazy" />
-      <img class="scene__frame" data-frame="5" src="assets/abyssal-06-pressure.jpg" alt="" loading="lazy" />
-      <img class="scene__frame" data-frame="6" src="assets/abyssal-07-life.jpg" alt="" loading="lazy" />
-      <img class="scene__frame" data-frame="7" src="assets/abyssal-08-discovery.jpg" alt="" loading="lazy" />
-      <img class="scene__frame" data-frame="8" src="assets/abyssal-09-signal.jpg" alt="" loading="lazy" />
+      <picture class="scene__frame" data-frame="0">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-01-awakening.jpg" />
+        <img src="assets/abyssal-01-awakening.jpg" alt="" fetchpriority="high"  />
+      </picture>
+      <picture class="scene__frame" data-frame="1">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-02-frame.jpg" />
+        <img src="assets/abyssal-02-frame.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="2">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-03-assembly.jpg" />
+        <img src="assets/abyssal-03-assembly.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="3">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-04-sealed.jpg" />
+        <img src="assets/abyssal-04-sealed.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="4">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-05-descent.jpg" />
+        <img src="assets/abyssal-05-descent.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="5">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-06-pressure.jpg" />
+        <img src="assets/abyssal-06-pressure.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="6">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-07-life.jpg" />
+        <img src="assets/abyssal-07-life.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="7">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-08-discovery.jpg" />
+        <img src="assets/abyssal-08-discovery.jpg" alt="" loading="eager"  />
+      </picture>
+      <picture class="scene__frame" data-frame="8">
+        <source media="(max-width: 900px) and (orientation: portrait)" srcset="assets/mobile/abyssal-09-signal.jpg" />
+        <img src="assets/abyssal-09-signal.jpg" alt="" loading="eager"  />
+      </picture>
     </div>
     <div class="scene__wash"></div><div class="scene__grain"></div>
     <p class="scene__coordinate"><span>59° 32′ N</span><span>004° 17′ W</span></p>

@@ -1,6 +1,7 @@
 (() => {
   const chapters = [...document.querySelectorAll(".chapter")];
   const frames = [...document.querySelectorAll(".scene__frame")];
+  const frameImages = frames.map((frame) => frame.querySelector("img"));
   const links = [...document.querySelectorAll(".chapter-menu a")];
   const loader = document.querySelector(".loader");
   const loaderCount = loader.querySelector("span");
@@ -13,6 +14,7 @@
   let framePending = false;
   let loaded = 0;
   let firstReady = false;
+  const readyFrames = new Set();
 
   const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
   const ease = (value) => {
@@ -21,16 +23,18 @@
   };
 
   function markLoaded(index) {
+    if (readyFrames.has(index)) return;
+    readyFrames.add(index);
     loaded += 1;
     loaderCount.textContent = String(Math.round((loaded / frames.length) * 100)).padStart(2, "0");
-    if (index === 0 && !firstReady) {
+    if (!firstReady && [0, 1, 2].every((frame) => readyFrames.has(frame))) {
       firstReady = true;
       requestAnimationFrame(() => loader.classList.add("is-gone"));
     }
   }
 
-  frames.forEach((image, index) => {
-    if (image.complete && image.naturalWidth) markLoaded(index);
+  frameImages.forEach((image, index) => {
+    if (image.complete) markLoaded(index);
     else {
       image.addEventListener("load", () => markLoaded(index), { once: true });
       image.addEventListener("error", () => markLoaded(index), { once: true });
