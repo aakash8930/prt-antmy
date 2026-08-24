@@ -49,6 +49,9 @@ type RoleFrame = {
   scaleX?: number;
   scaleY?: number;
   scaleZ?: number;
+  rotationX?: number;
+  rotationY?: number;
+  rotationZ?: number;
   opacity?: number;
 };
 
@@ -291,13 +294,217 @@ function spotifyTrack(progress: number, viewport: GraphViewport): ChoreographyFr
   };
 }
 
+function bellyBasketTrack(progress: number, viewport: GraphViewport): ChoreographyFrame {
+  const mobile = viewport === "mobile";
+  const tablet = viewport === "tablet";
+  const adminIn = smoothRange(progress, 0.1, 0.4);
+  const paymentIn = smoothRange(progress, 0.2, 0.5);
+  const locationIn = smoothRange(progress, 0.3, 0.6);
+  const mapsIn = smoothRange(progress, 0.48, 0.78);
+  const trackingIn = smoothRange(progress, 0.62, 0.9);
+  const expansion = smoothRange(progress, 0.18, 0.84);
+  const spread = mobile ? 0.62 : 1;
+
+  return {
+    composition: "copy-left",
+    root: {
+      x: mobile ? 0 : tablet ? 0.22 : mix(0.56, 0.16, expansion),
+      y: mobile ? -0.32 : 0,
+      scale: mobile ? 0.76 : tablet ? 0.86 : mix(0.96, 0.86, expansion),
+      rotationY: mix(-0.24, -0.12, expansion),
+    },
+    camera: mobile
+      ? {
+          x: mix(7.8, 8.25, expansion),
+          y: mix(5.2, 5.5, expansion),
+          z: mix(13, 14.3, expansion),
+          lookY: -0.15,
+        }
+      : {
+          x: mix(7.65, 8.65, expansion),
+          y: mix(4.75, 5.15, expansion),
+          z: mix(9.4, 11.35, expansion),
+          lookY: -0.08,
+        },
+    roles: {
+      interface: { opacity: 1 },
+      api: { opacity: 1 },
+      service: { opacity: 1 },
+      data: { opacity: 1 },
+      workbench: { opacity: mix(0.72, 0.38, expansion) },
+      admin: {
+        x: mix(-2.7 * spread, 0, adminIn),
+        y: mix(0.8, 0, adminIn),
+        z: mix(-0.8 * spread, 0, adminIn),
+        rotationY: mix(-0.9, 0, adminIn),
+        opacity: adminIn,
+      },
+      payment: {
+        x: mix(2.8 * spread, 0, paymentIn),
+        y: mix(-0.7, 0, paymentIn),
+        z: mix(1.2 * spread, 0, paymentIn),
+        rotationY: mix(0.7, 0, paymentIn),
+        opacity: paymentIn,
+      },
+      location: {
+        x: mix(3.2 * spread, 0, locationIn),
+        y: mix(-1.25, 0, locationIn),
+        opacity: locationIn,
+      },
+      maps: {
+        x: mix(2.4 * spread, 0, mapsIn),
+        y: mix(1.1, 0, mapsIn),
+        z: mix(1.7 * spread, 0, mapsIn),
+        rotationZ: mix(0.42, 0, mapsIn),
+        opacity: mapsIn,
+      },
+      tracking: {
+        y: mix(0.7, 0, trackingIn),
+        z: mix(1.4 * spread, 0, trackingIn),
+        scaleX: mix(0.2, 1, trackingIn),
+        scaleY: 1,
+        scaleZ: 1,
+        opacity: trackingIn,
+      },
+    },
+  };
+}
+
+function clientWorkTrack(progress: number, viewport: GraphViewport): ChoreographyFrame {
+  const mobile = viewport === "mobile";
+  const tablet = viewport === "tablet";
+  const moduleExit = smoothRange(progress, 0.02, 0.26);
+  const constrain = smoothRange(progress, 0.1, 0.42);
+  const delivery = smoothRange(progress, 0.7, 0.95);
+  const constraintX = threePoint(progress, 0.1, 0.52, 0.7, 1.1, -0.22, 0);
+  const constraintPresence = mix(constrain, 0.34, delivery);
+
+  return {
+    composition: mobile ? "copy-left" : "copy-right",
+    root: {
+      x: mobile ? 0 : tablet ? -0.24 : -0.62,
+      y: mobile ? -0.3 : 0,
+      scale: mobile ? 0.76 : tablet ? 0.88 : 0.92,
+      rotationY: mix(-0.12, -0.28, constrain),
+    },
+    camera: mobile
+      ? { x: 7.9, y: 5.35, z: 14, lookY: -0.16 }
+      : {
+          x: mix(8.5, 7.7, constrain),
+          y: mix(5.1, 4.55, constrain),
+          z: mix(11.1, 9.45, constrain),
+          lookY: -0.08,
+        },
+    roles: {
+      interface: { opacity: 1 },
+      api: { opacity: 1 },
+      service: { opacity: 1 },
+      data: { opacity: 1 },
+      workbench: { opacity: mix(0.38, 0.72, constrain) },
+      admin: { x: mix(0, -1.2, moduleExit), opacity: 1 - moduleExit },
+      payment: { x: mix(0, 1.2, moduleExit), opacity: 1 - moduleExit },
+      location: { x: mix(0, 1.4, moduleExit), opacity: 1 - moduleExit },
+      maps: { z: mix(0, 1.2, moduleExit), opacity: 1 - moduleExit },
+      tracking: { scaleX: mix(1, 0.15, moduleExit), opacity: 1 - moduleExit },
+      constraints: {
+        x: constraintX,
+        z: mix(1.65, 0, constrain),
+        scale: mix(1.28, 1, constrain),
+        opacity: constraintPresence,
+      },
+      delivery: {
+        x: mix(-1.6, 0, delivery),
+        scaleX: mix(0.12, 1, delivery),
+        scaleY: 1,
+        scaleZ: 1,
+        opacity: delivery,
+      },
+    },
+  };
+}
+
+function rebuildingTrack(progress: number, viewport: GraphViewport): ChoreographyFrame {
+  const mobile = viewport === "mobile";
+  const tablet = viewport === "tablet";
+  const inherit = smoothRange(progress, 0.04, 0.3);
+  const inspect = smoothRange(progress, 0.2, 0.46);
+  const rebuild = smoothRange(progress, 0.43, 0.76);
+  const resolve = smoothRange(progress, 0.7, 0.95);
+  const inspectionPresence = inspect * (1 - smoothRange(progress, 0.55, 0.82));
+  const coreQuiet = mix(1, 0.34, inherit);
+  const spread = mobile ? 0.62 : 1;
+
+  return {
+    composition: mobile ? "copy-left" : "copy-right",
+    root: {
+      x: mobile ? 0 : tablet ? -0.18 : -0.46,
+      y: mobile ? -0.3 : 0,
+      scale: mobile ? 0.74 : tablet ? 0.84 : 0.88,
+      rotationY: threePoint(progress, 0.04, 0.38, 0.88, -0.28, -0.52, -0.16),
+    },
+    camera: mobile
+      ? {
+          x: threePoint(progress, 0.04, 0.4, 0.9, 7.9, 6.8, 8.2),
+          y: threePoint(progress, 0.04, 0.4, 0.9, 5.3, 4.2, 5.25),
+          z: threePoint(progress, 0.04, 0.4, 0.9, 13.7, 11.6, 13.4),
+          lookZ: mix(-0.15, -0.58, inspectionPresence),
+          lookY: -0.14,
+        }
+      : {
+          x: threePoint(progress, 0.04, 0.4, 0.9, 8.2, 6.25, 8.4),
+          y: threePoint(progress, 0.04, 0.4, 0.9, 4.9, 3.55, 5.05),
+          z: threePoint(progress, 0.04, 0.4, 0.9, 10.5, 7.35, 10.5),
+          lookZ: mix(-0.2, -0.82, inspectionPresence),
+          lookY: -0.1,
+        },
+    roles: {
+      interface: { opacity: mix(coreQuiet, 0.52, resolve) },
+      api: { opacity: mix(coreQuiet, 0.62, resolve) },
+      service: { opacity: mix(coreQuiet, 0.54, resolve) },
+      data: { opacity: mix(coreQuiet, 0.58, resolve) },
+      workbench: { opacity: mix(0.72, 0.28, inherit) },
+      constraints: { opacity: mix(0.34, 0, smoothRange(progress, 0, 0.16)) },
+      delivery: {
+        x: mix(0, 1.2, smoothRange(progress, 0, 0.18)),
+        opacity: mix(1, 0, smoothRange(progress, 0, 0.18)),
+      },
+      legacy: {
+        x: mix(-2.2 * spread, 0, inherit),
+        y: mix(0.6, 0, inherit),
+        z: mix(-1.3 * spread, 0, inherit),
+        scale: mix(0.7, 1, inherit),
+        rotationY: mix(-0.5, 0, inherit),
+        opacity: mix(inherit, 0.22, resolve),
+      },
+      inspection: {
+        x: mix(-1.1 * spread, 1.1 * spread, inspect),
+        z: mix(-0.8, 0, inspect),
+        opacity: inspectionPresence,
+      },
+      rebuild: {
+        x: mix(2.4 * spread, 0, rebuild),
+        y: mix(0.65, 0, rebuild),
+        z: mix(-0.9 * spread, 0, rebuild),
+        scale: mix(0.68, 1, rebuild),
+        rotationY: mix(0.65, 0, rebuild),
+        opacity: rebuild,
+      },
+      shared: {
+        y: mix(-0.4, 0, resolve),
+        scale: mix(0.72, 1, resolve),
+        opacity: resolve,
+      },
+    },
+  };
+}
+
 const COMPOSITIONS: Record<IntegratedChapterId, CompositionMode> = {
   "what-i-build-now": "copy-left",
   "before-the-system": "copy-left",
   "spotify-clone": "copy-right",
   "first-real-system": "copy-left",
-  "client-work": "copy-left",
-  "rebuilding-model": "copy-left",
+  "client-work": "copy-right",
+  "rebuilding-model": "copy-right",
   "building-genko": "copy-left",
   "ai-engineering": "copy-left",
   "quantx-experiment": "copy-left",
@@ -308,7 +515,14 @@ export function compositionForChapter(
   chapterId: IntegratedChapterId,
   viewport: GraphViewport,
 ): CompositionMode {
-  if (chapterId === "spotify-clone" && viewport === "mobile") return "copy-left";
+  if (
+    viewport === "mobile"
+    && (chapterId === "spotify-clone"
+      || chapterId === "client-work"
+      || chapterId === "rebuilding-model")
+  ) {
+    return "copy-left";
+  }
   return COMPOSITIONS[chapterId];
 }
 
@@ -322,5 +536,8 @@ export function sampleChoreography(
   if (chapterId === "what-i-build-now") return currentAssemblyTrack(progress, viewport);
   if (chapterId === "before-the-system") return beforeSystemTrack(progress, viewport);
   if (chapterId === "spotify-clone") return spotifyTrack(progress, viewport);
+  if (chapterId === "first-real-system") return bellyBasketTrack(progress, viewport);
+  if (chapterId === "client-work") return clientWorkTrack(progress, viewport);
+  if (chapterId === "rebuilding-model") return rebuildingTrack(progress, viewport);
   return { composition: compositionForChapter(chapterId, viewport), roles: {} };
 }

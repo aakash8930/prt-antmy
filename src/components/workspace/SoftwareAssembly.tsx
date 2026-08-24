@@ -1127,6 +1127,9 @@ export function SoftwareAssembly({
     const basePositions = Object.fromEntries(
       Object.entries(roles).map(([name, group]) => [name, group.position.clone()]),
     ) as Record<SceneRole, THREE.Vector3>;
+    const baseRotations = Object.fromEntries(
+      Object.entries(roles).map(([name, group]) => [name, group.rotation.clone()]),
+    ) as Record<SceneRole, THREE.Euler>;
     let renderedMode = modeRef.current;
     let targets = targetsForMode(renderedMode);
     (Object.keys(roles) as SceneRole[]).forEach((name) => {
@@ -1208,6 +1211,23 @@ export function SoftwareAssembly({
         }
         group.position.y = THREE.MathUtils.lerp(group.position.y, targetY, factor);
         group.position.z = THREE.MathUtils.lerp(group.position.z, targetZ, factor);
+        group.rotation.x = THREE.MathUtils.lerp(
+          group.rotation.x,
+          baseRotations[name].x + (track?.rotationX ?? 0),
+          factor,
+        );
+        if (name !== "learning") {
+          group.rotation.y = THREE.MathUtils.lerp(
+            group.rotation.y,
+            baseRotations[name].y + (track?.rotationY ?? 0),
+            factor,
+          );
+        }
+        group.rotation.z = THREE.MathUtils.lerp(
+          group.rotation.z,
+          baseRotations[name].z + (track?.rotationZ ?? 0),
+          factor,
+        );
         const trackedScale = track?.scale ?? target.scale;
         group.scale.x = THREE.MathUtils.lerp(
           group.scale.x,
@@ -1232,8 +1252,10 @@ export function SoftwareAssembly({
       });
 
       const activeMode = modeRef.current;
-      const inspectionX = activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0;
-      const rebuildX = activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0;
+      const inspectionX = choreography.roles.inspection?.x
+        ?? (activeMode === "inspection" ? THREE.MathUtils.lerp(-0.72, 0.72, chapterProgress) : 0);
+      const rebuildX = choreography.roles.rebuild?.x
+        ?? (activeMode === "rebuildGrowing" ? THREE.MathUtils.lerp(0.72, 0, chapterProgress) : 0);
       const activeAiMode = AI_MODES.has(activeMode);
       const activeQuantMode = QUANT_MODES.has(activeMode);
       const aiDetachProgress = activeMode === "aiBoundary" ? THREE.MathUtils.clamp(chapterProgress / 0.3, 0, 1) : activeAiMode ? 1 : 0;
