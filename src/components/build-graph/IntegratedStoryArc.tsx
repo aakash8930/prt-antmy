@@ -160,7 +160,7 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
       data-active-chapter={runtime.chapterId}
       data-visual-state={runtime.state}
       data-visual-phase={runtime.phase}
-      data-composition={compositionForChapter(runtime.chapterId)}
+      data-composition={compositionForChapter(runtime.chapterId, runtime.viewport)}
       data-reduced-motion={runtime.reducedMotion ? "true" : "false"}
     >
       <div className="story-arc-visual-layer">

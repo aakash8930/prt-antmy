@@ -1208,8 +1208,22 @@ export function SoftwareAssembly({
         }
         group.position.y = THREE.MathUtils.lerp(group.position.y, targetY, factor);
         group.position.z = THREE.MathUtils.lerp(group.position.z, targetZ, factor);
-        const scale = THREE.MathUtils.lerp(group.scale.x, track?.scale ?? target.scale, factor);
-        group.scale.setScalar(scale);
+        const trackedScale = track?.scale ?? target.scale;
+        group.scale.x = THREE.MathUtils.lerp(
+          group.scale.x,
+          track?.scaleX ?? trackedScale,
+          factor,
+        );
+        group.scale.y = THREE.MathUtils.lerp(
+          group.scale.y,
+          track?.scaleY ?? trackedScale,
+          factor,
+        );
+        group.scale.z = THREE.MathUtils.lerp(
+          group.scale.z,
+          track?.scaleZ ?? trackedScale,
+          factor,
+        );
         const currentOpacity = group.userData.roleOpacity ?? 0;
         setGroupOpacity(
           group,
