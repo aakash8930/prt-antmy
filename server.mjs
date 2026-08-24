@@ -27,4 +27,4 @@ createServer((request, response) => {
     "cache-control": extname(file) === ".jpg" ? "public, max-age=31536000, immutable" : "no-cache",
   });
   createReadStream(file).pipe(response);
-}).listen(port, host, () => console.log(`Abyssal story running at http://${host}:${port}`));
+}).listen(port, host, () => console.log(`Deep Ocean Expedition running at http://${host}:${port}`));

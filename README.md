@@ -1,4 +1,4 @@
-# Abyssal One
+# The Deep Ocean Expedition
 
 A complete cinematic, scroll-driven field story and fictional expedition archive built as an independent interactive design project.
 
