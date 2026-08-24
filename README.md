@@ -12,7 +12,7 @@ Open `http://localhost:3000`.
 
 ## Interaction
 
-Scroll position is mapped deterministically across nine visual chapters. A composited motion system physically assembles the pressure frame, viewport, hull panels, ballast, halo and sampling arms; later chapters add pressure waves, drifting water, bioluminescent life, sampling motion and the final surface signal. Scrolling upward reconstructs every motion state in reverse. Reduced-motion preferences switch to complete static chapter frames.
+Scroll position is mapped deterministically across nine visual chapters. Scrolling upward reconstructs the same sequence in reverse. Reduced-motion preferences switch the crossfades to static chapter frames.
 
 The experience includes dedicated landscape and portrait artwork, an accessible chapter index, live depth telemetry, responsive vessel specifications, a linked field record, and a concise interactive case file.
 
