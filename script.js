@@ -2,6 +2,8 @@
   const chapters = [...document.querySelectorAll(".chapter")];
   const frames = [...document.querySelectorAll(".scene__frame")];
   const frameImages = frames.map((frame) => frame.querySelector("img"));
+  const motionImages = [...document.querySelectorAll(".motion-world img")];
+  const preloadImages = [...frameImages, ...motionImages];
   const links = [...document.querySelectorAll(".chapter-menu a")];
   const loader = document.querySelector(".loader");
   const loaderCount = loader.querySelector("span");
@@ -9,6 +11,19 @@
   const indexButton = document.querySelector(".masthead__index");
   const menu = document.querySelector(".chapter-menu");
   const archive = document.querySelector(".archive");
+  const motionWorld = document.querySelector(".motion-world");
+  const motionCapsule = document.querySelector(".motion-capsule");
+  const motionParts = Object.fromEntries(
+    [...document.querySelectorAll(".motion-part")].map((part) => [
+      [...part.classList].find((name) => name.startsWith("motion-part--")).replace("motion-part--", ""),
+      part,
+    ]),
+  );
+  const particleField = document.querySelector(".motion-field__particles");
+  const organismField = document.querySelector(".motion-field__organisms");
+  const pressureField = document.querySelector(".motion-field__pressure");
+  const sampleField = document.querySelector(".motion-field__sample");
+  const signalField = document.querySelector(".motion-field__signal");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
   let metrics = [];
@@ -22,19 +37,105 @@
     const t = clamp(value);
     return t * t * (3 - 2 * t);
   };
+  const range = (value, start, end) => ease((value - start) / (end - start));
+  const mix = (from, to, progress) => from + (to - from) * progress;
+
+  // Deterministic ambient life: no layout changes between reloads or while reversing.
+  for (let index = 0; index < 34; index += 1) {
+    const particle = document.createElement("i");
+    particle.className = "motion-particle";
+    particle.style.setProperty("--left", `${(index * 37) % 101}%`);
+    particle.style.setProperty("--top", `${(index * 61) % 103}%`);
+    particle.style.setProperty("--size", `${1 + (index % 3)}px`);
+    particle.style.setProperty("--alpha", `${.16 + (index % 5) * .08}`);
+    particle.style.setProperty("--duration", `${3.8 + (index % 7) * .7}s`);
+    particle.style.setProperty("--delay", `${-(index % 8) * .6}s`);
+    particle.style.setProperty("--drift", `${-18 + (index % 9) * 5}px`);
+    particleField.append(particle);
+  }
+  for (let index = 0; index < 11; index += 1) {
+    const organism = document.createElement("i");
+    organism.className = "motion-organism";
+    organism.style.setProperty("--left", `${16 + (index * 19) % 72}%`);
+    organism.style.setProperty("--top", `${14 + (index * 31) % 65}%`);
+    organism.style.setProperty("--size", `${12 + (index % 4) * 8}px`);
+    organism.style.setProperty("--duration", `${3.5 + (index % 5)}s`);
+    organism.style.setProperty("--delay", `${-(index % 6) * .8}s`);
+    organism.style.setProperty("--tail", `${-24 + (index % 7) * 8}deg`);
+    organismField.append(organism);
+  }
+
+  function setPart(name, progress, from) {
+    const part = motionParts[name];
+    part.style.setProperty("--part-opacity", progress.toFixed(3));
+    part.style.setProperty("--tx", `${mix(from.x, 0, progress).toFixed(1)}px`);
+    part.style.setProperty("--ty", `${mix(from.y, 0, progress).toFixed(1)}px`);
+    part.style.setProperty("--rotation", `${mix(from.rotation, 0, progress).toFixed(1)}deg`);
+    part.style.setProperty("--part-scale", mix(from.scale, 1, progress).toFixed(3));
+  }
+
+  function renderMotion(narrative) {
+    const instant = reduceMotion.matches;
+    const worldOpacity = instant ? 0 : 1 - range(narrative, 2.35, 2.95);
+    const core = range(narrative, .04, .48);
+    const viewport = range(narrative, .28, .9);
+    const ballast = range(narrative, .56, 1.16);
+    const panels = range(narrative, .92, 1.58);
+    const halo = range(narrative, 1.25, 1.82);
+    const arms = range(narrative, 1.48, 2.16);
+
+    motionWorld.style.setProperty("--world-opacity", worldOpacity.toFixed(3));
+    motionCapsule.style.setProperty("--capsule-scale", `${matchMedia("(max-width: 640px)").matches ? .67 : matchMedia("(max-width: 900px) and (orientation: portrait)").matches ? .82 : 1}`);
+    motionCapsule.style.setProperty("--capsule-y", `${mix(48, 0, core) + Math.sin(narrative * 3.2) * 3}px`);
+    motionCapsule.style.setProperty("--capsule-rotation", `${mix(-5, 0, core)}deg`);
+    motionCapsule.style.setProperty("--glass-opacity", viewport.toFixed(3));
+    motionCapsule.style.setProperty("--glass-scale", mix(.28, 1, viewport).toFixed(3));
+    motionCapsule.style.setProperty("--beam-opacity", range(narrative, 1.7, 2.2).toFixed(3));
+    motionCapsule.style.setProperty("--lights-opacity", range(narrative, 1.82, 2.22).toFixed(3));
+
+    setPart("core", core, { x: 0, y: -120, rotation: -7, scale: .68 });
+    setPart("viewport", viewport, { x: -270, y: -40, rotation: -42, scale: .42 });
+    setPart("ballast", ballast, { x: 0, y: 230, rotation: 0, scale: .58 });
+    setPart("panel-left", panels, { x: -250, y: 28, rotation: -18, scale: .82 });
+    setPart("panel-right", panels, { x: 250, y: 28, rotation: 18, scale: .82 });
+    setPart("halo", halo, { x: 0, y: -210, rotation: 8, scale: .55 });
+    setPart("arm-left", arms, { x: -350, y: 100, rotation: -34, scale: .75 });
+    setPart("arm-right", arms, { x: 350, y: 100, rotation: 34, scale: .75 });
+
+    const fieldIn = range(narrative, 2.72, 3.3);
+    const fieldOut = 1 - range(narrative, 7.82, 8);
+    particleField.style.setProperty("--field-opacity", (instant ? 0 : fieldIn * fieldOut).toFixed(3));
+    particleField.style.setProperty("--field-y", `${(narrative - 3) * -22}px`);
+
+    const pressure = range(narrative, 4.25, 4.95) * (1 - range(narrative, 5.32, 5.78));
+    pressureField.style.setProperty("--pressure-opacity", (instant ? 0 : pressure).toFixed(3));
+    pressureField.style.setProperty("--pressure-scale", mix(.55, 1.22, range(narrative, 4.25, 5.6)).toFixed(3));
+
+    const organisms = range(narrative, 5.45, 6.08) * (1 - range(narrative, 6.72, 7.15));
+    organismField.style.setProperty("--organism-opacity", (instant ? 0 : organisms).toFixed(3));
+    organismField.style.setProperty("--organism-scale", mix(.65, 1.12, range(narrative, 5.45, 6.85)).toFixed(3));
+
+    const sample = range(narrative, 6.58, 7.24);
+    sampleField.style.setProperty("--sample-opacity", (instant ? 0 : sample * (1 - range(narrative, 7.55, 7.85))).toFixed(3));
+    sampleField.style.setProperty("--sample-progress", sample.toFixed(3));
+
+    const signal = range(narrative, 7.5, 8);
+    signalField.style.setProperty("--signal-opacity", (instant ? 0 : signal).toFixed(3));
+    signalField.style.setProperty("--signal-progress", signal.toFixed(3));
+  }
 
   function markLoaded(index) {
     if (readyFrames.has(index)) return;
     readyFrames.add(index);
     loaded += 1;
-    loaderCount.textContent = String(Math.round((loaded / frames.length) * 100)).padStart(2, "0");
-    if (!firstReady && [0, 1, 2].every((frame) => readyFrames.has(frame))) {
+    loaderCount.textContent = String(Math.round((loaded / preloadImages.length) * 100)).padStart(2, "0");
+    if (!firstReady && readyFrames.size === preloadImages.length) {
       firstReady = true;
       requestAnimationFrame(() => loader.classList.add("is-gone"));
     }
   }
 
-  frameImages.forEach((image, index) => {
+  preloadImages.forEach((image, index) => {
     if (image.complete) markLoaded(index);
     else {
       image.addEventListener("load", () => markLoaded(index), { once: true });
@@ -77,6 +178,7 @@
     const viewportHeight = window.innerHeight;
     const focus = window.scrollY + viewportHeight * 0.5;
     const narrative = getNarrativePosition(focus);
+    renderMotion(narrative);
     const activeIndex = Math.round(narrative);
     const active = metrics[activeIndex];
 
