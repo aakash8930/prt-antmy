@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #08090a;
+  --panel: #0d1011;
+  --acid: #d9ff5f;
+  --signal: #8ce8ff;
+  --muted: #899294;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ink);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  background: var(--ink);
+  color: white;
+  font-family: Arial, "Helvetica Neue", sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--acid);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 232, 255, 0.35);
+  border-radius: 999px;
+}
+
+html {
+  scrollbar-color: rgba(140, 232, 255, 0.35) var(--ink);
+  scrollbar-width: thin;
+}
+
+@layer components {
+  .eyebrow {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .hero-stage {
+    background: #070c0f;
+  }
+
+  .hero-image {
+    background-image: linear-gradient(90deg, rgba(7, 12, 15, 0.88) 0%, rgba(7, 12, 15, 0.3) 55%, rgba(7, 12, 15, 0.22) 100%), url("/ai-core-style-frame.jpg");
+    background-position: center;
+    background-size: cover;
+    filter: saturate(0.92);
+  }
+
+  .hero-grid {
+    background-image: linear-gradient(rgba(140, 232, 255, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(140, 232, 255, 0.06) 1px, transparent 1px);
+    background-size: 68px 68px;
+    mask-image: linear-gradient(to bottom, black, transparent 82%);
+    opacity: 0.55;
+  }
+
+  .hero-glow {
+    background: radial-gradient(circle at 72% 38%, rgba(140, 232, 255, 0.12), transparent 30%), radial-gradient(circle at 92% 80%, rgba(217, 255, 95, 0.08), transparent 26%);
+  }
+
+  .stage-vignette {
+    background: linear-gradient(180deg, rgba(8, 9, 10, 0.08) 0%, rgba(8, 9, 10, 0.04) 42%, rgba(8, 9, 10, 0.8) 100%), radial-gradient(circle at center, transparent 22%, rgba(8, 9, 10, 0.56) 100%);
+  }
+
+  .enter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    width: fit-content;
+    border: 1px solid rgba(217, 255, 95, 0.65);
+    padding: 14px 17px 14px 18px;
+    color: var(--acid);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+    transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+  }
+
+  .enter-button:hover {
+    border-color: var(--acid);
+    background: var(--acid);
+    color: var(--ink);
+  }
+
+  .enter-arrow {
+    font-size: 17px;
+    line-height: 0.5;
+  }
+}
+
+@keyframes cursor-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(217, 255, 95, 0.35);
+    opacity: 0.65;
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(217, 255, 95, 0.85);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-image {
+    background-position: 58% center;
+  }
+
+  .hero-grid {
+    background-size: 46px 46px;
+  }
+}
