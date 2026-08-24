@@ -130,6 +130,11 @@ export function IntegratedStoryArc({ chapters }: IntegratedStoryArcProps) {
       ) {
         runtimeRef.current = next;
         setRuntime(next);
+        if (previous.chapterId !== next.chapterId) {
+          window.dispatchEvent(
+            new CustomEvent("story:chapter-change", { detail: next.chapterId }),
+          );
+        }
       }
     };
 

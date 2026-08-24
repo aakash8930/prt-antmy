@@ -90,9 +90,14 @@
 }
 
 .story-nav-chapters a:hover,
-.story-nav-chapters a:focus-visible {
+.story-nav-chapters a:focus-visible,
+.story-nav-chapters a[aria-current="step"] {
   color: var(--redline);
   background: var(--redline-soft);
+}
+
+.story-nav-chapters a[aria-current="step"] {
+  box-shadow: inset 0 -1px var(--redline);
 }
 
 .story-nav-menu {
@@ -1122,6 +1127,11 @@ blockquote {
 
   .story-nav-menu a span {
     color: var(--redline);
+  }
+
+  .story-nav-menu a[aria-current="step"] {
+    color: var(--ink);
+    background: var(--redline-soft);
   }
 
   .story-chapter {

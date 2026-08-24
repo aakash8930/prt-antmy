@@ -1,10 +1,19 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { chapters, quickLinks } from "@/content/story";
 
 export function StoryNavigation() {
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+  const [activeChapter, setActiveChapter] = useState(chapters[0].id);
+
+  useEffect(() => {
+    const handleChapterChange = (event: Event) => {
+      setActiveChapter((event as CustomEvent<string>).detail);
+    };
+    window.addEventListener("story:chapter-change", handleChapterChange);
+    return () => window.removeEventListener("story:chapter-change", handleChapterChange);
+  }, []);
 
   const closeMobileMenu = (chapterId: string) => {
     if (mobileMenuRef.current) mobileMenuRef.current.open = false;
@@ -34,7 +43,11 @@ export function StoryNavigation() {
           <ol>
             {chapters.map((chapter) => (
               <li key={chapter.id}>
-                <a href={`#${chapter.id}`} aria-label={`${chapter.number}, ${chapter.title}`}>
+                <a
+                  href={`#${chapter.id}`}
+                  aria-label={`${chapter.number}, ${chapter.title}`}
+                  aria-current={activeChapter === chapter.id ? "step" : undefined}
+                >
                   {chapter.number}
                 </a>
               </li>
@@ -47,7 +60,11 @@ export function StoryNavigation() {
           <ol>
             {chapters.map((chapter) => (
               <li key={chapter.id}>
-                <a href={`#${chapter.id}`} onClick={() => closeMobileMenu(chapter.id)}>
+                <a
+                  href={`#${chapter.id}`}
+                  aria-current={activeChapter === chapter.id ? "step" : undefined}
+                  onClick={() => closeMobileMenu(chapter.id)}
+                >
                   <span>{chapter.number}</span>
                   {chapter.navLabel}
                 </a>
