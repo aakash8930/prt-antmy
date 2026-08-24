@@ -1,4 +1,4 @@
-import * as THREE from "./node_modules/three/build/three.module.js";
+import * as THREE from "./assets/vendor/three.module.min.js";
 
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (v, a, b) => {
