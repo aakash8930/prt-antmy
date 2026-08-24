@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #031018;
+  --bg-shadow: #02070b;
+  --ocean-blue: #062638;
+  --accent-cyan: #58d8ff;
+  --soft-blue: #8adfff;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-shadow);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: radial-gradient(ellipse 120% 90% at 50% 20%, var(--ocean-blue) 0%, var(--bg-primary) 45%, var(--bg-shadow) 100%);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 220, 255, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 220, 255, 0.5);
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 220, 255, 0.25) rgba(255, 255, 255, 0.05);
+}
+
+@keyframes driftParticle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  90% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateY(-110vh) translateX(var(--drift-x, 20px));
+    opacity: 0;
+  }
+}
+
+@keyframes scrollLine {
+  0%, 100% {
+    transform: scaleY(0.3);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 0.9;
+  }
+}
