@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#020506" />
-  <meta name="description" content="Abyssal One — a scroll-driven cinematic story of construction and descent." />
+  <meta name="description" content="Abyssal One — a responsive, scroll-driven cinematic story of construction, pressure and deep-sea discovery." />
+  <meta property="og:title" content="Abyssal One — An Anatomy of Descent" />
+  <meta property="og:description" content="One vessel. Six thousand metres. A world beyond daylight." />
+  <meta property="og:image" content="assets/abyssal-01-awakening.jpg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <title>Abyssal One — An Anatomy of Descent</title>
   <script>document.documentElement.classList.add("js")</script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -39,6 +44,7 @@
       <li><a href="#discovery"><span>07</span>Contact</a></li>
       <li><a href="#signal"><span>08</span>Signal</a></li>
     </ol>
+    <a class="chapter-menu__archive" href="#archive"><span>Project file</span>Open expedition archive</a>
   </nav>
 
   <div class="scene" aria-hidden="true">
@@ -163,11 +169,88 @@
         <p class="eyebrow">08 · Signal received</p>
         <h2>We went down<br />to look <em>closer.</em></h2>
         <p>Discovery begins when certainty ends.</p>
-        <a href="#awakening">Return to the surface <span aria-hidden="true">↑</span></a>
+        <a href="#archive">Open the expedition archive <span aria-hidden="true">↓</span></a>
       </article>
-      <footer><span>A fictional field story</span><span>Designed for the scroll</span><span>© 2026</span></footer>
     </section>
   </main>
+
+  <section class="archive" id="archive" aria-labelledby="archive-title">
+    <div class="archive__intro">
+      <p class="eyebrow">Expedition archive · A·01</p>
+      <h2 id="archive-title">A vessel designed<br />for the <em>unknown.</em></h2>
+      <p>Abyssal One is a fictional research mission and an interactive study in digital storytelling. The archive extends the cinematic journey with the vessel specification, mission record and design decisions behind the experience.</p>
+    </div>
+
+    <dl class="archive__metrics" aria-label="Mission overview">
+      <div><dt>Maximum depth</dt><dd>6,000 <small>m</small></dd></div>
+      <div><dt>Mission duration</dt><dd>11:42 <small>h</small></dd></div>
+      <div><dt>External pressure</dt><dd>60 <small>MPa</small></dd></div>
+      <div><dt>Research systems</dt><dd>18</dd></div>
+    </dl>
+
+    <div class="systems">
+      <div class="section-heading">
+        <p class="eyebrow">Vessel specification</p>
+        <h3>Four systems.<br />One atmosphere.</h3>
+      </div>
+      <div class="systems__list">
+        <details open>
+          <summary><span>01</span>Pressure chamber<i>+</i></summary>
+          <div><p>A ribbed titanium frame distributes external pressure around a compact spherical chamber. The circular viewport uses a tapered acrylic block that seats more firmly as pressure rises.</p><ul><li>Grade 5 titanium</li><li>Three-person environment</li><li>Acoustic stress monitoring</li></ul></div>
+        </details>
+        <details>
+          <summary><span>02</span>Observation array<i>+</i></summary>
+          <div><p>Low-light optical sensors work beside the main viewport, recording colour and movement without flooding the environment with artificial light.</p><ul><li>4K low-light optics</li><li>Macro sample camera</li><li>Passive illumination mode</li></ul></div>
+        </details>
+        <details>
+          <summary><span>03</span>Sampling arms<i>+</i></summary>
+          <div><p>Twin seven-axis manipulators fold into the vessel silhouette during descent, then extend for precise contact at the seabed.</p><ul><li>Force-feedback control</li><li>Interchangeable tools</li><li>Sterile sample chamber</li></ul></div>
+        </details>
+        <details>
+          <summary><span>04</span>Surface signal<i>+</i></summary>
+          <div><p>A redundant acoustic link carries low-bandwidth telemetry through kilometres of water. Critical data remains stored aboard until recovery.</p><ul><li>Dual acoustic modems</li><li>Emergency ascent beacon</li><li>Local encrypted record</li></ul></div>
+        </details>
+      </div>
+    </div>
+
+    <div class="field-log">
+      <div class="section-heading section-heading--row">
+        <div><p class="eyebrow">Selected field record</p><h3>Moments from<br />the descent.</h3></div>
+        <p>Each image is a chapter marker. Select one to return directly to that moment in the expedition.</p>
+      </div>
+      <div class="field-log__grid">
+        <a href="#assembly"><img src="assets/abyssal-03-assembly.jpg" alt="Abyssal One components arranged in an exploded assembly" loading="lazy" /><span><b>02</b>Assembly</span></a>
+        <a href="#descent"><img src="assets/abyssal-05-descent.jpg" alt="The capsule descending beneath the last surface light" loading="lazy" /><span><b>04</b>Leaving daylight</span></a>
+        <a href="#life"><img src="assets/abyssal-07-life.jpg" alt="Bioluminescent organisms surrounding the capsule" loading="lazy" /><span><b>06</b>Life below light</span></a>
+        <a href="#discovery"><img src="assets/abyssal-08-discovery.jpg" alt="The sampling arm reaching toward a mineral structure" loading="lazy" /><span><b>07</b>The seabed</span></a>
+      </div>
+    </div>
+
+    <div class="case-file">
+      <div class="section-heading">
+        <p class="eyebrow">Interactive case file</p>
+        <h3>Designed for<br />the <em>scroll.</em></h3>
+      </div>
+      <div class="case-file__body">
+        <p class="case-file__lead">The purpose of this concept is simple: make scrolling feel like physically advancing and reversing a film—not moving between a stack of webpages.</p>
+        <div class="case-file__grid">
+          <article><span>01</span><h4>Deterministic motion</h4><p>Every visual state is calculated directly from document position. Scrolling upward reconstructs the same expedition in reverse.</p></article>
+          <article><span>02</span><h4>Art-directed devices</h4><p>Landscape and portrait screens receive separately composed artwork rather than relying on one aggressively cropped image.</p></article>
+          <article><span>03</span><h4>Progressive delivery</h4><p>The opening sequence loads first. Remaining scenes are prepared in the background, with a readable static experience when scripts are unavailable.</p></article>
+          <article><span>04</span><h4>Inclusive by default</h4><p>Reduced-motion visitors receive complete static chapter frames, while semantic headings, native controls and keyboard navigation remain available.</p></article>
+        </div>
+        <p class="case-file__stack"><span>Built with</span>Semantic HTML · Responsive CSS · Vanilla JavaScript · Generated cinematic artwork</p>
+      </div>
+    </div>
+
+    <div class="archive__closing">
+      <p class="eyebrow">End of field record</p>
+      <h3>The surface is<br />only the <em>beginning.</em></h3>
+      <div><a href="#awakening">Replay the descent <span aria-hidden="true">↑</span></a><p>A fictional field story created as an independent interactive design project.</p></div>
+    </div>
+
+    <footer class="site-footer"><span>Abyssal Research Unit · A·01</span><span>Responsive cinematic storytelling</span><span>© 2026</span></footer>
+  </section>
 
   <noscript><div class="no-script">This story uses scroll to move through the expedition. Enable JavaScript for the cinematic sequence.</div></noscript>
 </body>

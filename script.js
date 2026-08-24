@@ -8,6 +8,7 @@
   const depthReadout = document.querySelector(".masthead__depth strong");
   const indexButton = document.querySelector(".masthead__index");
   const menu = document.querySelector(".chapter-menu");
+  const archive = document.querySelector(".archive");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
   let metrics = [];
@@ -117,8 +118,11 @@
     document.body.dataset.side = side;
     document.body.dataset.chapter = active.chapter.id;
 
+    const archiveActive = archive.getBoundingClientRect().top <= viewportHeight * 0.5;
     links.forEach((link) => {
-      const current = link.hash === `#${active.chapter.id}`;
+      const current = archiveActive
+        ? link.hash === "#archive"
+        : link.hash === `#${active.chapter.id}`;
       if (current) link.setAttribute("aria-current", "step");
       else link.removeAttribute("aria-current");
     });
