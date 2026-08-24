@@ -889,14 +889,14 @@ blockquote {
 /* Contact ------------------------------------------------------------- */
 .story-footer {
   position: relative;
-  width: min(100%, var(--page-max));
-  min-height: 70svh;
-  margin: 0 auto;
-  padding: clamp(100px, 13vw, 180px) var(--gutter) 44px;
+  width: 100%;
+  min-height: calc(100svh - 72px);
+  margin: 0;
+  padding: clamp(76px, 8vw, 116px) var(--gutter) 44px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
   grid-template-rows: auto 1fr auto;
-  gap: 48px;
+  gap: 32px clamp(48px, 8vw, 140px);
   background:
     radial-gradient(circle at 75% 45%, rgba(131, 180, 191, 0.08), transparent 35%);
 }
@@ -914,8 +914,8 @@ blockquote {
 .story-footer-handoff__line {
   position: absolute;
   top: 0;
-  right: 14%;
-  width: min(42vw, 540px);
+  right: 7%;
+  width: min(58vw, 920px);
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--redline) 30%, rgba(239, 115, 83, 0.68));
 }
@@ -923,7 +923,7 @@ blockquote {
 .story-footer-handoff__port {
   position: absolute;
   top: -4px;
-  right: calc(14% - 4px);
+  right: calc(7% - 4px);
   width: 9px;
   height: 9px;
   border: 1px solid var(--redline);
@@ -934,7 +934,7 @@ blockquote {
 .story-footer-handoff__label {
   position: absolute;
   top: 14px;
-  right: 14%;
+  right: 7%;
   font: 600 8px/1.2 var(--font-mono);
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -977,10 +977,12 @@ blockquote {
 
 .story-footer-actions {
   display: flex;
+  width: min(100%, 520px);
+  justify-self: end;
   align-items: flex-start;
   flex-direction: column;
   gap: 20px;
-  padding-top: 48px;
+  padding-top: 32px;
 }
 
 .story-footer-actions a {
@@ -1286,9 +1288,9 @@ blockquote {
   }
 
   .story-footer {
-    min-height: 0;
+    min-height: calc(100svh - 64px);
     grid-template-columns: 1fr;
-    padding-top: 100px;
+    padding-top: 82px;
   }
 
   .story-footer-index,
@@ -1297,6 +1299,8 @@ blockquote {
   }
 
   .story-footer-actions {
+    width: 100%;
+    justify-self: stretch;
     padding-top: 0;
   }
 }
@@ -1403,7 +1407,7 @@ blockquote {
 }
 
 .story-chapter--integrated#how-i-build-now {
-  min-height: max(1450px, 205svh);
+  min-height: max(1550px, 220svh);
 }
 
 .story-chapter--integrated .chapter-heading,

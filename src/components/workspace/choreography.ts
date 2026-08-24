@@ -743,6 +743,97 @@ function quantxTrack(progress: number, viewport: GraphViewport): ChoreographyFra
   };
 }
 
+function finaleTrack(progress: number, viewport: GraphViewport): ChoreographyFrame {
+  const mobile = viewport === "mobile";
+  const tablet = viewport === "tablet";
+  const compress = smoothRange(progress, 0.02, 0.26);
+  const revealProvenance = smoothRange(progress, 0.2, 0.56);
+  const frontier = smoothRange(progress, 0.7, 0.9);
+  const handoff = smoothRange(progress, 0.9, 1);
+  const quantExit = smoothRange(progress, 0.02, 0.24);
+  const coreQuiet = smoothRange(progress, 0.68, 1);
+  const rootStart = mobile ? 0 : tablet ? 0.08 : 0.32;
+  const rootCompressed = mobile ? 0 : tablet ? 0.42 : 0.62;
+  const rootBeforeHandoff = mix(mix(rootStart, rootCompressed, compress), mobile ? 0 : -0.18, frontier);
+  const rootEnd = mobile ? 0 : tablet ? -0.72 : -1.58;
+  const scaleStart = mobile ? 0.68 : 0.76;
+  const scaleCompressed = mobile ? 0.7 : tablet ? 0.82 : 0.86;
+  const scaleEnd = mobile ? 0.58 : tablet ? 0.66 : 0.68;
+
+  return {
+    composition: "copy-left",
+    root: {
+      x: mix(rootBeforeHandoff, rootEnd, handoff),
+      y: mobile ? mix(-0.34, 0.15, handoff) : 0,
+      scale: mix(mix(scaleStart, scaleCompressed, compress), scaleEnd, handoff),
+      rotationY: mix(-0.06, 0.02, handoff),
+    },
+    camera: mobile
+      ? {
+          x: mix(mix(8.8, 8.7, compress), 9.15, handoff),
+          y: mix(mix(5.7, 5.65, compress), 5.2, handoff),
+          z: mix(mix(15.2, 14.8, compress), 15.4, handoff),
+          lookY: mix(-0.05, 0.12, handoff),
+        }
+      : {
+          x: mix(mix(9.1, 8.05, compress), 9.35, handoff),
+          y: mix(5.3, 5.05, handoff),
+          z: mix(mix(11.9, 10.25, compress), 12.9, handoff),
+          lookY: -0.08,
+        },
+    roles: {
+      interface: { opacity: mix(mix(0.3, 0.72, compress), 0.14, coreQuiet) },
+      api: { opacity: mix(mix(0.46, 0.76, compress), 0.32, coreQuiet) },
+      service: { opacity: mix(mix(0.5, 0.8, compress), 0.2, coreQuiet) },
+      data: { opacity: mix(mix(1, 0.76, compress), 0.24, coreQuiet) },
+      workbench: { x: mix(0, -1.1, compress), opacity: mix(0.42, 0, compress) },
+      market: { x: mix(0, 1.4, quantExit), opacity: mix(0.2, 0, quantExit) },
+      features: { x: mix(0, 1, quantExit), opacity: mix(0.38, 0, quantExit) },
+      models: { x: mix(0, 1.3, quantExit), scaleZ: mix(1.18, 0.22, quantExit), opacity: mix(0.46, 0, quantExit) },
+      riskGates: { x: mix(0, -0.8, quantExit), opacity: mix(0.7, 0, quantExit) },
+      actions: { x: mix(0, -1.1, quantExit), opacity: mix(0.52, 0, quantExit) },
+      unresolved: {
+        x: mix(0, -1.5, quantExit),
+        y: mix(0, 0.8, quantExit),
+        opacity: mix(1, 0, quantExit),
+      },
+      capability: {
+        y: mix(0.45, 0, compress),
+        z: mix(0.7, 0, compress),
+        scaleX: mix(1.28, 1, compress),
+        scaleY: mix(1.28, 1, compress),
+        scaleZ: mix(1.55, 1, compress),
+        opacity: mix(0, mix(1, 0.22, handoff), compress),
+      },
+      provenance: {
+        x: mix(-1.8, 0, revealProvenance),
+        y: mix(0.7, 0, revealProvenance),
+        z: mix(-1.2, 0, revealProvenance),
+        rotationY: mix(-0.62, 0, revealProvenance),
+        opacity: mix(0, mix(1, 0.2, handoff), revealProvenance),
+      },
+      frontier: {
+        x: mix(-1.1, 0, frontier),
+        y: mobile ? mix(2.2, 2.8, frontier) : 0,
+        rotationZ: mobile ? -Math.PI / 2 : 0,
+        scaleX: mix(0.18, 1, frontier),
+        scaleY: 1,
+        scaleZ: 1,
+        opacity: frontier * mix(1, 0.28, handoff),
+      },
+      contact: {
+        x: mix(-1.2, 0, handoff),
+        y: mobile ? mix(3.2, 3.8, handoff) : 0,
+        rotationZ: mobile ? -Math.PI / 2 : 0,
+        scaleX: mix(0.08, 1, handoff),
+        scaleY: 1,
+        scaleZ: 1,
+        opacity: handoff,
+      },
+    },
+  };
+}
+
 const COMPOSITIONS: Record<IntegratedChapterId, CompositionMode> = {
   "what-i-build-now": "copy-left",
   "before-the-system": "copy-left",
@@ -788,5 +879,6 @@ export function sampleChoreography(
   if (chapterId === "building-genko") return genkoTrack(progress, viewport);
   if (chapterId === "ai-engineering") return aiEngineeringTrack(progress, viewport);
   if (chapterId === "quantx-experiment") return quantxTrack(progress, viewport);
+  if (chapterId === "how-i-build-now") return finaleTrack(progress, viewport);
   return { composition: compositionForChapter(chapterId, viewport), roles: {} };
 }

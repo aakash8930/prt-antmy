@@ -1279,7 +1279,9 @@ export function SoftwareAssembly({
       const capabilityCompression = activeMode === "accumulated"
         ? THREE.MathUtils.clamp(chapterProgress / 0.22, 0, 1)
         : 1;
-      roles.capability.scale.z = roles.capability.scale.x * THREE.MathUtils.lerp(1.34, 1, capabilityCompression);
+      if (choreography.roles.capability?.scaleZ === undefined) {
+        roles.capability.scale.z = roles.capability.scale.x * THREE.MathUtils.lerp(1.34, 1, capabilityCompression);
+      }
       const frontierStart = portraitViewport ? 0.62 : 0.72;
       const contactStart = portraitViewport ? 0.88 : 0.92;
       const frontierExtension = activeMode === "frontier"
@@ -1287,11 +1289,13 @@ export function SoftwareAssembly({
         : activeMode === "handoff"
           ? 1
           : 0;
-      roles.frontier.position.x = THREE.MathUtils.lerp(roles.frontier.position.x, (1 - frontierExtension) * -0.72, factor);
+      const frontierX = choreography.roles.frontier?.x ?? (1 - frontierExtension) * -0.72;
+      roles.frontier.position.x = THREE.MathUtils.lerp(roles.frontier.position.x, frontierX, factor);
       const contactExtension = activeMode === "handoff"
         ? THREE.MathUtils.clamp((chapterProgress - contactStart) / (1 - contactStart), 0, 1)
         : 0;
-      roles.contact.position.x = THREE.MathUtils.lerp(roles.contact.position.x, (1 - contactExtension) * -0.86, factor);
+      const contactX = choreography.roles.contact?.x ?? (1 - contactExtension) * -0.86;
+      roles.contact.position.x = THREE.MathUtils.lerp(roles.contact.position.x, contactX, factor);
       const learningRotation = activeMode === "genkoLoop" || activeMode === "genkoAI" ? chapterProgress * 1.15 : 0;
       roles.learning.rotation.y = THREE.MathUtils.lerp(roles.learning.rotation.y, learningRotation, factor * 0.6);
 
