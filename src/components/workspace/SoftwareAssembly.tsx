@@ -1259,19 +1259,23 @@ export function SoftwareAssembly({
       const activeAiMode = AI_MODES.has(activeMode);
       const activeQuantMode = QUANT_MODES.has(activeMode);
       const aiDetachProgress = activeMode === "aiBoundary" ? THREE.MathUtils.clamp(chapterProgress / 0.3, 0, 1) : activeAiMode ? 1 : 0;
+      const productAiX = choreography.roles.productAI?.x ?? aiDetachProgress * 1.35;
       roles.inspection.position.x = THREE.MathUtils.lerp(roles.inspection.position.x, inspectionX, factor);
       roles.rebuild.position.x = THREE.MathUtils.lerp(roles.rebuild.position.x, rebuildX, factor);
-      roles.productAI.position.x = THREE.MathUtils.lerp(roles.productAI.position.x, aiDetachProgress * 1.35, factor);
+      roles.productAI.position.x = THREE.MathUtils.lerp(roles.productAI.position.x, productAiX, factor);
       const modelBranchProgress = activeMode === "quantModels"
         ? THREE.MathUtils.clamp((chapterProgress - 0.45) / 0.2, 0, 1)
         : activeQuantMode
           ? 1
           : 0;
-      roles.models.position.x = THREE.MathUtils.lerp(roles.models.position.x, (1 - modelBranchProgress) * 0.64, factor);
+      const modelX = choreography.roles.models?.x ?? (1 - modelBranchProgress) * 0.64;
+      roles.models.position.x = THREE.MathUtils.lerp(roles.models.position.x, modelX, factor);
       const gateProgress = activeMode === "quantGates"
         ? THREE.MathUtils.clamp((chapterProgress - 0.65) / 0.29, 0, 1)
         : 1;
-      roles.riskGates.scale.z = roles.riskGates.scale.x * THREE.MathUtils.lerp(1.32, 1, gateProgress);
+      if (choreography.roles.riskGates?.scaleZ === undefined) {
+        roles.riskGates.scale.z = roles.riskGates.scale.x * THREE.MathUtils.lerp(1.32, 1, gateProgress);
+      }
       const capabilityCompression = activeMode === "accumulated"
         ? THREE.MathUtils.clamp(chapterProgress / 0.22, 0, 1)
         : 1;
