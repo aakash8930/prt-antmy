@@ -31,8 +31,8 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.example npm run build
 
 ## Interaction
 
-Scroll position drives a 240-frame image sequence rendered on an HTML canvas (`components/SubmarineSequence.tsx`), taking the submarine from intact, through an exploded engineering view, to fully reassembled. The sequence is 30-fps ready (240 frames represent an eight-second motion study) while scroll position controls playback rather than elapsed time. Five text beats fade in and out in sync with scroll progress. A closing section (`components/ClosingSignal.tsx`) follows the sequence.
+Scroll position drives a five-beat narrative (`components/SubmarineSequence.tsx`) over a high-resolution static submarine poster. The story moves from first contact, through structure and engineering, to final departure. Framer Motion smooths the text transitions, while the closing section (`components/ClosingSignal.tsx`) follows the story.
 
-The frame sequence lives in `public/sequence/`. The frames are 2560 × 1440 WebP images, upscaled and lightly sharpened from the original 1920 × 1080 sequence to keep the canvas crisp on high-density displays. The renderer uses a nearest available frame while assets are settling, retries neither missing assets nor hides the failure, and supports a static poster for reduced-motion users.
+The project intentionally does not bundle an image-frame sequence. This keeps the experience lightweight and avoids blurry or inconsistent frame playback. The poster and closing artwork are 2560-pixel-wide images and a static fallback is used for reduced-motion users.
 
 The cinematic artwork was generated specifically for this project and is not a third-party stock asset.
