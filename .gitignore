@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+
+# misc
+.DS_Store
+*.pem
+*.log
+
+# typescript
+*.tsbuildinfo
+.next/types/**
+
+# env
+.env*
+!.env.example
+
+# local sequences / generated assets (not committed)
+public/sequence/*.webp
+public/video/*.mp4
+
+# debug
+.volt-debug/
