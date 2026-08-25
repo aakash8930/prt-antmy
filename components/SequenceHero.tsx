@@ -18,6 +18,9 @@ export default function SequenceHero() {
   const cache = useRef<Map<number, HTMLImageElement>>(new Map());
   const pending = useRef<Map<number, Promise<HTMLImageElement>>>(new Map());
   const lastDrawn = useRef<number>(-1);
+  // Image requests resolve out of order. This keeps an old frame from painting
+  // over the latest scroll position after a slower network decode completes.
+  const requestedFrameRef = useRef(0);
   const activeIndexRef = useRef<number>(-1);
   const sequenceFailedRef = useRef(false);
 
@@ -78,11 +81,14 @@ export default function SequenceHero() {
     (index: number) => {
       const cached = cache.current.get(index);
       if (cached) {
-        draw(cached);
-        lastDrawn.current = index;
+        if (index === requestedFrameRef.current) {
+          draw(cached);
+          lastDrawn.current = index;
+        }
         return;
       }
       getImage(index).then((img) => {
+        if (index !== requestedFrameRef.current) return;
         draw(img);
         lastDrawn.current = index;
       });
@@ -158,6 +164,7 @@ export default function SequenceHero() {
         Math.floor(p * FRAME_COUNT)
       );
 
+      requestedFrameRef.current = frameIndex;
       if (!sequenceUnavailable && frameIndex !== lastDrawn.current) {
         showFrame(frameIndex);
       }
