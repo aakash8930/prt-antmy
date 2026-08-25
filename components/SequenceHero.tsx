@@ -19,8 +19,10 @@ export default function SequenceHero() {
   const pending = useRef<Map<number, Promise<HTMLImageElement>>>(new Map());
   const lastDrawn = useRef<number>(-1);
   const activeIndexRef = useRef<number>(-1);
+  const sequenceFailedRef = useRef(false);
 
   const [ready, setReady] = useState(false);
+  const [sequenceUnavailable, setSequenceUnavailable] = useState(false);
   const [loadedCount, setLoadedCount] = useState(0);
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -105,7 +107,10 @@ export default function SequenceHero() {
       })
       // Never leave the entire portfolio blocked behind a failed asset request.
       .catch(() => {
-        if (!cancelled) setReady(true);
+        if (cancelled) return;
+        sequenceFailedRef.current = true;
+        setSequenceUnavailable(true);
+        setReady(true);
       });
 
     let next = 0;
@@ -113,7 +118,7 @@ export default function SequenceHero() {
     let loaded = 0;
 
     const pump = () => {
-      if (cancelled) return;
+      if (cancelled || sequenceFailedRef.current) return;
       while (inFlight < PRELOAD_CONCURRENCY && next < FRAME_COUNT) {
         const i = next++;
         inFlight++;
@@ -153,11 +158,11 @@ export default function SequenceHero() {
         Math.floor(p * FRAME_COUNT)
       );
 
-      if (frameIndex !== lastDrawn.current) {
+      if (!sequenceUnavailable && frameIndex !== lastDrawn.current) {
         showFrame(frameIndex);
       }
 
-      const fade = Math.max(0, 1 - p / 0.12);
+      const fade = sequenceUnavailable ? 1 : Math.max(0, 1 - p / 0.12);
       if (heroTextRef.current) heroTextRef.current.style.opacity = String(fade);
       if (scrollCueRef.current)
         scrollCueRef.current.style.opacity = String(Math.max(0, 1 - p / 0.05));
@@ -190,7 +195,7 @@ export default function SequenceHero() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, [showFrame, draw]);
+  }, [showFrame, draw, sequenceUnavailable]);
 
   useEffect(() => {
     if (progressBarRef.current) {
@@ -203,10 +208,15 @@ export default function SequenceHero() {
   return (
     <section ref={sectionRef} className="relative h-[700vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-background">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(circle at 50% 25%, #1d2411 0%, #0d0f09 32%, #050505 72%)" }}
+        />
         <canvas
           ref={canvasRef}
           aria-hidden
-          className="h-full w-full"
+          className="absolute inset-0 h-full w-full"
           style={{ opacity: ready ? 1 : 0, transition: "opacity 0.4s ease" }}
         />
 
