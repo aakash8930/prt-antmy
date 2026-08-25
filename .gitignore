@@ -6,3 +6,10 @@ build/
 .DS_Store
 .env*
 !.env.example
+source.mp4
+v1.mp4
+v2.mp4
+v3.mp4
+v4.mp4
+watermark-*.mp4
+watermark-*.png

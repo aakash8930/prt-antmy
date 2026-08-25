@@ -1,11 +1,37 @@
-# AI Core — animation frames
+# Aakash Singh — Full-stack developer
 
-The first visual pass for the new site is a futuristic AI-core sequence designed for an Anime.js-style scroll experience.
+A premium, scroll-driven portfolio experience built around a 40-second motion study. Four ten-second videos become 1,200 1080p frames at 30 FPS and are scrubbed by Anime.js through a crisp canvas renderer.
 
-- 240 SVG frames
-- 30 FPS timing
-- 8 seconds of motion
-- 2560 × 1440 frame canvas
-- Generated with `node scripts/generate-ai-sequence.mjs`
+## Run
 
-The SVG frames use the generated `public/ai-core-style-frame.jpg` as the visual anchor and add deterministic vector rings, particles, signals, and a controlled camera push-in. This keeps the sequence coherent, crisp, and lightweight while the website direction is finalized.
+```bash
+npm install
+npm run dev
+```
+
+Production checks:
+
+```bash
+npm run lint
+npm run build
+npm start
+```
+
+## Add the motion frames
+
+The source videos are intentionally not committed. Copy the generated frames into `public/sequence/` using this naming format:
+
+```text
+frame_0000.webp
+frame_0001.webp
+...
+frame_1199.webp
+```
+
+The frame renderer loads a small moving window around the current scroll position, so it does not decode all 1,200 images at once. The first 36 frames are loaded before the motion stage is revealed, and a nearest-frame fallback prevents blank draws while the user scrubs quickly.
+
+## Structure
+
+- `components/PortfolioExperience.tsx` — page composition and Anime.js entrance/reveal motion.
+- `components/FrameSequence.tsx` — Anime.js scroll observer, frame cache, high-DPI canvas rendering, and phase copy.
+- `public/sequence/` — local 30 FPS WebP sequence, supplied separately.

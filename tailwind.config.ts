@@ -5,18 +5,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#08090a",
-        panel: "#0d1011",
-        acid: "#d9ff5f",
-        signal: "#8ce8ff",
-        steel: "#9ca5a7",
+        ink: "#07090b",
+        panel: "#0c1114",
+        cyan: "#a7eaff",
+        ice: "#d8f6ff",
+        violet: "#9b9cff",
+        lime: "#d4f56a",
+        dim: "#68767d",
       },
       fontFamily: {
         display: ["Arial", "Helvetica Neue", "sans-serif"],
         mono: ["SFMono-Regular", "Consolas", "Liberation Mono", "monospace"],
       },
       boxShadow: {
-        glow: "0 0 80px rgba(140, 232, 255, 0.12)",
+        halo: "0 0 90px rgba(167, 234, 255, 0.13)",
       },
     },
   },

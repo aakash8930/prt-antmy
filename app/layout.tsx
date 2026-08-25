@@ -1,30 +1,24 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL;
-const siteUrl = configuredSiteUrl
-  ? configuredSiteUrl.startsWith("http")
-    ? configuredSiteUrl
-    : `https://${configuredSiteUrl}`
-  : undefined;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 const metadataBase = siteUrl ? new URL(siteUrl) : undefined;
-const socialImage = siteUrl ? `${siteUrl.replace(/\/$/, "")}/ai-core-style-frame.jpg` : undefined;
-const socialImageMetadata = socialImage ? { images: [socialImage] } : {};
+const socialImage = siteUrl ? `${siteUrl.replace(/\/$/, "")}/sequence/frame_0000.webp` : undefined;
 
 export const metadata: Metadata = {
   ...(metadataBase ? { metadataBase } : {}),
-  title: "NEXUS — AI systems in motion",
-  description: "A living interface for the next generation of artificial intelligence.",
+  title: "Aakash Singh — Full-stack developer",
+  description: "Aakash Singh crafts digital systems, intelligent interfaces, and products built to scale.",
   icons: { icon: "/favicon.svg" },
   openGraph: {
-    title: "NEXUS — AI systems in motion",
-    description: "A living interface for the next generation of artificial intelligence.",
-    ...socialImageMetadata,
+    title: "Aakash Singh — Full-stack developer",
+    description: "Crafting digital systems with clarity, motion, and purpose.",
+    ...(socialImage ? { images: [socialImage] } : {}),
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    ...socialImageMetadata,
+    ...(socialImage ? { images: [socialImage] } : {}),
   },
 };
 

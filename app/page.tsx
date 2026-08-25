@@ -1,5 +1,5 @@
-import NexusExperience from "@/components/NexusExperience";
+import PortfolioExperience from "@/components/PortfolioExperience";
 
 export default function Home() {
-  return <NexusExperience />;
+  return <PortfolioExperience />;
 }
