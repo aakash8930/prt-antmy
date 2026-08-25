@@ -38,7 +38,10 @@ export default function SequenceHero() {
         pending.current.delete(i);
         resolve(img);
       };
-      img.onerror = reject;
+      img.onerror = () => {
+        pending.current.delete(i);
+        reject(new Error(`Unable to load sequence frame ${i}`));
+      };
       img.src = FRAME_PATH(i);
     });
     pending.current.set(i, promise);
@@ -93,12 +96,17 @@ export default function SequenceHero() {
   useEffect(() => {
     let cancelled = false;
 
-    getImage(0).then((img) => {
-      if (cancelled) return;
-      draw(img);
-      lastDrawn.current = 0;
-      setReady(true);
-    });
+    getImage(0)
+      .then((img) => {
+        if (cancelled) return;
+        draw(img);
+        lastDrawn.current = 0;
+        setReady(true);
+      })
+      // Never leave the entire portfolio blocked behind a failed asset request.
+      .catch(() => {
+        if (!cancelled) setReady(true);
+      });
 
     let next = 0;
     let inFlight = 0;
