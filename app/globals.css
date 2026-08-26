@@ -1,44 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #050505;
-  --surface: #0d0d0f;
-  --surface-2: #131316;
-  --border: rgba(255, 255, 255, 0.1);
-  --foreground: #f5f5f5;
-  --muted: #9a9aa0;
-  --accent: #d7ff3f;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-border: var(--border);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: #0a0a0c;
+  --color-bg-soft: #131316;
+  --color-fg: #f2f0ea;
+  --color-fg-muted: #8b8983;
+  --color-accent: #ff4d1c;
+  --color-line: #232326;
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
-* {
-  box-sizing: border-box;
+/* Custom element resets live in @layer base so Tailwind's own utilities
+   (@layer utilities) always win over them regardless of source order or
+   selector specificity. A rule written outside any @layer is "unlayered"
+   and beats every layered rule, including utilities — bit by this before:
+   an unlayered `a, button { color: inherit }` silently overrode an
+   explicit text-color utility on one button. */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    overflow-x: clip;
+    cursor: none;
+  }
+
+  @media (pointer: fine) {
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    [role="button"] {
+      cursor: none;
+    }
+  }
+
+  @media (pointer: coarse) {
+    body {
+      cursor: auto;
+    }
+  }
+
+  @media (pointer: fine) {
+    a:focus,
+    button:focus,
+    [role="button"]:focus {
+      outline: none;
+    }
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  a,
+  button {
+    color: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), ui-serif, serif;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-  color-scheme: dark;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-}
-
-::selection {
-  background: var(--accent);
-  color: #050505;
+.font-accent {
+  font-family: var(--font-display), ui-serif, serif;
+  font-style: italic;
+  font-variation-settings: "SOFT" 60, "opsz" 60;
 }
 
 ::-webkit-scrollbar {
@@ -46,15 +113,78 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: var(--color-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-2);
+  background: var(--color-bg-soft);
   border-radius: 999px;
-  border: 2px solid var(--background);
+  border: 2px solid var(--color-bg);
 }
 
-.reveal {
-  opacity: 0;
+/* grain overlay — the ::before below intentionally bleeds 200px past the
+   edges so the noise texture never shows a hard border; overflow: hidden
+   here keeps that bleed from widening the page's scrollable area. */
+.grain {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: -200px;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* custom cursor */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-ring {
+  width: 38px;
+  height: 38px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot-visual,
+.cursor-ring-visual {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  will-change: transform;
+  mix-blend-mode: difference;
+}
+
+.cursor-dot-visual {
+  background: var(--color-fg);
+}
+
+.cursor-ring-visual {
+  border: 1px solid var(--color-fg);
+}
+
+@media (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
 }

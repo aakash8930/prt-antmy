@@ -1,21 +1,21 @@
-import Nav from "@/components/Nav";
+import Preloader from "@/components/Preloader";
 import SequenceHero from "@/components/SequenceHero";
-import About from "@/components/About";
-import ProjectShowcase from "@/components/ProjectShowcase";
-import OtherProjects from "@/components/OtherProjects";
-import Skills from "@/components/Skills";
+import Overview from "@/components/Overview";
+import Specs from "@/components/Specs";
+import Journal from "@/components/Journal";
 import Contact from "@/components/Contact";
 
 export default function Home() {
   return (
-    <div id="top" className="flex flex-1 flex-col">
-      <Nav />
-      <SequenceHero />
-      <About />
-      <ProjectShowcase />
-      <OtherProjects />
-      <Skills />
-      <Contact />
-    </div>
+    <>
+      <Preloader />
+      <main className="flex flex-1 flex-col">
+        <SequenceHero />
+        <Overview />
+        <Specs />
+        <Journal />
+        <Contact />
+      </main>
+    </>
   );
 }
